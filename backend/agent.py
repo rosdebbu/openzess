@@ -1,10 +1,21 @@
 import os
 import subprocess
 import requests
+import uuid
 from bs4 import BeautifulSoup
 from duckduckgo_search import DDGS
 import google.generativeai as genai
 from google.generativeai.types import content_types
+
+# Initialize Global ChromaDB Vector Vault
+try:
+    import chromadb
+    from chromadb.config import Settings
+    chroma_client = chromadb.PersistentClient(path="./chroma_db", settings=Settings(allow_reset=True))
+    memory_collection = chroma_client.get_or_create_collection(name="openzess_memory")
+except Exception as e:
+    print(f"Warning: ChromaDB failed to initialize {e}")
+    memory_collection = None
 
 def run_terminal_command(command: str) -> str:
     """Executes a shell command on the user's machine (Windows)."""
@@ -132,10 +143,59 @@ class OpenzessAgent:
             
         return {"reply": response.text, "tools": tool_outputs, "auth_required": False}
 
+    def _ingest_memory(self, prompt: str, reply: str):
+        try:
+            memory_string = f"User inquired: {prompt}\nAI Responded: {reply}"
+            embedding = genai.embed_content(
+                model="models/embedding-001", 
+                content=memory_string
+            )["embedding"]
+            
+            doc_id = str(uuid.uuid4())
+            memory_collection.add(
+                embeddings=[embedding],
+                documents=[memory_string],
+                metadatas=[{"type": "chat_interaction"}],
+                ids=[doc_id]
+            )
+        except Exception as e:
+            print(f"Failed to ingest memory: {e}")
+
     def chat(self, user_prompt: str):
         try:
-            response = self.chat_session.send_message(user_prompt)
-            return self._handle_response_loop(response)
+            self.last_prompt = user_prompt
+            
+            # --- RAG RETRIEVAL ---
+            rag_context = ""
+            if memory_collection is not None:
+                try:
+                    query_embedding = genai.embed_content(
+                        model="models/embedding-001", 
+                        content=user_prompt
+                    )["embedding"]
+                    
+                    results = memory_collection.query(
+                        query_embeddings=[query_embedding], 
+                        n_results=3
+                    )
+                    
+                    if results and results["documents"] and results["documents"][0]:
+                        rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
+                        for doc in results["documents"][0]:
+                            if doc.strip():
+                                rag_context += f"- {doc}\n"
+                except Exception as eval_e:
+                    print(f"RAG Retrieval failed: {eval_e}")
+            
+            enhanced_prompt = user_prompt + rag_context if rag_context else user_prompt
+            response = self.chat_session.send_message(enhanced_prompt)
+            result = self._handle_response_loop(response)
+            
+            # --- RAG INGESTION ---
+            if not result.get("auth_required") and result.get("reply") and memory_collection is not None:
+                self._ingest_memory(self.last_prompt, result["reply"])
+                
+            return result
         except Exception as e:
             return {"reply": f"An error occurred: {str(e)}", "tools": [], "auth_required": False}
 
@@ -161,6 +221,12 @@ class OpenzessAgent:
             if result.get("tools"):
                 tool_outputs.extend(result["tools"])
             result["tools"] = tool_outputs
+            
+            # --- RAG INGESTION ON TOOL SUCCESS ---
+            if not result.get("auth_required") and result.get("reply") and memory_collection is not None:
+                if hasattr(self, 'last_prompt'):
+                    self._ingest_memory(self.last_prompt, result["reply"])
+                    
             return result
         except Exception as e:
             return {"reply": f"An error occurred: {str(e)}", "tools": [], "auth_required": False}

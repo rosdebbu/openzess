@@ -4,6 +4,7 @@ import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, Fi
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Sidebar from './components/Sidebar';
+import CustomCursor from './components/CustomCursor';
 import Chat from './pages/Chat';
 import Files from './pages/Files';
 import Tools from './pages/Tools';
@@ -71,8 +72,10 @@ function App() {
 
   return (
     <ThemeProvider>
+      <CustomCursor />
       <BrowserRouter>
-        <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 overflow-hidden font-sans transition-colors duration-300">
+        <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 overflow-hidden font-sans transition-colors duration-300 relative">
+        <div className="ambient-orb"></div>
         
         {/* Settings Full Modal */}
         <AnimatePresence>

@@ -27,7 +27,40 @@
 
 @layer base {
   body {
-    @apply antialiased font-sans h-screen flex justify-center items-center overflow-hidden;
+    @apply antialiased font-sans h-screen flex justify-center items-center overflow-hidden transition-colors duration-500 text-neutral-900 dark:text-neutral-100;
+  }
+  
+  * {
+      cursor: none !important;
+  }
+  
+  iframe, iframe * {
+      cursor: auto !important;
+  }
+  
+  .ambient-orb {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 70vw;
+      height: 70vh;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--color-brand) 0%, transparent 60%);
+      filter: blur(140px);
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+      animation: driftOrb 18s ease-in-out infinite alternate;
+      transform-origin: center;
+  }
+  
+  .dark .ambient-orb {
+      opacity: 0.06;
+  }
+  
+  @keyframes driftOrb {
+      0% { transform: translate(-50%, -50%) scale(1) translateX(0); }
+      100% { transform: translate(-50%, -50%) scale(1.1) translateX(10vw) translateY(5vh); }
   }
   
   /* Additional scrollbar styling for extra premium feel */

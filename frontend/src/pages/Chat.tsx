@@ -302,7 +302,7 @@ export default function Chat() {
                  </div>
               </motion.div>
           ) : (
-            <div className="w-full max-w-4xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex items-end p-2 px-3 transition-all focus-within:border-brand/40 shadow-xl dark:shadow-2xl relative z-20">
+            <div className="w-full max-w-4xl bg-white/70 dark:bg-black/40 backdrop-blur-3xl border border-white/40 dark:border-white/10 rounded-3xl flex items-end p-2.5 px-4 transition-all focus-within:border-brand/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] relative z-20 overflow-hidden">
               <textarea
                 className="flex-1 bg-transparent border-none text-neutral-900 dark:text-neutral-200 text-base resize-none px-3 py-3 min-h-[50px] max-h-[200px] focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-500 leading-relaxed font-sans"
                 placeholder="Ask anything... (@scraper or @codegen via swarm)"
@@ -318,11 +318,11 @@ export default function Chat() {
                 rows={1}
               />
               <button 
-                className="bg-brand hover:bg-brand-hover text-white rounded-xl w-10 h-10 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 shadow-md mb-1.5"
+                className="bg-brand hover:bg-brand-hover text-white rounded-2xl w-12 h-12 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-brand/20 mb-1 active:scale-95"
                 onClick={() => handleSend()} 
                 disabled={!input.trim() || isLoading}
               >
-                <Send size={16} className="translate-y-[1px] translate-x-[1px]" />
+                <Send size={18} className="translate-y-[1px] translate-x-[1px]" />
               </button>
             </div>
           )}

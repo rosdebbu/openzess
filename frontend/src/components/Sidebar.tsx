@@ -1,5 +1,6 @@
 import { MessageSquare, Folder, Wrench, Settings, History, Sun, Moon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Sidebar() {
@@ -23,21 +24,39 @@ export default function Sidebar() {
         <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-4 font-mono uppercase tracking-widest pl-1">Workspace</p>
       </div>
       
-      <div className="flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto">
+      <motion.div 
+        className="flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto"
+        initial="hidden"
+        animate="visible"
+        variants={{
+           hidden: { opacity: 0 },
+           visible: {
+             opacity: 1,
+             transition: { staggerChildren: 0.1 }
+           }
+        }}
+      >
         {navItems.map((item) => (
-          <NavLink 
-            key={item.name} 
-            to={item.path}
-            className={({ isActive }) => `
-              flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all font-medium text-sm
-              ${isActive ? 'bg-brand/10 text-brand font-semibold' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-surface'}
-            `}
+          <motion.div 
+             key={item.name}
+             variants={{
+                hidden: { opacity: 0, x: -20 },
+                visible: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+             }}
           >
-            {item.icon}
-            {item.name}
-          </NavLink>
+            <NavLink 
+              to={item.path}
+              className={({ isActive }) => `
+                flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all font-medium text-sm border-l-2
+                ${isActive ? 'bg-brand/10 text-brand font-semibold border-brand shadow-sm shadow-brand/5' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-surface border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'}
+              `}
+            >
+              {item.icon}
+              {item.name}
+            </NavLink>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
       
       <div className="p-4 border-t border-neutral-200 dark:border-border flex flex-col gap-2">
         <button 
