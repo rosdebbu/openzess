@@ -22,22 +22,22 @@ export default function Files() {
   return (
     <div className="flex-1 p-10 overflow-y-auto w-full">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl font-semibold mb-2 text-neutral-100">Files</h2>
-        <p className="text-neutral-400 mb-10 flex items-center gap-2 font-mono text-sm">
+        <h2 className="text-3xl font-semibold mb-2 text-neutral-900 dark:text-neutral-100">Files</h2>
+        <p className="text-neutral-600 dark:text-neutral-400 mb-10 flex items-center gap-2 font-mono text-sm">
           <HardDrive size={16} /> {directory}
         </p>
 
-        <div className="bg-surface border border-border rounded-2xl p-2 shadow-lg w-full">
+        <div className="bg-white dark:bg-surface border border-neutral-200 dark:border-border rounded-2xl p-2 shadow-sm dark:shadow-lg w-full transition-colors">
           {files.map((f, i) => (
             <motion.div 
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.02 }}
               key={i} 
-              className="flex items-center gap-4 px-4 py-3 hover:bg-neutral-800/50 rounded-xl transition-colors cursor-default border-b border-border/50 last:border-0"
+              className="flex items-center gap-4 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-xl transition-colors cursor-default border-b border-neutral-100 dark:border-border/50 last:border-0"
             >
-              {f.is_dir ? <Folder size={20} className="text-brand shrink-0" /> : <FileIcon size={20} className="text-neutral-500 shrink-0" />}
-              <span className={f.is_dir ? 'text-neutral-200 font-medium' : 'text-neutral-400'}>{f.name}</span>
+              {f.is_dir ? <Folder size={20} className="text-brand shrink-0" /> : <FileIcon size={20} className="text-neutral-400 dark:text-neutral-500 shrink-0" />}
+              <span className={f.is_dir ? 'text-neutral-900 dark:text-neutral-200 font-medium' : 'text-neutral-500 dark:text-neutral-400'}>{f.name}</span>
             </motion.div>
           ))}
         </div>

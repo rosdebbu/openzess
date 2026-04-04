@@ -1,12 +1,10 @@
 import os
-import json
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict
-from sqlalchemy.orm import Session
 from agent import OpenzessAgent
-from db import get_db, DBSession, DBMessage
+import database
 
 app = FastAPI()
 
@@ -18,98 +16,101 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Initialize database
+database.init_db()
+
 class ChatRequest(BaseModel):
     message: str
     api_key: str
     session_id: Optional[str] = None
+    system_instruction: Optional[str] = None
+    allowed_tools: Optional[List[str]] = None
 
-@app.get("/api/sessions")
-async def get_sessions(db: Session = Depends(get_db)):
-    sessions = db.query(DBSession).order_by(DBSession.updated_at.desc()).all()
-    return {"sessions": [{"id": s.id, "title": s.title, "updated_at": s.updated_at} for s in sessions]}
-
-@app.post("/api/sessions")
-async def create_session(db: Session = Depends(get_db)):
-    new_session = DBSession(title="New Chat")
-    db.add(new_session)
-    db.commit()
-    db.refresh(new_session)
-    return {"id": new_session.id}
-
-@app.get("/api/sessions/{session_id}")
-async def get_session(session_id: str, db: Session = Depends(get_db)):
-    session = db.query(DBSession).filter(DBSession.id == session_id).first()
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-        
-    messages = db.query(DBMessage).filter(DBMessage.session_id == session_id).order_by(DBMessage.created_at.asc()).all()
-    return {
-        "id": session.id,
-        "title": session.title,
-        "messages": [
-            {
-                "id": str(m.id),
-                "role": m.role,
-                "content": m.content,
-                "tools": m.tools
-            } for m in messages
-        ]
-    }
+# Store session agents locally for speed, hydrate from DB on restart
+sessions: Dict[str, OpenzessAgent] = {}
 
 @app.post("/api/chat")
-async def chat(request: ChatRequest, db: Session = Depends(get_db)):
+async def chat(request: ChatRequest):
     if not request.api_key:
         raise HTTPException(status_code=400, detail="API Key is required")
         
     session_id = request.session_id
     if not session_id:
-        new_session = DBSession(title=request.message[:30] + "...")
-        db.add(new_session)
-        db.commit()
-        db.refresh(new_session)
-        session_id = new_session.id
-    else:
-        session_obj = db.query(DBSession).filter(DBSession.id == session_id).first()
-        if session_obj and session_obj.title == "New Chat":
-            session_obj.title = request.message[:30] + "..."
-            db.commit()
-
-    user_msg = DBMessage(session_id=session_id, role="user", content=request.message)
-    db.add(user_msg)
-    db.commit()
-
-    db_messages = db.query(DBMessage).filter(DBMessage.session_id == session_id).order_by(DBMessage.created_at.asc()).all()
-    history = []
-    for msg in db_messages[:-1]: # exclude the latest user payload
-        history.append({
-            "role": "model" if msg.role == "agent" else "user",
-            "parts": [msg.content]
-        })
-
-    agent = OpenzessAgent(api_key=request.api_key, history=history)
+        title = request.message[:40] + ("..." if len(request.message) > 40 else "")
+        session_id = database.create_session(title=title)
+    
+    need_instantiation = False
+    if session_id not in sessions:
+        need_instantiation = True
+    elif request.system_instruction or request.allowed_tools is not None:
+        need_instantiation = True
+        
+    if need_instantiation:
+        # Hydrate from DB
+        db_messages = database.get_session_messages(session_id)
+        history = []
+        for msg in db_messages:
+            role = "user" if msg["role"] == "user" else "model"
+            history.append({"role": role, "parts": [msg["content"]]})
+        
+        sessions[session_id] = OpenzessAgent(
+            api_key=request.api_key, 
+            history=history,
+            system_instruction=request.system_instruction,
+            allowed_tools=request.allowed_tools
+        )
+        
+    agent = sessions[session_id]
     
     try:
+        # 1. Save user message to database
+        database.add_message(session_id, "user", request.message)
+        
+        # 2. Get AI response
         response = agent.chat(request.message)
         
-        agent_msg = DBMessage(
-            session_id=session_id, 
-            role="agent", 
-            content=response["reply"],
-            tools=response.get("tools", [])
-        )
-        db.add(agent_msg)
+        # 3. Save AI response back to database ONLY if execution is completed
+        if not response.get("auth_required") and response.get("reply"):
+            database.add_message(session_id, "agent", response.get("reply"))
         
-        session_obj = db.query(DBSession).filter(DBSession.id == session_id).first()
-        if session_obj:
-            session_obj.updated_at = agent_msg.created_at
+        response["session_id"] = session_id
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class ApprovalRequest(BaseModel):
+    session_id: str
+    pending_calls: list
+    approved: bool
+
+@app.post("/api/chat/approve")
+async def chat_approve(request: ApprovalRequest):
+    agent = sessions.get(request.session_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Session not found in memory.")
+    
+    try:
+        response = agent.execute_pending_tools(request.pending_calls, request.approved)
+        if not response.get("auth_required") and response.get("reply"):
+            database.add_message(request.session_id, "agent", response.get("reply"))
             
-        db.commit()
-        
-        return {
-            "session_id": session_id,
-            "reply": response["reply"],
-            "tools": response.get("tools", [])
-        }
+        response["session_id"] = request.session_id
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/sessions")
+async def list_sessions():
+    try:
+        return {"sessions": database.get_all_sessions()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/sessions/{session_id}/messages")
+async def get_messages(session_id: str):
+    try:
+        messages = database.get_session_messages(session_id)
+        return {"messages": messages}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -128,6 +129,9 @@ async def list_tools():
     return {
         "tools": [
             {"name": "run_terminal_command", "description": "Execute local shell commands."},
+            {"name": "create_file", "description": "Create a brand new local file safely."},
+            {"name": "read_file", "description": "Read standard text elements inside a local file."},
+            {"name": "edit_code", "description": "Find & replace logic to precisely edit code lines safely."},
             {"name": "search_the_web", "description": "Perform web searches via DuckDuckGo."},
             {"name": "read_web_page", "description": "Scrape and read URL text content."}
         ]
