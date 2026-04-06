@@ -30,13 +30,7 @@
     @apply antialiased font-sans h-screen flex justify-center items-center overflow-hidden transition-colors duration-500 text-neutral-900 dark:text-neutral-100;
   }
   
-  * {
-      cursor: none !important;
-  }
-  
-  iframe, iframe * {
-      cursor: auto !important;
-  }
+
   
   .ambient-orb {
       position: fixed;

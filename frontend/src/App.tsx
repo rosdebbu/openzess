@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2 } from 'lucide-react';
+import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2, Activity, Zap, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Sidebar from './components/Sidebar';
-import CustomCursor from './components/CustomCursor';
 import Chat from './pages/Chat';
 import Files from './pages/Files';
 import Tools from './pages/Tools';
@@ -72,7 +71,6 @@ function App() {
 
   return (
     <ThemeProvider>
-      <CustomCursor />
       <BrowserRouter>
         <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 overflow-hidden font-sans transition-colors duration-300 relative">
         <div className="ambient-orb"></div>
@@ -257,6 +255,12 @@ function App() {
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/files" element={<Files />} />
             <Route path="/tools" element={<Tools />} />
+            
+            {/* New Workspaces Coming Soon Placeholders */}
+            <Route path="/skills" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Activity size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">Skills</h2><p className="text-neutral-500 dark:text-neutral-400">Expand your agent's capabilities with custom skills and logic blocks. Coming soon.</p></div>} />
+            <Route path="/mcp" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Zap size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">MCP Integration</h2><p className="text-neutral-500 dark:text-neutral-400">Connect to external APIs, databases, and services instantly via MCP. Coming soon.</p></div>} />
+            <Route path="/memory" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Database size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">Agent Memory Vault</h2><p className="text-neutral-500 dark:text-neutral-400">Explore, manage, and curate the long-term vector embeddings of your agent. Coming soon.</p></div>} />
+            
           </Routes>
         </div>
       </div>
