@@ -153,6 +153,7 @@ export default function Chat() {
       const response = await axios.post('http://localhost:8000/api/chat', {
         message: userMessage.content,
         api_key: apiKey,
+        provider: localStorage.getItem('openzess_provider') || 'gemini',
         session_id: sessionId || undefined,
         system_instruction: systemInstruction,
         allowed_tools: allowedTools

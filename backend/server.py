@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 from agent import OpenzessAgent, memory_collection
 import database
+from mcp_manager import mcp_registry
 
 app = FastAPI()
 
@@ -22,6 +23,7 @@ database.init_db()
 class ChatRequest(BaseModel):
     message: str
     api_key: str
+    provider: str = 'gemini'
     session_id: Optional[str] = None
     system_instruction: Optional[str] = None
     allowed_tools: Optional[List[str]] = None
@@ -55,6 +57,7 @@ async def chat(request: ChatRequest):
         
         sessions[session_id] = OpenzessAgent(
             api_key=request.api_key, 
+            provider=request.provider,
             history=history,
             system_instruction=request.system_instruction,
             allowed_tools=request.allowed_tools
@@ -181,6 +184,28 @@ async def clear_all_memories():
         return {"status": "success", "message": "All memories cleared."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+class MCPConnectRequest(BaseModel):
+    server_id: str
+    command: str
+    args: list
+
+@app.get("/api/mcp/servers")
+async def get_mcp_servers():
+    return {"servers": mcp_registry.get_status()}
+
+@app.post("/api/mcp/connect")
+async def connect_mcp(request: MCPConnectRequest):
+    try:
+        success = mcp_registry.connect(request.server_id, request.command, request.args)
+        return {"status": "connected" if success else "failed"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/mcp/disconnect/{server_id}")
+async def disconnect_mcp(server_id: str):
+    mcp_registry.disconnect(server_id)
+    return {"status": "disconnected"}
 
 if __name__ == "__main__":
     import uvicorn

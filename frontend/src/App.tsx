@@ -21,7 +21,8 @@ import { PERSONAS } from './utils/personas';
 
 function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('openzess_api_key') || '');
-  const [showSettings, setShowSettings] = useState(!apiKey);
+  const [provider, setProvider] = useState(localStorage.getItem('openzess_provider') || 'gemini');
+  const [showSettings, setShowSettings] = useState(!apiKey && provider !== 'ollama');
   const [activeTab, setActiveTab] = useState<'general' | 'persona'>('general');
 
   const [persona, setPersona] = useState(localStorage.getItem('openzess_persona') || 'architect');
@@ -65,6 +66,7 @@ function App() {
 
   const saveConfig = () => {
     localStorage.setItem('openzess_api_key', apiKey);
+    localStorage.setItem('openzess_provider', provider);
     localStorage.setItem('openzess_persona', persona);
     localStorage.setItem('openzess_sys_inst', systemInstruction);
     localStorage.setItem('openzess_tool_term', tools.run_terminal_command.toString());
@@ -115,18 +117,34 @@ function App() {
                   {activeTab === 'general' ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-4">
                       <h2 className="text-xl font-medium mb-1 flex items-center gap-2 text-neutral-900 dark:text-white">
-                        <Key size={20} className="text-brand" /> Configure Gemini API Key
+                        <Key size={20} className="text-brand" /> Configure Provider
                       </h2>
                       <p className="text-neutral-500 dark:text-neutral-400 mb-2 text-sm leading-relaxed">
-                        To power the agent natively on your device, please supply a Gemini API Key. It defaults to the lightning-fast <code>gemini-2.5-flash</code>.
+                        Select a provider and supply an API key. Powered universally by LiteLLM.
                       </p>
-                      <input 
-                        type="password"
-                        placeholder="AIzaSy..."
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        className="w-full bg-neutral-50 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand/50 dark:focus:border-brand font-mono transition-colors"
-                      />
+                      
+                      <div className="flex flex-col gap-3">
+                        <select 
+                           value={provider}
+                           onChange={(e) => setProvider(e.target.value)}
+                           className="w-full bg-neutral-50 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand/50 dark:focus:border-brand transition-colors"
+                        >
+                           <option value="gemini">Google Gemini (gemini-2.5-flash)</option>
+                           <option value="openai">OpenAI (gpt-4o-mini)</option>
+                           <option value="anthropic">Anthropic (claude-3-5-sonnet-20241022)</option>
+                           <option value="groq">Groq (llama-3.3-70b-versatile)</option>
+                           <option value="ollama">Local System (Ollama)</option>
+                        </select>
+                        
+                        <input 
+                          type="password"
+                          placeholder={provider === 'ollama' ? "Local model - API Key not required" : "sk-..."}
+                          value={apiKey}
+                          onChange={(e) => setApiKey(e.target.value)}
+                          disabled={provider === 'ollama'}
+                          className="w-full bg-neutral-50 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand/50 dark:focus:border-brand font-mono transition-colors disabled:opacity-50"
+                        />
+                      </div>
                     </motion.div>
                   ) : (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6">
@@ -238,7 +256,7 @@ function App() {
                   <button 
                     className="w-full py-3.5 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition-all shadow-lg shadow-brand/20 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.98]"
                     onClick={saveConfig}
-                    disabled={!apiKey}
+                    disabled={!apiKey && provider !== 'ollama'}
                   >
                     Save Configuration
                   </button>
