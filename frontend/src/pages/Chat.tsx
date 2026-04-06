@@ -211,7 +211,7 @@ export default function Chat() {
             >
               <Sparkles size={32} className="text-white" />
             </motion.div>
-            <h2 className="text-2xl font-medium mb-3 text-neutral-900 dark:text-neutral-100">Hello, how can I help you today?</h2>
+            <h2 className="text-2xl font-medium mb-3 text-neutral-900 dark:text-neutral-100">can I help you today?</h2>
             <p className="text-neutral-600 dark:text-neutral-400 mb-10 text-sm">Mention Swarm agents (e.g. @scraper or @codegen) to swap dynamically.</p>
             
             <div className="flex flex-col gap-3 w-full max-w-lg">

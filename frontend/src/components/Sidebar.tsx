@@ -1,4 +1,4 @@
-import { MessageSquare, Folder, Wrench, History, Sun, Moon, Database, Zap, SlidersHorizontal, Activity } from 'lucide-react';
+import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -11,14 +11,22 @@ export default function Sidebar() {
       title: 'General',
       items: [
         { name: 'New Chat', icon: <MessageSquare size={18} />, path: '/' },
-        { name: 'Past Chats', icon: <History size={18} />, path: '/sessions' },
+      ]
+    },
+    {
+      title: 'Control',
+      items: [
+        { name: 'Channels', icon: <Radio size={18} />, path: '/channels' },
+        { name: 'Sessions', icon: <Users size={18} />, path: '/sessions' },
+        { name: 'Cron Jobs', icon: <CalendarClock size={18} />, path: '/cron-jobs' },
+        { name: 'Heartbeat', icon: <Activity size={18} />, path: '/heartbeat' },
       ]
     },
     {
       title: 'Workspace',
       items: [
         { name: 'Files', icon: <Folder size={18} />, path: '/files' },
-        { name: 'Skills', icon: <Activity size={18} />, path: '/skills' },
+        { name: 'Skills', icon: <Wand2 size={18} />, path: '/skills' },
         { name: 'Tools', icon: <Wrench size={18} />, path: '/tools' },
         { name: 'MCP', icon: <Zap size={18} />, path: '/mcp' },
         { name: 'Configuration', icon: <SlidersHorizontal size={18} />, action: () => window.dispatchEvent(new Event('open-settings')) },
@@ -28,6 +36,7 @@ export default function Sidebar() {
       title: 'Settings',
       items: [
         { name: 'Agent Memory', icon: <Database size={18} />, path: '/memory' },
+        { name: 'Changelog', icon: <FileText size={18} />, path: '/changelog' },
       ]
     }
   ];
