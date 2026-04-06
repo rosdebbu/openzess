@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2, Activity, Zap, Database, Radio, CalendarClock } from 'lucide-react';
+import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2, Activity, Zap, Radio, CalendarClock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Sidebar from './components/Sidebar';
@@ -8,6 +8,8 @@ import Chat from './pages/Chat';
 import Files from './pages/Files';
 import Tools from './pages/Tools';
 import Sessions from './pages/Sessions';
+import MemoryVault from './pages/Memory';
+import Skills from './pages/Skills';
 import { ThemeProvider } from './context/ThemeContext';
 
 import { PERSONAS } from './utils/personas';
@@ -261,9 +263,9 @@ function App() {
             <Route path="/cron-jobs" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><CalendarClock size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">Cron Jobs</h2><p className="text-neutral-500 dark:text-neutral-400">Schedule autonomous agent tasks securely. Coming soon.</p></div>} />
             <Route path="/heartbeat" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Activity size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">Heartbeat</h2><p className="text-neutral-500 dark:text-neutral-400">Monitor continuous background processing loops. Coming soon.</p></div>} />
             
-            <Route path="/skills" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Activity size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">Skills</h2><p className="text-neutral-500 dark:text-neutral-400">Expand your agent's capabilities with custom skills and logic blocks. Coming soon.</p></div>} />
+            <Route path="/skills" element={<Skills />} />
             <Route path="/mcp" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Zap size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">MCP Integration</h2><p className="text-neutral-500 dark:text-neutral-400">Connect to external APIs, databases, and services instantly via MCP. Coming soon.</p></div>} />
-            <Route path="/memory" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Database size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">Agent Memory Vault</h2><p className="text-neutral-500 dark:text-neutral-400">Explore, manage, and curate the long-term vector embeddings of your agent. Coming soon.</p></div>} />
+            <Route path="/memory" element={<MemoryVault />} />
             <Route path="/changelog" element={<div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto text-center"><div className="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-sm"><FileText size={32} /></div><h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">Changelog</h2><p className="text-neutral-500 dark:text-neutral-400">Track all systematic updates, fixes, and feature additions to openzess. Coming soon.</p></div>} />
 
             

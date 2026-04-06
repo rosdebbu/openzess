@@ -111,10 +111,28 @@ export default function Chat() {
     const isSwarm = textTrimmed.startsWith('@');
     const triggerKeyword = isSwarm ? textTrimmed.split(' ')[0].substring(1).toLowerCase() : null;
     
-    if (triggerKeyword && PERSONAS[triggerKeyword]) {
+    // Combine standard personas with local storage skills
+    let activePersona = null;
+    if (triggerKeyword) {
+        if (PERSONAS[triggerKeyword]) {
+            activePersona = PERSONAS[triggerKeyword];
+        } else {
+            const customStored = localStorage.getItem('openzess_custom_skills');
+            if (customStored) {
+                try {
+                    const parsed = JSON.parse(customStored);
+                    if (parsed[triggerKeyword]) {
+                        activePersona = parsed[triggerKeyword];
+                    }
+                } catch(e) { console.error(e); }
+            }
+        }
+    }
+    
+    if (triggerKeyword && activePersona) {
        // Deep Hot Swap Activated for Swarm Agent
-       systemInstruction = PERSONAS[triggerKeyword].instruction;
-       const t = PERSONAS[triggerKeyword].tools;
+       systemInstruction = activePersona.instruction;
+       const t = activePersona.tools;
        if (t.run_terminal_command) allowedTools.push('run_terminal_command');
        if (t.search_the_web) allowedTools.push('search_the_web');
        if (t.read_web_page) allowedTools.push('read_web_page');

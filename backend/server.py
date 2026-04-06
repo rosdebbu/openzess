@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict
-from agent import OpenzessAgent
+from agent import OpenzessAgent, memory_collection
 import database
 
 app = FastAPI()
@@ -136,6 +136,51 @@ async def list_tools():
             {"name": "read_web_page", "description": "Scrape and read URL text content."}
         ]
     }
+
+@app.get("/api/memory")
+async def get_memories():
+    try:
+        if memory_collection is None:
+            return {"memories": []}
+            
+        results = memory_collection.get()
+        memories = []
+        if results and results.get("ids"):
+            for i in range(len(results["ids"])):
+                memories.append({
+                    "id": results["ids"][i],
+                    "document": results["documents"][i],
+                    "metadata": results["metadatas"][i] if results.get("metadatas") else None
+                })
+        return {"memories": memories}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/memory/{memory_id}")
+async def delete_memory(memory_id: str):
+    try:
+        if memory_collection is None:
+            raise HTTPException(status_code=400, detail="Memory vault is disabled.")
+            
+        memory_collection.delete(ids=[memory_id])
+        return {"status": "success", "deleted_id": memory_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/memory")
+async def clear_all_memories():
+    try:
+        if memory_collection is None:
+            raise HTTPException(status_code=400, detail="Memory vault is disabled.")
+            
+        # Get all ids to delete
+        results = memory_collection.get()
+        if results and results.get("ids") and len(results["ids"]) > 0:
+            memory_collection.delete(ids=results["ids"])
+            
+        return {"status": "success", "message": "All memories cleared."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
