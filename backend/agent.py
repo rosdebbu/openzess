@@ -7,6 +7,7 @@ from duckduckgo_search import DDGS
 from mcp_manager import mcp_registry
 import json
 import litellm
+import background_workers
 
 # Initialize Global ChromaDB Vector Vault
 try:
@@ -83,13 +84,31 @@ def edit_code(filepath: str, old_string: str, new_string: str) -> str:
     except Exception as e:
         return str(e)
 
+def schedule_background_task(command: str, interval_minutes: int) -> str:
+    """Schedules a native agent action to run automatically in the background at an interval."""
+    try:
+        job_id = background_workers.cron_manager.add_job(command, interval_minutes)
+        return f"CRON JOB INITIATED [ID: {job_id}]: Will execute '{command}' every {interval_minutes} minutes natively."
+    except Exception as e:
+        return f"Failed to schedule cron: {e}"
+
+def monitor_directory(directory: str, action: str) -> str:
+    """Mounts a filesystem watchdog on a folder. When the folder changes, the Agent will execute the required action."""
+    try:
+        watch_id = background_workers.watch_manager.add_watchdog(directory, action)
+        return f"WATCHDOG ACTIVE [ID: {watch_id}]: Observing {directory}. Action triggered on change: '{action}'."
+    except Exception as e:
+        return f"Failed to mount watchdog: {e}"
+
 native_tool_funcs = {
     "run_terminal_command": run_terminal_command,
     "search_the_web": search_the_web,
     "read_web_page": read_web_page,
     "create_file": create_file,
     "read_file": read_file,
-    "edit_code": edit_code
+    "edit_code": edit_code,
+    "schedule_background_task": schedule_background_task,
+    "monitor_directory": monitor_directory
 }
 
 NATIVE_TOOL_SCHEMAS = [
@@ -162,6 +181,30 @@ NATIVE_TOOL_SCHEMAS = [
                 "type": "object",
                 "properties": {"filepath": {"type": "string"}, "old_string": {"type": "string"}, "new_string": {"type": "string"}},
                 "required": ["filepath", "old_string", "new_string"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "schedule_background_task",
+            "description": "Schedules a proactive agent action to run automatically in the background at an interval (in minutes).",
+            "parameters": {
+                "type": "object",
+                "properties": {"command": {"type": "string"}, "interval_minutes": {"type": "integer"}},
+                "required": ["command", "interval_minutes"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "monitor_directory",
+            "description": "Mounts a filesystem watchdog on a folder. When the folder changes, the Agent will immediately execute the required action.",
+            "parameters": {
+                "type": "object",
+                "properties": {"directory": {"type": "string"}, "action": {"type": "string"}},
+                "required": ["directory", "action"]
             }
         }
     }
@@ -239,7 +282,7 @@ class OpenzessAgent:
             if not message.tool_calls:
                 return {"reply": message.content, "tools": tool_outputs, "auth_required": False}
                 
-            dangerous_tools = ["run_terminal_command", "create_file", "edit_code"]
+            dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory"]
             
             pending_calls = []
             for tc in message.tool_calls:

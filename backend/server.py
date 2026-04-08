@@ -6,6 +6,7 @@ from typing import Optional, List, Dict
 from agent import OpenzessAgent, memory_collection
 import database
 from mcp_manager import mcp_registry
+import background_workers
 
 app = FastAPI()
 
@@ -206,6 +207,24 @@ async def connect_mcp(request: MCPConnectRequest):
 async def disconnect_mcp(server_id: str):
     mcp_registry.disconnect(server_id)
     return {"status": "disconnected"}
+
+@app.get("/api/cron")
+async def get_cron_jobs():
+    return {"jobs": background_workers.cron_manager.get_jobs()}
+
+@app.delete("/api/cron/{job_id}")
+async def delete_cron_job(job_id: str):
+    background_workers.cron_manager.remove_job(job_id)
+    return {"status": "deleted"}
+
+@app.get("/api/watchdog")
+async def get_watchdogs():
+    return {"watchdogs": background_workers.watch_manager.get_watchdogs()}
+
+@app.delete("/api/watchdog/{watch_id}")
+async def delete_watchdog(watch_id: str):
+    background_workers.watch_manager.remove_watchdog(watch_id)
+    return {"status": "deleted"}
 
 if __name__ == "__main__":
     import uvicorn
