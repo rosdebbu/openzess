@@ -66,7 +66,20 @@ async def chat(request: ChatRequest):
         
     if need_instantiation:
         # Hydrate from DB
-        db_messages = database.get_session_messages(session_id)
+        try:
+            db_messages = database.get_session_messages(session_id)
+        except HTTPException:
+            # Session doesn't exist yet but ID was hard-provided (e.g., telegram worker)
+            title = "Telegram Chat" if session_id.startswith("telegram_") else "External Chat"
+            db = database.SessionLocal()
+            try:
+                new_session = database.Session(id=session_id, title=title)
+                db.add(new_session)
+                db.commit()
+            finally:
+                db.close()
+            db_messages = []
+
         history = []
         for msg in db_messages:
             role = "user" if msg["role"] == "user" else "model"
