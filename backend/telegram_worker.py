@@ -6,6 +6,7 @@ import json
 TELEGRAM_THREAD = None
 TELEGRAM_BOT = None
 IS_RUNNING = False
+PENDING_AUTH_STATE = {}
 
 def start_telegram_listener(bot_token: str, provider: str, api_key: str):
     global TELEGRAM_THREAD, TELEGRAM_BOT, IS_RUNNING
@@ -20,6 +21,43 @@ def start_telegram_listener(bot_token: str, provider: str, api_key: str):
         
     IS_RUNNING = True
     
+    @TELEGRAM_BOT.callback_query_handler(func=lambda call: call.data in ['auth_approve', 'auth_deny'])
+    def handle_auth_callback(call):
+        chat_id = call.message.chat.id
+        session_id = f"telegram_{chat_id}"
+        approved = (call.data == 'auth_approve')
+        
+        pending_calls = PENDING_AUTH_STATE.get(chat_id)
+        if pending_calls is None:
+            TELEGRAM_BOT.edit_message_text("This authorization request has expired or was already processed.", chat_id=chat_id, message_id=call.message.message_id)
+            return
+
+        TELEGRAM_BOT.edit_message_text(f"*(Processing { 'Approval' if approved else 'Denial' }...)*", chat_id=chat_id, message_id=call.message.message_id, parse_mode="Markdown")
+        
+        try:
+            TELEGRAM_BOT.send_chat_action(chat_id, 'typing')
+            res = requests.post("http://127.0.0.1:8000/api/chat/approve", json={
+                "session_id": session_id,
+                "pending_calls": pending_calls,
+                "approved": approved
+            }, timeout=120)
+            
+            if res.ok:
+                data = res.json()
+                reply = data.get("reply", "Execution finished but returned empty output.")
+                try:
+                    TELEGRAM_BOT.send_message(chat_id, reply, parse_mode="Markdown")
+                except:
+                    TELEGRAM_BOT.send_message(chat_id, reply)
+            else:
+                error_detail = res.json().get("detail", res.text) if "application/json" in res.headers.get("content-type", "") else res.text
+                TELEGRAM_BOT.send_message(chat_id, f"⚠️ Execution failed: {error_detail}")
+        except Exception as e:
+             TELEGRAM_BOT.send_message(chat_id, f"⚠️ Execution error: {str(e)}")
+             
+        if chat_id in PENDING_AUTH_STATE:
+            del PENDING_AUTH_STATE[chat_id]
+
     @TELEGRAM_BOT.message_handler(func=lambda message: True)
     def handle_all_messages(message):
         if not IS_RUNNING:
@@ -46,7 +84,27 @@ def start_telegram_listener(bot_token: str, provider: str, api_key: str):
             }, timeout=120)
             if response.ok:
                 data = response.json()
-                reply = data.get("reply", "AI returned an empty response.")
+                if data.get("auth_required"):
+                    pending = data.get("pending_calls", [])
+                    PENDING_AUTH_STATE[chat_id] = pending
+                    
+                    markup = telebot.types.InlineKeyboardMarkup()
+                    markup.add(
+                        telebot.types.InlineKeyboardButton("❌ Deny", callback_data="auth_deny"),
+                        telebot.types.InlineKeyboardButton("✅ Approve & Execute", callback_data="auth_approve")
+                    )
+                    
+                    # Format a nice string telling them what tools will run
+                    tools_str = ""
+                    for p in pending:
+                        tools_str += f"\n• `{p['name']}`\n  `{json.dumps(p.get('args', {}))}`"
+                        
+                    warning_msg = f"⚠️ *ACTION REQUIRED*\n\nThe AI wants to execute the following dangerous commands on your host machine:\n{tools_str}\n\nDo you want to authorize this?"
+                    
+                    TELEGRAM_BOT.send_message(chat_id, warning_msg, reply_markup=markup, parse_mode="Markdown")
+                    return
+                else:
+                    reply = data.get("reply", "AI returned an empty response.")
             else:
                 try:
                     error_data = response.json()
