@@ -1,9 +1,21 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Zap, Plug, Search, ChevronRight, CheckCircle2, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Zap, Plug, Search, ChevronRight, CheckCircle2, Loader2, Plus, Trash2, Wrench } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import AddMCPServerModal from '../components/AddMCPServerModal';
+import { useToast } from '../contexts/ToastContext';
 
-const DEFAULT_SERVERS = [
+interface MCPServerInfo {
+  id: string;
+  name: string;
+  desc: string;
+  icon: string;
+  command: string;
+  args: string[];
+  isCustom?: boolean;
+}
+
+const DEFAULT_SERVERS: MCPServerInfo[] = [
   { id: 'github', name: 'GitHub', desc: 'Read/write repository access and PR management.', icon: '🐙', command: 'npx', args: ['-y', '@modelcontextprotocol/server-github'] },
   { id: 'postgres', name: 'PostgreSQL', desc: 'Direct secure database queries and schema inspection.', icon: '🐘', command: 'npx', args: ['-y', '@modelcontextprotocol/server-postgres', 'postgresql://localhost/mydb'] },
   { id: 'everything', name: 'Test Sandbox', desc: 'Demo server with echo, long running tools and more.', icon: '🛠️', command: 'npx', args: ['-y', '@modelcontextprotocol/server-everything'] },
@@ -12,14 +24,20 @@ const DEFAULT_SERVERS = [
 ];
 
 export default function MCP() {
+  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [connectedIds, setConnectedIds] = useState<string[]>([]);
   const [loadingIds, setLoadingIds] = useState<string[]>([]);
+  const [serverStats, setServerStats] = useState<Record<string, any>>({});
+  const [savedServers, setSavedServers] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchServers = async () => {
      try {
         const res = await axios.get('http://localhost:8000/api/mcp/servers');
         setConnectedIds(Object.keys(res.data.servers || {}));
+        setServerStats(res.data.servers || {});
+        setSavedServers(res.data.saved_servers || []);
      } catch(e) { console.error(e); }
   };
 
@@ -37,20 +55,63 @@ export default function MCP() {
         } else {
            await axios.post('http://localhost:8000/api/mcp/connect', {
               server_id: server.id,
+              name: server.name || server.id,
               command: server.command,
               args: server.args
            });
+           showToast(`Connected to ${server.name}`, 'success');
         }
         await fetchServers();
      } catch (e) {
         console.error(e);
-        alert(`Failed to toggle ${server.name}`);
+        showToast(`Failed to toggle ${server.name}`, 'error');
      } finally {
         setLoadingIds(prev => prev.filter(id => id !== server.id));
      }
   };
 
-  const filteredServers = DEFAULT_SERVERS.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const handleAddCustom = async (serverData: any) => {
+     try {
+        await axios.post('http://localhost:8000/api/mcp/connect', {
+           server_id: serverData.id,
+           name: serverData.name,
+           command: serverData.command,
+           args: serverData.args
+        });
+        await fetchServers();
+     } catch (e) {
+        throw e; // Modal handles toast
+     }
+  };
+
+  const handleDeleteSaved = async (id: string, e: React.MouseEvent) => {
+     e.stopPropagation();
+     try {
+        await axios.delete(`http://localhost:8000/api/mcp/saved/${id}`);
+        showToast('Server deleted permanently.', 'success');
+        await fetchServers();
+     } catch(err) {
+        showToast('Failed to delete server.', 'error');
+     }
+  };
+
+  // Merge default servers and custom saved servers uniquely by ID
+  const allServers: MCPServerInfo[] = [...DEFAULT_SERVERS];
+  savedServers.forEach(ss => {
+     if (!allServers.find(s => s.id === ss.id)) {
+        allServers.push({
+           id: ss.id,
+           name: ss.name,
+           desc: 'User defined custom MCP server.',
+           icon: '⚙️',
+           command: ss.command,
+           args: ss.args,
+           isCustom: true
+        });
+     }
+  });
+
+  const filteredServers = allServers.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className="flex-1 p-10 overflow-y-auto w-full custom-scrollbar">
@@ -66,8 +127,16 @@ export default function MCP() {
              <p className="text-neutral-500 dark:text-neutral-400">Model Context Protocol integrations. Connect external tools safely.</p>
            </div>
 
-           <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+           <div className="flex items-center gap-4">
+              <button 
+                 onClick={() => setIsModalOpen(true)}
+                 className="flex items-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-4 py-2 rounded-xl font-medium text-sm hover:scale-[0.98] transition-transform shadow-sm"
+              >
+                  <Plus size={16} /> Add Protocol
+              </button>
+              
+              <div className="relative">
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
               <input 
                  type="text" 
                  placeholder="Search protocols..." 
@@ -75,7 +144,8 @@ export default function MCP() {
                  onChange={e => setSearchTerm(e.target.value)}
                  className="pl-10 pr-4 py-2 bg-white dark:bg-surface border border-neutral-200 dark:border-border rounded-xl focus:outline-none focus:border-indigo-500 transition-colors shadow-sm w-full md:w-64"
               />
-           </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -98,19 +168,45 @@ export default function MCP() {
                 )}
                 <div className="flex items-start justify-between mb-4">
                    <div className="text-4xl">{server.icon}</div>
-                   {isConnected ? (
-                      <span className="flex items-center gap-1 text-xs font-medium bg-emerald-500/10 text-emerald-600 px-2 py-1 rounded-md">
-                         <CheckCircle2 size={14} /> Connected
-                      </span>
-                   ) : (
-                      <span className="flex items-center gap-1 text-xs font-medium bg-neutral-100 dark:bg-neutral-900 text-neutral-500 px-2 py-1 rounded-md">
-                         <Plug size={14} /> Available
-                      </span>
-                   )}
+                   <div className="flex items-center gap-2">
+                       {server.isCustom && (
+                          <button 
+                             onClick={(e) => handleDeleteSaved(server.id, e)}
+                             className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                             title="Delete Custom Server"
+                          >
+                             <Trash2 size={16} />
+                          </button>
+                       )}
+                       {isConnected ? (
+                          <span className="flex items-center gap-1 text-xs font-medium bg-emerald-500/10 text-emerald-600 px-2 py-1 rounded-md">
+                             <CheckCircle2 size={14} /> Connected
+                          </span>
+                       ) : (
+                          <span className="flex items-center gap-1 text-xs font-medium bg-neutral-100 dark:bg-neutral-900 text-neutral-500 px-2 py-1 rounded-md">
+                             <Plug size={14} /> Available
+                          </span>
+                       )}
+                   </div>
                 </div>
                 
                 <h3 className="font-semibold text-lg text-neutral-900 dark:text-white mb-2">{server.name}</h3>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 flex-1 leading-relaxed mb-6">{server.desc}</p>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 flex-1 leading-relaxed mb-4">{server.desc}</p>
+                
+                {/* Specific Tools Loaded via MCP */}
+                {isConnected && serverStats[server.id]?.toolNames && (
+                   <div className="mb-6 flex flex-wrap gap-2">
+                      {serverStats[server.id].toolNames.length === 0 ? (
+                         <span className="text-xs text-neutral-400 italic">No tools exposed</span>
+                      ) : (
+                         serverStats[server.id].toolNames.map((tName: string) => (
+                            <span key={tName} className="flex items-center gap-1 text-[11px] bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 px-2 py-1 rounded-md border border-neutral-200 dark:border-neutral-700">
+                               <Wrench size={10} /> {tName}
+                            </span>
+                         ))
+                      )}
+                   </div>
+                )}
                 
                 <button 
                    onClick={() => toggleServer(server)}
@@ -124,6 +220,11 @@ export default function MCP() {
           })}
         </div>
       </div>
+      <AddMCPServerModal 
+         isOpen={isModalOpen} 
+         onClose={() => setIsModalOpen(false)} 
+         onAdd={handleAddCustom} 
+      />
     </div>
   );
 }

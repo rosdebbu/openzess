@@ -1,6 +1,7 @@
 import os
 import uuid
 from datetime import datetime
+import json
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
@@ -40,6 +41,14 @@ class Message(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     session = relationship("Session", back_populates="messages")
+
+class MCPServer(Base):
+    __tablename__ = "mcp_servers"
+    server_id = Column(String, primary_key=True, index=True)
+    name = Column(String)
+    command = Column(String)
+    args_json = Column(String) # JSON string array
+    is_active = Column(Integer, default=1) # 1=active, 0=inactive
 
 def init_db():
     Base.metadata.create_all(bind=engine)
@@ -89,5 +98,52 @@ def get_session_messages(session_id: str):
             
         results = db.query(Message).filter(Message.session_id == session_id).order_by(Message.created_at.asc()).all()
         return [{"id": m.id, "role": m.role, "content": m.content, "created_at": m.created_at.isoformat()} for m in results]
+    finally:
+        db.close()
+
+def add_or_update_mcp_server(server_id: str, name: str, command: str, args: list, is_active: bool = True):
+    db = SessionLocal()
+    try:
+        server = db.query(MCPServer).filter(MCPServer.server_id == server_id).first()
+        args_str = json.dumps(args)
+        if server:
+            server.name = name
+            server.command = command
+            server.args_json = args_str
+            server.is_active = 1 if is_active else 0
+        else:
+            new_server = MCPServer(
+                server_id=server_id, 
+                name=name, 
+                command=command, 
+                args_json=args_str, 
+                is_active=1 if is_active else 0
+            )
+            db.add(new_server)
+        db.commit()
+    finally:
+        db.close()
+
+def get_all_mcp_servers():
+    db = SessionLocal()
+    try:
+        results = db.query(MCPServer).all()
+        return [{
+            "id": s.server_id, 
+            "name": s.name, 
+            "command": s.command, 
+            "args": json.loads(s.args_json) if s.args_json else [],
+            "is_active": bool(s.is_active)
+        } for s in results]
+    finally:
+        db.close()
+
+def remove_mcp_server(server_id: str):
+    db = SessionLocal()
+    try:
+        server = db.query(MCPServer).filter(MCPServer.server_id == server_id).first()
+        if server:
+            db.delete(server)
+            db.commit()
     finally:
         db.close()

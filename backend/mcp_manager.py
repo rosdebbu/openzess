@@ -3,6 +3,7 @@ import threading
 import concurrent.futures
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+import psutil
 
 class MCPManager:
     def __init__(self):
@@ -63,9 +64,27 @@ class MCPManager:
             try:
                 await srv["session_mgr"].__aexit__(None, None, None)
             except Exception: pass
+            
+            # Find PID before tear down if possible
+            pid = None
+            if hasattr(srv["stdio_mgr"], 'process') and getattr(srv["stdio_mgr"].process, 'pid', None):
+                pid = srv["stdio_mgr"].process.pid
+                
             try:
                 await srv["stdio_mgr"].__aexit__(None, None, None)
             except Exception: pass
+            
+            # Force kill tree to prevent zombie processes (common with npx on Windows)
+            if pid:
+                try:
+                    parent = psutil.Process(pid)
+                    for child in parent.children(recursive=True):
+                        child.kill()
+                    parent.kill()
+                except psutil.NoSuchProcess:
+                    pass
+                except Exception as e:
+                    print(f"[{server_id}] Process cleanup error: {e}")
             
             del self.servers[server_id]
             if server_id in self.server_tools:
@@ -96,7 +115,7 @@ class MCPManager:
             sid: {
                 "command": data["command"],
                 "args": data["args"],
-                "tools": len(self.server_tools.get(sid, []))
+                "toolNames": [t.name for t in self.server_tools.get(sid, [])]
             } for sid, data in self.servers.items()
         }
 

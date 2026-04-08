@@ -16,6 +16,7 @@ import Heartbeat from './pages/Heartbeat';
 import MCP from './pages/MCP';
 import Changelog from './pages/Changelog';
 import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
 
 import { PERSONAS } from './utils/personas';
 
@@ -80,6 +81,7 @@ function App() {
 
   return (
     <ThemeProvider>
+      <ToastProvider>
       <BrowserRouter>
         <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 overflow-hidden font-sans transition-colors duration-300 relative">
         <div className="ambient-orb"></div>
@@ -296,6 +298,7 @@ function App() {
         </div>
       </div>
       </BrowserRouter>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

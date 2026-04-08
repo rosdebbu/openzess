@@ -19,7 +19,22 @@ app.add_middleware(
 )
 
 # Initialize database
+import asyncio
 database.init_db()
+
+# Auto-reconnect active MCP servers
+def init_active_mcps():
+    servers = database.get_all_mcp_servers()
+    for s in servers:
+        if s["is_active"]:
+            try:
+                print(f"Auto-connecting MCP: {s['name']}")
+                mcp_registry.connect(s["id"], s["command"], s["args"])
+            except Exception as e:
+                print(f"Failed to auto-connect MCP {s['name']}: {e}")
+
+# Run the initialization
+init_active_mcps()
 
 class ChatRequest(BaseModel):
     message: str
@@ -188,17 +203,21 @@ async def clear_all_memories():
 
 class MCPConnectRequest(BaseModel):
     server_id: str
+    name: str = ""
     command: str
     args: list
 
 @app.get("/api/mcp/servers")
 async def get_mcp_servers():
-    return {"servers": mcp_registry.get_status()}
+    return {"servers": mcp_registry.get_status(), "saved_servers": database.get_all_mcp_servers()}
 
 @app.post("/api/mcp/connect")
 async def connect_mcp(request: MCPConnectRequest):
     try:
         success = mcp_registry.connect(request.server_id, request.command, request.args)
+        if success:
+            display_name = request.name if request.name else request.server_id
+            database.add_or_update_mcp_server(request.server_id, display_name, request.command, request.args, is_active=True)
         return {"status": "connected" if success else "failed"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -206,7 +225,18 @@ async def connect_mcp(request: MCPConnectRequest):
 @app.post("/api/mcp/disconnect/{server_id}")
 async def disconnect_mcp(server_id: str):
     mcp_registry.disconnect(server_id)
+    saved = database.get_all_mcp_servers()
+    for s in saved:
+        if s["id"] == server_id:
+            database.add_or_update_mcp_server(server_id, s["name"], s["command"], s["args"], is_active=False)
+            break
     return {"status": "disconnected"}
+
+@app.delete("/api/mcp/saved/{server_id}")
+async def remove_saved_mcp(server_id: str):
+    mcp_registry.disconnect(server_id)
+    database.remove_mcp_server(server_id)
+    return {"status": "deleted"}
 
 @app.get("/api/cron")
 async def get_cron_jobs():
