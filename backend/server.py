@@ -7,6 +7,7 @@ from agent import OpenzessAgent, memory_collection
 import database
 from mcp_manager import mcp_registry
 import background_workers
+import telegram_worker
 
 app = FastAPI()
 
@@ -255,6 +256,34 @@ async def get_watchdogs():
 async def delete_watchdog(watch_id: str):
     background_workers.watch_manager.remove_watchdog(watch_id)
     return {"status": "deleted"}
+
+# ================================
+# CHANNELS (Telegram, etc)
+# ================================
+class TelegramStartRequest(BaseModel):
+    bot_token: str
+    provider: str
+    api_key: str
+
+@app.post("/api/channels/telegram/start")
+async def start_telegram(request: TelegramStartRequest):
+    try:
+        success = telegram_worker.start_telegram_listener(request.bot_token, request.provider, request.api_key)
+        return {"status": "started" if success else "failed"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/channels/telegram/stop")
+async def stop_telegram():
+    try:
+        telegram_worker.stop_telegram_listener()
+        return {"status": "stopped"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/channels/telegram/status")
+async def get_telegram_status():
+    return {"is_running": telegram_worker.get_status()}
 
 if __name__ == "__main__":
     import uvicorn
