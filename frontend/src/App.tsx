@@ -17,8 +17,41 @@ import MCP from './pages/MCP';
 import Changelog from './pages/Changelog';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
+import PageTransition from './components/PageTransition';
 
 import { PERSONAS } from './utils/personas';
+import { useLocation } from 'react-router-dom';
+
+function AnimatedRoutes({ persona }: { persona: string }) {
+  const location = useLocation();
+  return (
+    <div className="flex-1 flex overflow-hidden relative">
+      {persona !== 'architect' && (
+         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 bg-brand/10 border border-brand/30 text-brand px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md shadow-sm pointer-events-none flex items-center gap-2">
+            <Bot size={12} /> {PERSONAS[persona]?.name || PERSONAS['custom'].name} Active
+         </div>
+      )}
+
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Chat /></PageTransition>} />
+          <Route path="/sessions" element={<PageTransition><Sessions /></PageTransition>} />
+          <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
+          <Route path="/tools" element={<PageTransition><Tools /></PageTransition>} />
+          
+          <Route path="/channels" element={<PageTransition><Channels /></PageTransition>} />
+          <Route path="/cron-jobs" element={<PageTransition><CronJobs /></PageTransition>} />
+          <Route path="/heartbeat" element={<PageTransition><Heartbeat /></PageTransition>} />
+          
+          <Route path="/skills" element={<PageTransition><Skills /></PageTransition>} />
+          <Route path="/mcp" element={<PageTransition><MCP /></PageTransition>} />
+          <Route path="/memory" element={<PageTransition><MemoryVault /></PageTransition>} />
+          <Route path="/changelog" element={<PageTransition><Changelog /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
+    </div>
+  );
+}
 
 function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('openzess_api_key') || '');
@@ -270,32 +303,7 @@ function App() {
 
         <Sidebar />
 
-        <div className="flex-1 flex overflow-hidden relative">
-          {persona !== 'architect' && (
-             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 bg-brand/10 border border-brand/30 text-brand px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md shadow-sm pointer-events-none flex items-center gap-2">
-                <Bot size={12} /> {PERSONAS[persona]?.name || PERSONAS['custom'].name} Active
-             </div>
-          )}
-
-          <Routes>
-            <Route path="/" element={<Chat />} />
-            <Route path="/sessions" element={<Sessions />} />
-            <Route path="/files" element={<Files />} />
-            <Route path="/tools" element={<Tools />} />
-            
-            {/* New Workspaces */}
-            <Route path="/channels" element={<Channels />} />
-            <Route path="/cron-jobs" element={<CronJobs />} />
-            <Route path="/heartbeat" element={<Heartbeat />} />
-            
-            <Route path="/skills" element={<Skills />} />
-            <Route path="/mcp" element={<MCP />} />
-            <Route path="/memory" element={<MemoryVault />} />
-            <Route path="/changelog" element={<Changelog />} />
-
-            
-          </Routes>
-        </div>
+        <AnimatedRoutes persona={persona} />
       </div>
       </BrowserRouter>
       </ToastProvider>

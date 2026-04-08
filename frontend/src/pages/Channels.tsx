@@ -162,127 +162,137 @@ export default function Channels() {
           </div>
         </div>
 
-        {activeChannel === 'telegram' ? (
-           <div className="flex-1 p-8 overflow-y-auto">
-              <div className="max-w-2xl mx-auto bg-white dark:bg-surface border border-neutral-200 dark:border-border p-8 rounded-2xl shadow-sm">
-                 <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-6 shadow-sm">
-                    <Send size={32} />
-                 </div>
-                 <h2 className="text-2xl font-bold mb-2">Connect Telegram</h2>
-                 <p className="text-neutral-500 mb-8 text-sm leading-relaxed">
-                   Link your Openzess local environment to a Telegram Bot. Once active, any message sent to your bot from anywhere in the world goes straight to your local AI array.
-                 </p>
-                 
-                 <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Bot API Token</label>
-                      <input
-                        type="password"
-                        placeholder="1234567890:AAH_XxXxXxXxXxXxXxXxXxXxXxXxXx"
-                        value={telegramToken}
-                        onChange={e => setTelegramToken(e.target.value)}
-                        className="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
-                        disabled={isTelegramRunning}
-                      />
-                      <p className="text-xs text-neutral-400 mt-2">Get this from @BotFather on Telegram.</p>
-                    </div>
-
-                    <button
-                       onClick={toggleTelegram}
-                       disabled={isToggling}
-                       className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold transition-all transform active:scale-[0.98] ${
-                          isTelegramRunning 
-                          ? 'bg-red-500/10 text-red-600 border border-red-500/30 hover:bg-red-500 hover:text-white shadow-xl shadow-red-500/10' 
-                          : 'bg-indigo-500 text-white hover:bg-indigo-600 shadow-xl shadow-indigo-500/20'
-                       }`}
-                    >
-                       {isToggling && <Loader2 size={18} className="animate-spin" />}
-                       {!isToggling && isTelegramRunning && <Square size={18} className="fill-current" />}
-                       {!isToggling && !isTelegramRunning && <Play size={18} className="fill-current" />}
-                       
-                       {isToggling 
-                          ? 'Switching State...' 
-                          : isTelegramRunning 
-                             ? 'Terminate Telegram Bridge' 
-                             : 'Start Telegram Listener'
-                       }
-                    </button>
-                    
-                    {isTelegramRunning && (
-                       <div className="mt-6 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 text-sm flex items-start gap-3">
-                         <Shield className="shrink-0 mt-0.5" size={18} />
-                         <div>
-                            <span className="font-semibold block mb-1">Bridge Active and Secured</span>
-                            Messages sent to your connected Bot are physically executed directly on this machine's local instance.
-                         </div>
-                       </div>
-                    )}
-                 </div>
-              </div>
-           </div>
-        ) : (
-          <>
-            {/* VIRTUALIZED CONTAINER */}
-        <div 
-          ref={scrollRef} 
-          className="flex-1 overflow-y-auto px-6 pt-6 custom-scrollbar"
-        >
-          <div
-            style={{
-              height: `${virtualizer.getTotalSize()}px`,
-              width: '100%',
-              position: 'relative',
-            }}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeChannel}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="flex-1 flex flex-col overflow-hidden"
           >
-            {virtualizer.getVirtualItems().map((virtualRow) => {
-              const msg = mockMessages[virtualRow.index];
-              return (
-                <div
-                  key={virtualRow.index}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: `${virtualRow.size}px`,
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
+            {activeChannel === 'telegram' ? (
+               <div className="flex-1 p-8 overflow-y-auto">
+                  <div className="max-w-2xl mx-auto bg-white dark:bg-surface border border-neutral-200 dark:border-border p-8 rounded-2xl shadow-sm">
+                     <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-6 shadow-sm">
+                        <Send size={32} />
+                     </div>
+                     <h2 className="text-2xl font-bold mb-2">Connect Telegram</h2>
+                     <p className="text-neutral-500 mb-8 text-sm leading-relaxed">
+                       Link your Openzess local environment to a Telegram Bot. Once active, any message sent to your bot from anywhere in the world goes straight to your local AI array.
+                     </p>
+                     
+                     <div className="space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Bot API Token</label>
+                          <input
+                            type="password"
+                            placeholder="1234567890:AAH_XxXxXxXxXxXxXxXxXxXxXxXxXx"
+                            value={telegramToken}
+                            onChange={e => setTelegramToken(e.target.value)}
+                            className="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
+                            disabled={isTelegramRunning}
+                          />
+                          <p className="text-xs text-neutral-400 mt-2">Get this from @BotFather on Telegram.</p>
+                        </div>
+
+                        <button
+                           onClick={toggleTelegram}
+                           disabled={isToggling}
+                           className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold transition-all transform active:scale-[0.98] ${
+                              isTelegramRunning 
+                              ? 'bg-red-500/10 text-red-600 border border-red-500/30 hover:bg-red-500 hover:text-white shadow-xl shadow-red-500/10' 
+                              : 'bg-indigo-500 text-white hover:bg-indigo-600 shadow-xl shadow-indigo-500/20'
+                           }`}
+                        >
+                           {isToggling && <Loader2 size={18} className="animate-spin" />}
+                           {!isToggling && isTelegramRunning && <Square size={18} className="fill-current" />}
+                           {!isToggling && !isTelegramRunning && <Play size={18} className="fill-current" />}
+                           
+                           {isToggling 
+                              ? 'Switching State...' 
+                              : isTelegramRunning 
+                                 ? 'Terminate Telegram Bridge' 
+                                 : 'Start Telegram Listener'
+                           }
+                        </button>
+                        
+                        {isTelegramRunning && (
+                           <div className="mt-6 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 text-sm flex items-start gap-3">
+                             <Shield className="shrink-0 mt-0.5" size={18} />
+                             <div>
+                                <span className="font-semibold block mb-1">Bridge Active and Secured</span>
+                                Messages sent to your connected Bot are physically executed directly on this machine's local instance.
+                             </div>
+                           </div>
+                        )}
+                     </div>
+                  </div>
+               </div>
+            ) : (
+              <>
+                <div 
+                  ref={scrollRef} 
+                  className="flex-1 overflow-y-auto px-6 pt-6 custom-scrollbar"
                 >
-                  <div className={`flex flex-col max-w-[80%] pb-6 ${msg.align === 'right' ? 'self-end ml-auto' : 'self-start'}`}>
-                    <div className={`flex items-center gap-2 mb-1 text-xs ${msg.align === 'right' ? 'justify-end flex-row-reverse' : ''}`}>
-                       {msg.role === 'system' && <Radio size={12} className="text-neutral-400" />}
-                       {msg.role === 'agent' && <Bot size={12} className="text-brand" />}
-                       {msg.role === 'user' && <User size={12} className="text-blue-500" />}
-                       <span className="font-medium text-neutral-500">{msg.sender}</span>
-                       <span className="text-neutral-400">{msg.time}</span>
-                    </div>
-                    <div className={`p-4 rounded-2xl shadow-sm text-sm leading-[22px] ${msg.align === 'right' ? 'bg-brand text-white rounded-tr-sm' : 'bg-white dark:bg-surface border border-neutral-200 dark:border-border text-neutral-800 dark:text-neutral-200 rounded-tl-sm'}`}>
-                      {msg.text}
-                    </div>
+                  <div
+                    style={{
+                      height: `${virtualizer.getTotalSize()}px`,
+                      width: '100%',
+                      position: 'relative',
+                    }}
+                  >
+                    {virtualizer.getVirtualItems().map((virtualRow) => {
+                      const msg = mockMessages[virtualRow.index];
+                      return (
+                        <div
+                          key={virtualRow.index}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: `${virtualRow.size}px`,
+                            transform: `translateY(${virtualRow.start}px)`,
+                          }}
+                        >
+                          <div className={`flex flex-col max-w-[80%] pb-6 ${msg.align === 'right' ? 'self-end ml-auto' : 'self-start'}`}>
+                            <div className={`flex items-center gap-2 mb-1 text-xs ${msg.align === 'right' ? 'justify-end flex-row-reverse' : ''}`}>
+                               {msg.role === 'system' && <Radio size={12} className="text-neutral-400" />}
+                               {msg.role === 'agent' && <Bot size={12} className="text-brand" />}
+                               {msg.role === 'user' && <User size={12} className="text-blue-500" />}
+                               <span className="font-medium text-neutral-500">{msg.sender}</span>
+                               <span className="text-neutral-400">{msg.time}</span>
+                            </div>
+                            <div className={`p-4 rounded-2xl shadow-sm text-sm leading-[22px] ${msg.align === 'right' ? 'bg-brand text-white rounded-tr-sm' : 'bg-white dark:bg-surface border border-neutral-200 dark:border-border text-neutral-800 dark:text-neutral-200 rounded-tl-sm'}`}>
+                              {msg.text}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
 
-        <div className="p-4 border-t border-neutral-200 dark:border-border bg-white/50 dark:bg-surface/50 backdrop-blur-md shrink-0">
-          <div className="flex items-center gap-2 max-w-4xl mx-auto relative">
-             <input
-                type="text"
-                placeholder={`Read Only - Pretext Render Pipeline Benchmark Active.`}
-                value={inputVal}
-                onChange={e => setInputVal(e.target.value)}
-                className="w-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand/50 transition-colors"
-                disabled
-             />
-             <button disabled className="absolute right-2 p-2 bg-brand text-white rounded-lg opacity-50 cursor-not-allowed">
-                <Send size={16} />
-             </button>
-          </div>
-        </div>
-        </>
-      )}
+                <div className="p-4 border-t border-neutral-200 dark:border-border bg-white/50 dark:bg-surface/50 backdrop-blur-md shrink-0">
+                  <div className="flex items-center gap-2 max-w-4xl mx-auto relative">
+                     <input
+                        type="text"
+                        placeholder={`Read Only - Pretext Render Pipeline Benchmark Active.`}
+                        value={inputVal}
+                        onChange={e => setInputVal(e.target.value)}
+                        className="w-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand/50 transition-colors"
+                        disabled
+                     />
+                     <button disabled className="absolute right-2 p-2 bg-brand text-white rounded-lg opacity-50 cursor-not-allowed">
+                        <Send size={16} />
+                     </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

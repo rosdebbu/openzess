@@ -349,6 +349,118 @@ class OpenzessAgent:
         except BaseException as e:
             import traceback
             traceback.print_exc()
+            raise e
+
+    def chat_stream(self, user_prompt: str):
+        try:
+            self.last_prompt = user_prompt
+            
+            rag_context = ""
+            if memory_collection is not None:
+                try:
+                    results = memory_collection.query(query_texts=[user_prompt], n_results=3)
+                    if results and results.get("documents") and results["documents"] and results["documents"][0]:
+                        rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
+                        for doc in results["documents"][0]:
+                            if doc.strip():
+                                rag_context += f"- {doc}\n"
+                except Exception as eval_e:
+                    print(f"RAG Retrieval failed: {eval_e}")
+            
+            enhanced_prompt = user_prompt + rag_context if rag_context else user_prompt
+            self.messages.append({"role": "user", "content": enhanced_prompt})
+            
+            tool_outputs = []
+            
+            while True:
+                response_stream = litellm.completion(
+                    model=self.model_name,
+                    messages=self.messages,
+                    tools=self.tools if self.tools else None,
+                    stream=True
+                )
+                
+                collected_content = ""
+                tool_calls = []
+
+                for chunk in response_stream:
+                    delta = chunk.choices[0].delta
+                    
+                    if delta.content:
+                        collected_content += delta.content
+                        yield {"type": "content", "content": delta.content}
+                        
+                    if getattr(delta, "tool_calls", None):
+                        for tcall in delta.tool_calls:
+                            idx = getattr(tcall, "index", 0)
+                            while len(tool_calls) <= idx:
+                                tool_calls.append({"id": getattr(tcall, "id", None), "type": "function", "function": {"name": "", "arguments": ""}})
+                            
+                            if getattr(tcall, "id", None):
+                                tool_calls[idx]["id"] = tcall.id
+                            if getattr(tcall, "function", None):
+                                if getattr(tcall.function, "name", None):
+                                    tool_calls[idx]["function"]["name"] = tcall.function.name
+                                if getattr(tcall.function, "arguments", None):
+                                    tool_calls[idx]["function"]["arguments"] += tcall.function.arguments
+
+                msg_dict = {"role": "assistant"}
+                if tool_calls:
+                     msg_dict["tool_calls"] = tool_calls
+                     # Some APIs require content to be present, even if empty string
+                     msg_dict["content"] = collected_content if collected_content else ""
+                else:
+                     msg_dict["content"] = collected_content if collected_content else ""
+                     
+                self.messages.append(msg_dict)
+                
+                if not tool_calls:
+                    if collected_content and memory_collection is not None:
+                        self._ingest_memory(self.last_prompt, collected_content)
+                    yield {"type": "done", "auth_required": False, "reply": collected_content}
+                    return
+                    
+                dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory"]
+                
+                pending_calls = []
+                for tc in tool_calls:
+                    args = {}
+                    try:
+                        args = json.loads(tc["function"]["arguments"])
+                        # If args contains a dictionary with an identical string representation it might need strict loading
+                    except:
+                        try:
+                            # fallback for bad quotes
+                            import ast
+                            args = ast.literal_eval(tc["function"]["arguments"])
+                        except:
+                            pass
+                    pending_calls.append({"id": tc["id"], "name": tc["function"]["name"], "args": args})
+                
+                requires_auth = any(pc["name"] in dangerous_tools for pc in pending_calls)
+                if requires_auth:
+                    yield {
+                        "type": "auth_required",
+                        "pending_calls": pending_calls
+                    }
+                    return
+                    
+                for pc in pending_calls:
+                    yield {"type": "tool_start", "tool": pc["name"]}
+                    output = self._run_tool(pc["name"], pc["args"])
+                    tool_outputs.append({"tool": pc["name"], "args": pc["args"], "output": output})
+                    yield {"type": "tool_result", "tool": pc["name"], "args": pc["args"], "output": str(output)}
+                    self.messages.append({
+                        "role": "tool",
+                        "tool_call_id": pc["id"],
+                        "content": str(output)
+                    })
+                    
+        except BaseException as e:
+            import traceback
+            traceback.print_exc()
+            yield {"type": "error", "error": str(e)}
+            traceback.print_exc()
             return {"reply": f"An error occurred: {str(e)}", "tools": [], "auth_required": False}
 
     def execute_pending_tools(self, pending_calls: list, approved: bool):
@@ -386,4 +498,34 @@ class OpenzessAgent:
         except BaseException as e:
             import traceback
             traceback.print_exc()
-            return {"reply": f"An error occurred: {str(e)}", "tools": [], "auth_required": False}
+            return {"reply": f"Error: {e}", "tools": [], "auth_required": False}
+
+    def execute_pending_tools_stream(self, pending_calls: list, approved: bool):
+        try:
+            for pc in pending_calls:
+                name = pc["name"]
+                args = pc["args"]
+                tool_call_id = pc.get("id", "temp_id")
+                
+                yield {"type": "tool_start", "tool": name}
+                
+                if not approved:
+                    output = "Execution halted: USER DENIED PERMISSION to run this tool."
+                else:
+                    output = self._run_tool(name, args)
+                    
+                yield {"type": "tool_result", "tool": name, "args": args, "output": str(output)}
+                self.messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call_id,
+                    "content": str(output)
+                })
+                
+            for chunk in self.chat_stream(""):
+                if chunk.get("type") in ["content", "tool_start", "tool_result", "auth_required", "error"]:
+                    yield chunk
+                elif chunk.get("type") == "done":
+                    yield chunk
+                    
+        except BaseException as e:
+            import traceback

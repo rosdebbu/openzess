@@ -1,7 +1,9 @@
 import os
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import json
 from typing import Optional, List, Dict
 from agent import OpenzessAgent, memory_collection
 import database
@@ -44,6 +46,7 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = None
     system_instruction: Optional[str] = None
     allowed_tools: Optional[List[str]] = None
+    stream: bool = False
 
 # Store session agents locally for speed, hydrate from DB on restart
 sessions: Dict[str, OpenzessAgent] = {}
@@ -99,15 +102,23 @@ async def chat(request: ChatRequest):
         # 1. Save user message to database
         database.add_message(session_id, "user", request.message)
         
-        # 2. Get AI response
-        response = agent.chat(request.message)
-        
-        # 3. Save AI response back to database ONLY if execution is completed
-        if not response.get("auth_required") and response.get("reply"):
-            database.add_message(session_id, "agent", response.get("reply"))
-        
-        response["session_id"] = session_id
-        return response
+        if request.stream:
+            def event_generator():
+                # Stream initialization
+                yield f"data: {json.dumps({'type': 'session', 'session_id': session_id})}\n\n"
+                
+                for chunk in agent.chat_stream(request.message):
+                    yield f"data: {json.dumps(chunk)}\n\n"
+                    if chunk.get("type") == "done" and not chunk.get("auth_required") and chunk.get("reply"):
+                        database.add_message(session_id, "agent", chunk.get("reply"))
+            return StreamingResponse(event_generator(), media_type="text/event-stream")
+        else:
+            response = agent.chat(request.message)
+            if not response.get("auth_required") and response.get("reply"):
+                database.add_message(session_id, "agent", response.get("reply"))
+            
+            response["session_id"] = session_id
+            return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -115,6 +126,7 @@ class ApprovalRequest(BaseModel):
     session_id: str
     pending_calls: list
     approved: bool
+    stream: bool = False
 
 @app.post("/api/chat/approve")
 async def chat_approve(request: ApprovalRequest):
@@ -123,12 +135,20 @@ async def chat_approve(request: ApprovalRequest):
         raise HTTPException(status_code=404, detail="Session not found in memory.")
     
     try:
-        response = agent.execute_pending_tools(request.pending_calls, request.approved)
-        if not response.get("auth_required") and response.get("reply"):
-            database.add_message(request.session_id, "agent", response.get("reply"))
-            
-        response["session_id"] = request.session_id
-        return response
+        if request.stream:
+            def event_generator():
+                for chunk in agent.execute_pending_tools_stream(request.pending_calls, request.approved):
+                    yield f"data: {json.dumps(chunk)}\n\n"
+                    if chunk.get("type") == "done" and not chunk.get("auth_required") and chunk.get("reply"):
+                        database.add_message(request.session_id, "agent", chunk.get("reply"))
+            return StreamingResponse(event_generator(), media_type="text/event-stream")
+        else:
+            response = agent.execute_pending_tools(request.pending_calls, request.approved)
+            if not response.get("auth_required") and response.get("reply"):
+                database.add_message(request.session_id, "agent", response.get("reply"))
+                
+            response["session_id"] = request.session_id
+            return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -150,34 +150,80 @@ export default function Chat() {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/api/chat', {
-        message: userMessage.content,
-        api_key: apiKey,
-        provider: localStorage.getItem('openzess_provider') || 'gemini',
-        session_id: sessionId || undefined,
-        system_instruction: systemInstruction,
-        allowed_tools: allowedTools
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage.content,
+          api_key: apiKey,
+          provider: localStorage.getItem('openzess_provider') || 'gemini',
+          session_id: sessionId || undefined,
+          system_instruction: systemInstruction,
+          allowed_tools: allowedTools,
+          stream: true
+        })
       });
 
-      const data = response.data;
-      
-      if (data.session_id && data.session_id !== sessionId) {
-        setSearchParams({ session_id: data.session_id }, { replace: true });
-      }
-      
-      if (data.auth_required) {
-          setPendingCalls(data.pending_calls);
-          return;
-      }
-      
-      if (data.tools && data.tools.length > 0) {
-        setTerminalLogs(prev => [...prev, ...data.tools]);
+      if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText);
       }
 
-      setMessages(prev => [...prev, { id: Date.now().toString() + 'r', role: 'agent', content: data.reply }]);
+      if (!response.body) throw new Error("No response body");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      const responseId = Date.now().toString() + 'r';
+      setMessages(prev => [...prev, { id: responseId, role: 'agent', content: '' }]);
+
+      let done = false;
+      let streamedResponse = '';
+      let buffer = '';
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        if (value) {
+            buffer += decoder.decode(value, { stream: true });
+            
+            const lines = buffer.split('\n\n');
+            buffer = lines.pop() || '';
+            
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const dataStr = line.replace('data: ', '');
+                    try {
+                        const data = JSON.parse(dataStr);
+                        
+                        if (data.type === 'session') {
+                            if (data.session_id && data.session_id !== sessionId) {
+                              setSearchParams({ session_id: data.session_id }, { replace: true });
+                            }
+                        } else if (data.type === 'content') {
+                            streamedResponse += data.content;
+                            setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                        } else if (data.type === 'tool_start') {
+                            streamedResponse += `\n\n⚙️ Executing \`${data.tool}\`...\n\n`;
+                            setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                        } else if (data.type === 'tool_result') {
+                            setTerminalLogs(prev => [...prev, { tool: data.tool, args: data.args, output: data.output }]);
+                        } else if (data.type === 'auth_required') {
+                            setPendingCalls(data.pending_calls);
+                        } else if (data.type === 'error') {
+                            streamedResponse += `\n\n❌ Error: ${data.error}`;
+                            setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                        }
+                    } catch (e) {
+                        console.error('Error parsing SSE data', e);
+                    }
+                }
+            }
+        }
+      }
     } catch (error: any) {
       console.error(error);
-      const errMsg = error.response?.data?.detail || error.message || 'Unknown error occurred.';
+      const errMsg = error.message || 'Unknown error occurred.';
       setMessages(prev => [...prev, { id: 'err', role: 'agent', content: `Error: ${errMsg}` }]);
       if (errMsg.includes('API Key')) {
         window.dispatchEvent(new Event('open-settings'));
@@ -193,26 +239,73 @@ export default function Chat() {
       setPendingCalls(null);
       
       try {
-         const response = await axios.post('http://localhost:8000/api/chat/approve', {
-             session_id: sessionId,
-             pending_calls: callsRef,
-             approved: approved
+         const response = await fetch('http://localhost:8000/api/chat/approve', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({
+                 session_id: sessionId,
+                 pending_calls: callsRef,
+                 approved: approved,
+                 stream: true
+             })
          });
          
-         const data = response.data;
-         
-         if (data.auth_required) {
-             setPendingCalls(data.pending_calls);
-             return;
+         if (!response.ok) {
+             const errorText = await response.text();
+             throw new Error(errorText);
          }
+
+         if (!response.body) throw new Error("No response body");
+
+         const reader = response.body.getReader();
+         const decoder = new TextDecoder();
          
-         if (data.tools && data.tools.length > 0) {
-            setTerminalLogs(prev => [...prev, ...data.tools]);
+         const responseId = Date.now().toString() + 'r';
+         setMessages(prev => [...prev, { id: responseId, role: 'agent', content: '' }]);
+
+         let done = false;
+         let streamedResponse = '';
+         let buffer = '';
+
+         while (!done) {
+             const { value, done: doneReading } = await reader.read();
+             done = doneReading;
+             if (value) {
+                 buffer += decoder.decode(value, { stream: true });
+                 
+                 const lines = buffer.split('\n\n');
+                 buffer = lines.pop() || '';
+                 
+                 for (const line of lines) {
+                     if (line.startsWith('data: ')) {
+                         const dataStr = line.replace('data: ', '');
+                         try {
+                             const data = JSON.parse(dataStr);
+                             
+                             if (data.type === 'content') {
+                                 streamedResponse += data.content;
+                                 setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                             } else if (data.type === 'tool_start') {
+                                 streamedResponse += `\n\n⚙️ Executing \`${data.tool}\`...\n\n`;
+                                 setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                             } else if (data.type === 'tool_result') {
+                                 setTerminalLogs(prev => [...prev, { tool: data.tool, args: data.args, output: data.output }]);
+                             } else if (data.type === 'auth_required') {
+                                 setPendingCalls(data.pending_calls);
+                             } else if (data.type === 'error') {
+                                 streamedResponse += `\n\n❌ Error: ${data.error}`;
+                                 setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                             }
+                         } catch (e) {
+                             console.error('Error parsing SSE data', e);
+                         }
+                     }
+                 }
+             }
          }
-         setMessages(prev => [...prev, { id: Date.now().toString() + 'r', role: 'agent', content: data.reply }]);
       } catch (error: any) {
           console.error(error);
-          setMessages(prev => [...prev, { id: 'err', role: 'agent', content: `Error fulfilling execution.` }]);
+          setMessages(prev => [...prev, { id: 'err', role: 'agent', content: `Error fulfilling execution: ${error.message}` }]);
       } finally {
           setIsLoading(false);
       }
