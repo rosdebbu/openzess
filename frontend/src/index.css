@@ -16,6 +16,7 @@
   --border: rgba(255, 255, 255, 0.08);
   --scrollbar: rgba(255, 255, 255, 0.1);
   --scrollbar-hover: rgba(255, 255, 255, 0.2);
+  color-scheme: dark;
 }
 
 @theme {

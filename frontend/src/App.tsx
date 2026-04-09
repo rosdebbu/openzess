@@ -164,11 +164,11 @@ function App() {
                            onChange={(e) => setProvider(e.target.value)}
                            className="w-full bg-neutral-50 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand/50 dark:focus:border-brand transition-colors"
                         >
-                           <option value="gemini">Google Gemini (gemini-2.5-flash)</option>
-                           <option value="openai">OpenAI (gpt-4o-mini)</option>
-                           <option value="anthropic">Anthropic (claude-3-5-sonnet-20241022)</option>
-                           <option value="groq">Groq (llama-3.3-70b-versatile)</option>
-                           <option value="ollama">Local System (Ollama)</option>
+                           <option value="gemini" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Google Gemini / Gemma (gemini-2.5-flash)</option>
+                           <option value="openai" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">OpenAI (gpt-4o-mini)</option>
+                           <option value="anthropic" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Anthropic (claude-3-5-sonnet-20241022)</option>
+                           <option value="groq" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Groq (llama-3.3-70b-versatile)</option>
+                           <option value="ollama" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Local System (Ollama)</option>
                         </select>
                         
                         <input 
