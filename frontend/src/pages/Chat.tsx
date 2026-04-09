@@ -28,12 +28,13 @@ export default function Chat() {
   
   const [activeArtifact, setActiveArtifact] = useState<string | null>(null);
   const [lastProcessedMsgId, setLastProcessedMsgId] = useState<string | null>(null);
+  const isStreamingRef = useRef(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId && !isStreamingRef.current) {
       loadSessionHistory(sessionId);
     } else {
       setMessages([]);
@@ -101,6 +102,7 @@ export default function Chat() {
     setMessages(prev => [...prev, userMessage]);
     if (!suggestedText) setInput('');
     setIsLoading(true);
+    isStreamingRef.current = true;
     setPendingCalls(null);
 
     // Swarm Native Parser
@@ -230,6 +232,7 @@ export default function Chat() {
       }
     } finally {
       setIsLoading(false);
+      isStreamingRef.current = false;
     }
   };
 
