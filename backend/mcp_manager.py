@@ -20,10 +20,10 @@ class MCPManager:
         asyncio.set_event_loop(self._loop)
         self._loop.run_forever()
 
-    def _run_async(self, coro):
+    def _run_async(self, coro, timeout=120):
         """Helper to run coroutines in the background loop from sync functions"""
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
-        return future.result(timeout=30)
+        return future.result(timeout=timeout)
 
     async def _amake_connection(self, server_id: str, command: str, args: list):
         if server_id in self.servers:
@@ -32,10 +32,14 @@ class MCPManager:
         print(f"[{server_id}] Connecting MCP stdio via {command} {' '.join(args)}...", flush=True)
         
         import sys
+        import os
+        
+        env = os.environ.copy()
+        
         if sys.platform == "win32" and command == "npx":
             command = "npx.cmd"
             
-        server_params = StdioServerParameters(command=command, args=args, env=None)
+        server_params = StdioServerParameters(command=command, args=args, env=env)
         
         stdio_mgr = stdio_client(server_params)
         read, write = await stdio_mgr.__aenter__()
