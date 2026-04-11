@@ -324,6 +324,24 @@ class OpenzessAgent:
                     "content": str(output)
                 })
 
+                if pc["name"] == "take_screenshot":
+                    try:
+                        import base64
+                        import os
+                        img_path = os.path.join(os.getcwd(), "temp_matrix_screen.png")
+                        if os.path.exists(img_path):
+                            with open(img_path, "rb") as image_file:
+                                b64 = base64.b64encode(image_file.read()).decode('utf-8')
+                            self.messages.append({
+                                "role": "user",
+                                "content": [
+                                    {"type": "text", "text": "Here is the visual feed of the desktop matrix:"},
+                                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}
+                                ]
+                            })
+                    except Exception as ve:
+                        print(f"Vision cortex error: {ve}")
+
     def _ingest_memory(self, prompt: str, reply: str):
         try:
             memory_string = f"User inquired: {prompt}\nAI Responded: {reply}"
@@ -472,6 +490,24 @@ class OpenzessAgent:
                         "tool_call_id": pc["id"],
                         "content": str(output)
                     })
+
+                    if pc["name"] == "take_screenshot":
+                        try:
+                            import base64
+                            import os
+                            img_path = os.path.join(os.getcwd(), "temp_matrix_screen.png")
+                            if os.path.exists(img_path):
+                                with open(img_path, "rb") as image_file:
+                                    b64 = base64.b64encode(image_file.read()).decode('utf-8')
+                                self.messages.append({
+                                    "role": "user",
+                                    "content": [
+                                        {"type": "text", "text": "Here is the visual feed of the desktop matrix:"},
+                                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}
+                                    ]
+                                })
+                        except Exception as ve:
+                            print(f"Vision cortex error: {ve}")
                     
         except BaseException as e:
             import traceback
