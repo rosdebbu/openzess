@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Layers, Github, Database, Globe, Command, PlusCircle, Server, CheckCircle, Info } from 'lucide-react';
+import { Layers, Folder, Database, Globe, Command, PlusCircle, Server, CheckCircle, Info, Box } from 'lucide-react';
 import axios from 'axios';
 
 interface PluginCard {
@@ -18,60 +18,60 @@ interface PluginCard {
 
 const MARKETPLACE_PLUGINS: PluginCard[] = [
   {
-    id: "mcp-github",
-    name: "GitHub Ecosystem",
+    id: "mcp-filesystem",
+    name: "System Files Access",
     developer: "ModelContextProtocol",
-    description: "Allows the Agent to read repositories, manage issues, and natively push Pull Requests to GitHub.",
-    icon: Github,
+    description: "Allows the Agent to read, write, and manipulate files safely on your local hard drive natively.",
+    icon: Folder,
     iconColor: "text-neutral-900 dark:text-white",
     command: "npx",
-    args: ["-y", "@modelcontextprotocol/server-github"],
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "./"],
     bannerGradient: "from-neutral-200 to-neutral-400 dark:from-neutral-800 dark:to-neutral-900",
     popular: true
   },
   {
-    id: "mcp-sqlite",
-    name: "SQLite Database Explorer",
-    developer: "ModelContextProtocol",
-    description: "Gives your Agent native SQL execution access to explore and mutate local SQLite database structures natively.",
-    icon: Database,
+    id: "mcp-kubernetes",
+    name: "Kubernetes Cluster Controller",
+    developer: "flux159",
+    description: "Gives your Agent native execution access to explore and mutate kubernetes clusters using kubectl.",
+    icon: Database, // Generic database/server icon
     iconColor: "text-blue-500",
     command: "npx",
-    args: ["-y", "@modelcontextprotocol/server-sqlite", "--db", "./mydb.sqlite"],
+    args: ["-y", "mcp-server-kubernetes"],
     bannerGradient: "from-blue-500/20 to-cyan-500/20",
     popular: true
   },
   {
-    id: "mcp-puppeteer",
-    name: "Puppeteer Web Browser",
-    developer: "ModelContextProtocol",
-    description: "Provides full headless Chromium access. The AI can natively browse the visual web, click buttons, and scrape secure pages.",
+    id: "mcp-sentry",
+    name: "Sentry Error Monitoring",
+    developer: "Sentry",
+    description: "Connects Openzess directly to your Sentry projects to read crash reports and automatically triage errors.",
     icon: Globe,
     iconColor: "text-emerald-500",
     command: "npx",
-    args: ["-y", "@modelcontextprotocol/server-puppeteer"],
+    args: ["-y", "@sentry/mcp-server"],
     bannerGradient: "from-emerald-500/20 to-teal-500/20"
   },
   {
-    id: "mcp-slack",
-    name: "Slack Communicator",
-    developer: "ModelContextProtocol",
-    description: "Connects Openzess to your Slack workspace to read channels and automatically reply to colleagues.",
-    icon: Command,
+    id: "mcp-supabase",
+    name: "Supabase Bridge",
+    developer: "Supabase",
+    description: "Connects Openzess to your Supabase cloud backend to orchestrate native API adjustments.",
+    icon: Server,
     iconColor: "text-rose-500",
     command: "npx",
-    args: ["-y", "@modelcontextprotocol/server-slack"],
+    args: ["-y", "@supabase/mcp-server-supabase"],
     bannerGradient: "from-rose-500/20 to-pink-500/20"
   },
   {
-    id: "mcp-postgres",
-    name: "PostgreSQL Bridge",
-    developer: "ModelContextProtocol",
-    description: "Native agent logic allowing structural modification and heavy data retrieval from secure production PostgreSQL tables.",
+    id: "mcp-heroku",
+    name: "Heroku Platform Control",
+    developer: "Heroku",
+    description: "Native agent logic allowing structural modification and deployment management of your Heroku apps.",
     icon: Server,
     iconColor: "text-indigo-500",
     command: "npx",
-    args: ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
+    args: ["-y", "@heroku/mcp-server"],
     bannerGradient: "from-indigo-500/20 to-purple-500/20"
   }
 ];

@@ -39,6 +39,17 @@ class MCPManager:
         if sys.platform == "win32" and command == "npx":
             command = "npx.cmd"
             
+        # [CRITICAL FIX] If it's an npx command, do a dry run simple install first to prevent stdout corruption
+        # npx spits out progress bars on first run which violently breaks the MCP JSON-RPC protocol
+        if 'npx' in command:
+            import subprocess
+            print(f"[{server_id}] Pre-installing node package to prevent stream corruption...", flush=True)
+            try:
+                # We run it with --help just to force NPM to download and cache the package in the global registry
+                subprocess.run([command] + args + ["--help"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=45)
+            except Exception as e:
+                print(f"[{server_id}] Pre-install cache slip: {e}")
+
         server_params = StdioServerParameters(command=command, args=args, env=env)
         
         stdio_mgr = stdio_client(server_params)
