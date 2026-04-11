@@ -20,15 +20,38 @@
 }
 
 @theme {
-  --color-brand: #4f46e5;
-  --color-brand-hover: #4338ca;
+  --color-brand: #6366f1; /* Cyber Indigo */
+  --color-brand-hover: #4f46e5;
   --color-surface: var(--surface);
   --color-border: var(--border);
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 @layer base {
   body {
     @apply antialiased font-sans h-screen flex justify-center items-center overflow-hidden transition-colors duration-500 text-neutral-900 dark:text-neutral-100;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  .glass-panel {
+    @apply bg-white/60 dark:bg-neutral-900/60 backdrop-blur-2xl border border-white/40 dark:border-white/5 shadow-2xl;
+  }
+
+  .premium-shadow {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 40px rgba(99, 102, 241, 0.1);
+  }
+  
+  .dark .premium-shadow {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 60px rgba(99, 102, 241, 0.15);
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-[1.02] active:scale-95;
   }
   
 
@@ -37,20 +60,20 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 70vw;
-      height: 70vh;
+      width: 80vw;
+      height: 80vh;
       border-radius: 50%;
-      background: radial-gradient(circle, var(--color-brand) 0%, transparent 60%);
-      filter: blur(140px);
-      opacity: 0.12;
+      background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 40%, transparent 70%);
+      filter: blur(100px);
       z-index: 0;
       pointer-events: none;
-      animation: driftOrb 18s ease-in-out infinite alternate;
+      animation: driftOrb 20s ease-in-out infinite alternate, pulseOrb 10s ease-in-out infinite alternate;
       transform-origin: center;
   }
   
   .dark .ambient-orb {
-      opacity: 0.06;
+      background: radial-gradient(circle at center, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.15) 40%, transparent 70%);
+      filter: blur(120px);
   }
   
   .drag-region {
@@ -62,8 +85,13 @@
   }
   
   @keyframes driftOrb {
-      0% { transform: translate(-50%, -50%) scale(1) translateX(0); }
-      100% { transform: translate(-50%, -50%) scale(1.1) translateX(10vw) translateY(5vh); }
+      0% { transform: translate(-50%, -50%) scale(1) translateX(-5vw); }
+      100% { transform: translate(-50%, -50%) scale(1.15) translateX(10vw) translateY(5vh); }
+  }
+
+  @keyframes pulseOrb {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; }
   }
   
   /* Additional scrollbar styling for extra premium feel */

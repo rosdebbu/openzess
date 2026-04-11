@@ -122,23 +122,23 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
       <BrowserRouter>
-        <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 overflow-hidden font-sans transition-colors duration-300 relative">
-        <div className="ambient-orb"></div>
-        
-        {/* Settings Full Modal */}
-        <AnimatePresence>
-          {showSettings && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4"
-            >
+        <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 font-sans relative overflow-hidden transition-colors duration-500">
+          <div className="ambient-orb"></div>
+          
+          {/* Settings Full Modal */}
+          <AnimatePresence>
+            {showSettings && (
               <motion.div 
-                initial={{ y: 20, opacity: 0, scale: 0.95 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 px-4"
               >
+                <motion.div 
+                  initial={{ y: 30, opacity: 0, scale: 0.95 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-3xl border border-neutral-200 dark:border-white/10 rounded-3xl w-full max-w-4xl premium-shadow flex flex-col overflow-hidden max-h-[90vh]"
+                >
                 <div className="flex border-b border-neutral-200 dark:border-border shrink-0">
                   <button 
                     onClick={() => setActiveTab('general')}
@@ -307,10 +307,11 @@ function App() {
           )}
         </AnimatePresence>
 
-        <Sidebar />
-
-        <AnimatedRoutes persona={persona} />
-      </div>
+          <div className="flex flex-1 relative z-10 w-full h-full text-neutral-900 dark:text-neutral-200 bg-transparent">
+             <Sidebar />
+             <AnimatedRoutes persona={persona} />
+          </div>
+        </div>
       </BrowserRouter>
       </ToastProvider>
     </ThemeProvider>
