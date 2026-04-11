@@ -32,7 +32,7 @@ source ~/openzess_venv/bin/activate
 
 # Ensure internal packages are installed for Linux natively
 echo "Installing Python dependencies natively into WSL (this will be fast now!)..."
-pip install fastapi uvicorn litellm chromadb duckduckgo-search beautifulsoup4 mcp psutil pyautogui mss pillow requests pydantic httpx
+pip install fastapi uvicorn litellm chromadb duckduckgo-search beautifulsoup4 mcp psutil pyautogui mss pillow requests pydantic httpx apscheduler watchdog sqlalchemy gtts python-dotenv python-multipart
 
 # Removed CRLF fix that caused massive file I/O bottleneck
 
