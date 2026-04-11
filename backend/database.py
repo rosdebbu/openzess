@@ -50,6 +50,18 @@ class MCPServer(Base):
     args_json = Column(String) # JSON string array
     is_active = Column(Integer, default=1) # 1=active, 0=inactive
 
+class Persona(Base):
+    __tablename__ = "personas"
+    id = Column(String, primary_key=True, index=True)
+    name = Column(String, index=True)
+    description = Column(String)
+    personality = Column(String)
+    scenario = Column(String)
+    first_mes = Column(String)
+    mes_example = Column(String)
+    avatar_base64 = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 
@@ -144,6 +156,62 @@ def remove_mcp_server(server_id: str):
         server = db.query(MCPServer).filter(MCPServer.server_id == server_id).first()
         if server:
             db.delete(server)
+            db.commit()
+    finally:
+        db.close()
+
+def add_or_update_persona(persona_id: str, data: dict):
+    db = SessionLocal()
+    try:
+        persona = db.query(Persona).filter(Persona.id == persona_id).first()
+        if persona:
+            persona.name = data.get("name", persona.name)
+            persona.description = data.get("description", persona.description)
+            persona.personality = data.get("personality", persona.personality)
+            persona.scenario = data.get("scenario", persona.scenario)
+            persona.first_mes = data.get("first_mes", persona.first_mes)
+            persona.mes_example = data.get("mes_example", persona.mes_example)
+            if data.get("avatar_base64"):
+                persona.avatar_base64 = data["avatar_base64"]
+        else:
+            new_persona = Persona(
+                id=persona_id,
+                name=data.get("name", "Unknown"),
+                description=data.get("description", ""),
+                personality=data.get("personality", ""),
+                scenario=data.get("scenario", ""),
+                first_mes=data.get("first_mes", ""),
+                mes_example=data.get("mes_example", ""),
+                avatar_base64=data.get("avatar_base64", "")
+            )
+            db.add(new_persona)
+        db.commit()
+    finally:
+        db.close()
+
+def get_all_personas():
+    db = SessionLocal()
+    try:
+        results = db.query(Persona).all()
+        return [{
+            "id": p.id,
+            "name": p.name,
+            "description": p.description,
+            "personality": p.personality,
+            "scenario": p.scenario,
+            "first_mes": p.first_mes,
+            "mes_example": p.mes_example,
+            "avatar_base64": p.avatar_base64
+        } for p in results]
+    finally:
+        db.close()
+
+def delete_persona(persona_id: str):
+    db = SessionLocal()
+    try:
+        p = db.query(Persona).filter(Persona.id == persona_id).first()
+        if p:
+            db.delete(p)
             db.commit()
     finally:
         db.close()

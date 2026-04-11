@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -12,6 +12,9 @@ import background_workers
 import telegram_worker
 from gtts import gTTS
 import io
+import uuid
+import shutil
+import tavern_parser
 
 app = FastAPI()
 
@@ -274,6 +277,18 @@ async def remove_saved_mcp(server_id: str):
     database.remove_mcp_server(server_id)
     return {"status": "deleted"}
 
+class CronCreateRequest(BaseModel):
+    command: str
+    interval_minutes: int
+
+@app.post("/api/cron")
+async def create_cron_job(request: CronCreateRequest):
+    try:
+        job_id = background_workers.cron_manager.add_job(request.command, request.interval_minutes)
+        return {"status": "created", "job_id": job_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/cron")
 async def get_cron_jobs():
     return {"jobs": background_workers.cron_manager.get_jobs()}
@@ -283,6 +298,18 @@ async def delete_cron_job(job_id: str):
     background_workers.cron_manager.remove_job(job_id)
     return {"status": "deleted"}
 
+class WatchdogCreateRequest(BaseModel):
+    directory: str
+    action: str
+
+@app.post("/api/watchdog")
+async def create_watchdog(request: WatchdogCreateRequest):
+    try:
+        watch_id = background_workers.watch_manager.add_watchdog(request.directory, request.action)
+        return {"status": "created", "watch_id": watch_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/watchdog")
 async def get_watchdogs():
     return {"watchdogs": background_workers.watch_manager.get_watchdogs()}
@@ -290,6 +317,44 @@ async def get_watchdogs():
 @app.delete("/api/watchdog/{watch_id}")
 async def delete_watchdog(watch_id: str):
     background_workers.watch_manager.remove_watchdog(watch_id)
+    return {"status": "deleted"}
+
+# ================================
+# PERSONA / TAVERN
+# ================================
+@app.post("/api/personas/import")
+async def import_persona(file: UploadFile = File(...)):
+    file_path = f"temp_{uuid.uuid4()}_{file.filename}"
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        if file.filename.endswith(".png"):
+            persona_data = tavern_parser.parse_tavern_png(file_path)
+        elif file.filename.endswith(".json"):
+            persona_data = tavern_parser.parse_tavern_json(file_path)
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file format.")
+            
+        persona_id = str(uuid.uuid4())
+        database.add_or_update_persona(persona_id, persona_data)
+        
+        if os.path.exists(file_path): os.remove(file_path)
+        return {"status": "success", "persona_id": persona_id, "name": persona_data["name"]}
+    except Exception as e:
+        if os.path.exists(file_path): os.remove(file_path)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/personas")
+async def get_personas():
+    try:
+        return {"personas": database.get_all_personas()}
+    except Exception as e:
+         raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/personas/{persona_id}")
+async def delete_persona(persona_id: str):
+    database.delete_persona(persona_id)
     return {"status": "deleted"}
 
 # ================================

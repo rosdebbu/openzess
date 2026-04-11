@@ -53,6 +53,14 @@
       opacity: 0.06;
   }
   
+  .drag-region {
+      -webkit-app-region: drag;
+  }
+  
+  .no-drag {
+      -webkit-app-region: no-drag;
+  }
+  
   @keyframes driftOrb {
       0% { transform: translate(-50%, -50%) scale(1) translateX(0); }
       100% { transform: translate(-50%, -50%) scale(1.1) translateX(10vw) translateY(5vh); }

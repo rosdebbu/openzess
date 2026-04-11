@@ -18,7 +18,7 @@ export default function Sidebar() {
       items: [
         { name: 'Channels', icon: <Radio size={18} />, path: '/channels' },
         { name: 'Sessions', icon: <Users size={18} />, path: '/sessions' },
-        { name: 'Cron Jobs', icon: <CalendarClock size={18} />, path: '/cron-jobs' },
+        { name: 'Task Center', icon: <CalendarClock size={18} />, path: '/cron-jobs' },
         { name: 'Heartbeat', icon: <Activity size={18} />, path: '/heartbeat' },
       ]
     },
