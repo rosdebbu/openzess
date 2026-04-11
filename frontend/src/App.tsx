@@ -16,6 +16,8 @@ import Heartbeat from './pages/Heartbeat';
 import MCP from './pages/MCP';
 import Changelog from './pages/Changelog';
 import Companion from './pages/Companion';
+import Tavern from './pages/Tavern';
+import Marketplace from './pages/Marketplace';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -46,6 +48,8 @@ function AnimatedRoutes({ persona }: { persona: string }) {
           
           <Route path="/skills" element={<PageTransition><Skills /></PageTransition>} />
           <Route path="/mcp" element={<PageTransition><MCP /></PageTransition>} />
+          <Route path="/marketplace" element={<PageTransition><Marketplace /></PageTransition>} />
+          <Route path="/tavern" element={<PageTransition><Tavern /></PageTransition>} />
           <Route path="/memory" element={<PageTransition><MemoryVault /></PageTransition>} />
           <Route path="/companion" element={<PageTransition><Companion /></PageTransition>} />
           <Route path="/changelog" element={<PageTransition><Changelog /></PageTransition>} />

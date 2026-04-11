@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -52,6 +52,7 @@ class ChatRequest(BaseModel):
     system_instruction: Optional[str] = None
     allowed_tools: Optional[List[str]] = None
     stream: bool = False
+    agent_name: Optional[str] = None
 
 # Store session agents locally for speed, hydrate from DB on restart
 sessions: Dict[str, OpenzessAgent] = {}
@@ -115,12 +116,14 @@ async def chat(request: ChatRequest):
                 for chunk in agent.chat_stream(request.message):
                     yield f"data: {json.dumps(chunk)}\n\n"
                     if chunk.get("type") == "done" and not chunk.get("auth_required") and chunk.get("reply"):
-                        database.add_message(session_id, "agent", chunk.get("reply"))
+                        db_role = f"agent:{request.agent_name}" if request.agent_name else "agent"
+                        database.add_message(session_id, db_role, chunk.get("reply"))
             return StreamingResponse(event_generator(), media_type="text/event-stream")
         else:
             response = agent.chat(request.message)
             if not response.get("auth_required") and response.get("reply"):
-                database.add_message(session_id, "agent", response.get("reply"))
+                db_role = f"agent:{request.agent_name}" if request.agent_name else "agent"
+                database.add_message(session_id, db_role, response.get("reply"))
             
             response["session_id"] = session_id
             return response
@@ -356,6 +359,143 @@ async def get_personas():
 async def delete_persona(persona_id: str):
     database.delete_persona(persona_id)
     return {"status": "deleted"}
+
+class TavernChatRequest(BaseModel):
+    message: str
+    api_key: str
+    provider: str = 'gemini'
+    session_id: str
+    target_persona_id: str
+    allowed_tools: Optional[List[str]] = None
+    stream: bool = False
+
+@app.post("/api/tavern/chat")
+async def tavern_chat(request: TavernChatRequest):
+    db = database.SessionLocal()
+    try:
+        persona = db.query(database.Persona).filter(database.Persona.id == request.target_persona_id).first()
+        if not persona:
+            raise HTTPException(status_code=404, detail="Persona not found")
+            
+        system_instruction = f"You are {persona.name}, roleplaying in a group chat room.\n\nDescription: {persona.description}\nPersonality: {persona.personality}\nScenario: {persona.scenario}\n\nExample Dialogues: {persona.mes_example}\n\nRespond naturally to the conversation IN CHARACTER as {persona.name}."
+        agent_name = persona.name
+    finally:
+        db.close()
+        
+    chat_req = ChatRequest(
+        message=request.message,
+        api_key=request.api_key,
+        provider=request.provider,
+        session_id=request.session_id,
+        system_instruction=system_instruction,
+        allowed_tools=request.allowed_tools,
+        stream=request.stream,
+        agent_name=agent_name
+    )
+    return await chat(chat_req)
+
+# ================================
+# DEVELOPER API (OpenAI & Anthropic)
+# ================================
+class OpenAIMessage(BaseModel):
+    role: str
+    content: str
+    
+class OpenAIChatRequest(BaseModel):
+    model: str = "openzess"
+    messages: List[OpenAIMessage]
+    stream: bool = False
+
+@app.get("/v1/models")
+async def get_openai_models():
+    return {
+        "object": "list",
+        "data": [{ "id": "openzess", "object": "model", "created": 1686935002, "owned_by": "openzess" }]
+    }
+
+def guess_provider(key: str) -> str:
+    if key.startswith("sk-ant"): return "anthropic"
+    if key.startswith("gsk_"): return "groq"
+    if key.startswith("sk-"): return "openai"
+    return "gemini"
+
+@app.post("/v1/chat/completions")
+async def openai_chat_completions(request: OpenAIChatRequest, api_req: Request):
+    auth_header = api_req.headers.get("Authorization") or api_req.headers.get("x-api-key")
+    api_key = auth_header.replace("Bearer ", "").strip() if auth_header else ""
+    provider = guess_provider(api_key)
+        
+    if not request.messages:
+         raise HTTPException(status_code=400, detail="Messages array cannot be empty.")
+         
+    last_msg = request.messages[-1].content
+    history = []
+    for m in request.messages[:-1]:
+         role = "user" if m.role == "user" else "model"
+         history.append({"role": role, "parts": [m.content]})
+         
+    try:
+        agent = OpenzessAgent(api_key=api_key, provider=provider, history=history)
+        response = agent.chat(last_msg)
+        reply = response.get("reply", "")
+        
+        return {
+            "id": "chatcmpl-" + str(uuid.uuid4()),
+            "object": "chat.completion",
+            "created": 1677652288,
+            "model": request.model,
+            "choices": [{
+                "index": 0,
+                "message": { "role": "assistant", "content": reply },
+                "finish_reason": "stop"
+            }]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class AnthropicMessage(BaseModel):
+    role: str
+    content: str
+
+class AnthropicChatRequest(BaseModel):
+    model: str = "openzess"
+    messages: List[AnthropicMessage]
+    system: Optional[str] = None
+    max_tokens: Optional[int] = 1024
+    stream: bool = False
+
+@app.post("/v1/messages")
+async def anthropic_messages(request: AnthropicChatRequest, api_req: Request):
+    auth_header = api_req.headers.get("x-api-key") or api_req.headers.get("Authorization")
+    api_key = auth_header.replace("Bearer ", "").strip() if auth_header else ""
+    provider = guess_provider(api_key)
+        
+    if not request.messages:
+         raise HTTPException(status_code=400, detail="Messages array cannot be empty.")
+         
+    last_msg = request.messages[-1].content
+    history = []
+    for m in request.messages[:-1]:
+         role = "user" if m.role == "user" else "model"
+         history.append({"role": role, "parts": [m.content]})
+         
+    try:
+        agent = OpenzessAgent(api_key=api_key, provider=provider, history=history, system_instruction=request.system)
+        response = agent.chat(last_msg)
+        reply = response.get("reply", "")
+        
+        return {
+            "id": "msg-" + str(uuid.uuid4()),
+            "type": "message",
+            "role": "assistant",
+            "model": request.model,
+            "content": [{ "type": "text", "text": reply }],
+            "stop_reason": "end_turn",
+            "stop_sequence": None,
+            "usage": { "input_tokens": 0, "output_tokens": 0 }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ================================
 # CHANNELS (Telegram, etc)

@@ -8,6 +8,10 @@ from mcp_manager import mcp_registry
 import json
 import litellm
 import background_workers
+from plugin_loader import plugin_registry, load_plugins
+
+# Boot up the custom Python plugin folder dynamically:
+load_plugins()
 
 # Initialize Global ChromaDB Vector Vault
 try:
@@ -111,6 +115,9 @@ native_tool_funcs = {
     "monitor_directory": monitor_directory
 }
 
+# Dynamically merge hot-loaded python plugins into the core native ecosystem!
+native_tool_funcs.update(plugin_registry.funcs)
+
 NATIVE_TOOL_SCHEMAS = [
     {
         "type": "function",
@@ -209,6 +216,9 @@ NATIVE_TOOL_SCHEMAS = [
         }
     }
 ]
+
+# Dynamically inject the schemas for the hot-loaded plugins!
+NATIVE_TOOL_SCHEMAS.extend(plugin_registry.schemas)
 
 PROVIDER_MODELS = {
     "gemini": "gemini/gemini-2.5-flash",

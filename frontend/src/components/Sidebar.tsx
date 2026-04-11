@@ -26,9 +26,12 @@ export default function Sidebar() {
       title: 'Workspace',
       items: [
         { name: 'Files', icon: <Folder size={18} />, path: '/files' },
+        { name: 'Memory Vault', icon: <Database size={18} />, path: '/memory' },
         { name: 'Skills', icon: <Wand2 size={18} />, path: '/skills' },
+        { name: 'Ecosystem', icon: <Layers size={18} />, path: '/marketplace' },
         { name: 'Tools', icon: <Wrench size={18} />, path: '/tools' },
         { name: 'MCP', icon: <Zap size={18} />, path: '/mcp' },
+        { name: 'Tavern', icon: <Users size={18} />, path: '/tavern' },
         { name: 'Companion', icon: <Smile size={18} />, path: '/companion' },
         { name: 'Configuration', icon: <SlidersHorizontal size={18} />, action: () => window.dispatchEvent(new Event('open-settings')) },
       ]
