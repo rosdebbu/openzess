@@ -23,22 +23,22 @@ x11vnc -display :99 -forever -shared -bg -nopw -quiet
 echo "[Sys] VNC Server active on internal WSL port 5900. You can connect via Windows!"
 
 echo "[Sys] Booting Python Ecosystem..."
-if [ ! -d "venv_wsl" ]; then
-    echo "Creating Python Virtual Environment for WSL..."
-    python3 -m venv venv_wsl
+# Construct VENV natively in Linux home directory (/home/user/) to bypass brutal /mnt/c/ IO speed bottlenecks
+if [ ! -d ~/openzess_venv ]; then
+    echo "Creating Python Virtual Environment natively in Linux..."
+    python3 -m venv ~/openzess_venv
 fi
-source venv_wsl/bin/activate
+source ~/openzess_venv/bin/activate
 
 # Ensure internal packages are installed for Linux natively
-echo "Installing Python dependencies natively into WSL..."
-pip install fastapi uvicorn litellm chromadb duckduckgo-search beautifulsoup4 mcp psutil pyautogui mss pillow requests pydantic httpx --quiet
+echo "Installing Python dependencies natively into WSL (this will be fast now!)..."
+pip install fastapi uvicorn litellm chromadb duckduckgo-search beautifulsoup4 mcp psutil pyautogui mss pillow requests pydantic httpx
 
-# Fix Windows CRLF issues dynamically that might crash linux scripts
-find . -type f -name "*.py" -exec sed -i 's/\r$//' {} +
+# Removed CRLF fix that caused massive file I/O bottleneck
 
 # Boot Backend
 cd backend
-python3 main.py &
+python3 server.py &
 BACKEND_PID=$!
 echo "[Sys] FastAPI Backend started on port 8000"
 cd ..
@@ -46,7 +46,7 @@ cd ..
 # Boot Frontend (Node.js must be accessible in WSL)
 echo "[Sys] Booting Frontend UI..."
 cd frontend
-npm install --silent
+npm install
 npm run dev -- --host &
 FRONTEND_PID=$!
 
