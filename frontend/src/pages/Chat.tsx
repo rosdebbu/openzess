@@ -223,6 +223,11 @@ export default function Chat() {
             }
         }
       }
+
+      // Phase 3 trigger
+      if (streamedResponse && (window as any).electronAPI) {
+          (window as any).electronAPI.companionSpeak(streamedResponse);
+      }
     } catch (error: any) {
       console.error(error);
       const errMsg = error.message || 'Unknown error occurred.';
@@ -305,6 +310,11 @@ export default function Chat() {
                      }
                  }
              }
+         }
+         
+         // Phase 3 trigger
+         if (streamedResponse && (window as any).electronAPI) {
+             (window as any).electronAPI.companionSpeak(streamedResponse);
          }
       } catch (error: any) {
           console.error(error);

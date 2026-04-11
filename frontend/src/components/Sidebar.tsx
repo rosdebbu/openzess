@@ -1,4 +1,4 @@
-import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText } from 'lucide-react';
+import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -29,6 +29,7 @@ export default function Sidebar() {
         { name: 'Skills', icon: <Wand2 size={18} />, path: '/skills' },
         { name: 'Tools', icon: <Wrench size={18} />, path: '/tools' },
         { name: 'MCP', icon: <Zap size={18} />, path: '/mcp' },
+        { name: 'Companion', icon: <Smile size={18} />, path: '/companion' },
         { name: 'Configuration', icon: <SlidersHorizontal size={18} />, action: () => window.dispatchEvent(new Event('open-settings')) },
       ]
     },

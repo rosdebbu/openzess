@@ -250,6 +250,12 @@ class OpenzessAgent:
         mcp_declarations = mcp_registry.get_all_tools_for_litellm()
         if mcp_declarations:
             self.tools.extend(mcp_declarations)
+            
+        # Deduplicate tools by name to prevent LLM API BadRequest errors (e.g., duplicated 'read_file')
+        unique_tools = {}
+        for t in self.tools:
+            unique_tools[t["function"]["name"]] = t
+        self.tools = list(unique_tools.values())
 
     def _run_tool(self, name: str, args: dict) -> str:
         sid = mcp_registry.find_server_for_tool(name)

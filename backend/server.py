@@ -10,6 +10,8 @@ import database
 from mcp_manager import mcp_registry
 import background_workers
 import telegram_worker
+from gtts import gTTS
+import io
 
 app = FastAPI()
 
@@ -317,6 +319,25 @@ async def stop_telegram():
 @app.get("/api/channels/telegram/status")
 async def get_telegram_status():
     return {"is_running": telegram_worker.get_status()}
+
+# ================================
+# TTS ENGINE
+# ================================
+class TTSRequest(BaseModel):
+    text: str
+
+@app.post("/api/tts")
+async def generate_tts(request: TTSRequest):
+    try:
+        if not request.text or len(request.text.strip()) == 0:
+             raise HTTPException(status_code=400, detail="Text cannot be empty.")
+        tts = gTTS(text=request.text, lang='en', slow=False)
+        mp3_fp = io.BytesIO()
+        tts.write_to_fp(mp3_fp)
+        mp3_fp.seek(0)
+        return StreamingResponse(mp3_fp, media_type="audio/mpeg")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
