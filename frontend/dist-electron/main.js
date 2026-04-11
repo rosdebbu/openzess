@@ -3,6 +3,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 //#region electron/main.ts
 var __dirname = dirname(fileURLToPath(import.meta.url));
+if (process.platform === "linux" && process.env.DISPLAY) {
+	app.commandLine.appendSwitch("no-sandbox");
+	app.commandLine.appendSwitch("disable-gpu");
+	app.commandLine.appendSwitch("disable-dev-shm-usage");
+	app.commandLine.appendSwitch("disable-software-rasterizer");
+}
 process.env.DIST = join(__dirname, "../dist");
 process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : join(process.env.DIST, "../public");
 var win;

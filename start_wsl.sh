@@ -44,6 +44,8 @@ echo "[Sys] FastAPI Backend started on port 8000"
 cd ..
 
 # Boot Frontend (Node.js must be accessible in WSL)
+echo "[Sys] Checking Linux GUI Dependencies for Electron..."
+sudo apt-get install -y libnss3 libatk-bridge2.0-0 libgtk-3-0 libasound2 libgbm1
 echo "[Sys] Booting Frontend UI..."
 cd frontend
 npm install
