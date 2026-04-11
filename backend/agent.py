@@ -27,7 +27,8 @@ except Exception as e:
 # ---- NATIVE TOOLS ----
 def run_terminal_command(command: str) -> str:
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=15)
+        # Securely sandbox terminal execution into Debian WSL
+        result = subprocess.run(["wsl", "-d", "Debian", "bash", "-c", command], capture_output=True, text=True, timeout=15)
         return result.stdout if result.stdout else result.stderr
     except Exception as e:
         return str(e)
@@ -123,7 +124,7 @@ NATIVE_TOOL_SCHEMAS = [
         "type": "function",
         "function": {
             "name": "run_terminal_command",
-            "description": "Executes a shell command on the user's machine (Windows PowerShell).",
+            "description": "Executes a secure shell command inside a sandboxed Linux WSL environment (Debian). Use standard Linux bash commands (e.g., ls, cat, grep, python3).",
             "parameters": {
                 "type": "object",
                 "properties": {"command": {"type": "string"}},
@@ -242,7 +243,7 @@ class OpenzessAgent:
         self.model_name = PROVIDER_MODELS.get(provider, "openai/gpt-4o-mini")
         
         self.messages = []
-        default_inst = "You are openzess, a helpful AI coding assistant. You can help the user by running terminal commands on a Windows system. Use general Windows/PowerShell commands where appropriate."
+        default_inst = "You are openzess, a powerful AI coding assistant. You can help the user by writing code and executing terminal commands. Your terminal executes exclusively inside a secure Linux Debian WSL sandbox. Use standard bash commands."
         self.messages.append({"role": "system", "content": system_instruction if system_instruction else default_inst})
         
         if history:
