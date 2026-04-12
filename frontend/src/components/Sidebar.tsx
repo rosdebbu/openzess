@@ -1,4 +1,4 @@
-import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers } from 'lucide-react';
+import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -19,6 +19,7 @@ export default function Sidebar() {
         { name: 'Channels', icon: <Radio size={18} />, path: '/channels' },
         { name: 'Sessions', icon: <Users size={18} />, path: '/sessions' },
         { name: 'Task Center', icon: <CalendarClock size={18} />, path: '/cron-jobs' },
+        { name: 'Matrix Viewer', icon: <Monitor size={18} />, path: '/matrix' },
         { name: 'Heartbeat', icon: <Activity size={18} />, path: '/heartbeat' },
       ]
     },

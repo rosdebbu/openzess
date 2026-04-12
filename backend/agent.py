@@ -14,11 +14,16 @@ from mcp_manager import mcp_registry
 import json
 import litellm
 import background_workers
-import pyautogui
-from plugin_loader import plugin_registry, load_plugins
 
-# Set pyautogui fail-safe (moves mouse to corner aborts)
-pyautogui.FAILSAFE = False
+pyautogui = None
+try:
+    import pyautogui
+    # Set pyautogui fail-safe (moves mouse to corner aborts)
+    pyautogui.FAILSAFE = False
+except Exception as e:
+    print(f"Warning: pyautogui failed to load (Xvfb matrix offline?): {e}")
+
+from plugin_loader import plugin_registry, load_plugins
 
 # Boot up the custom Python plugin folder dynamically:
 load_plugins()
@@ -115,8 +120,17 @@ def monitor_directory(directory: str, action: str) -> str:
     except Exception as e:
         return f"Failed to mount watchdog: {e}"
 
+def verify_sandbox_environment() -> str:
+    """Ensure we are strictly operating inside the WSL Linux sandbox and dependencies loaded."""
+    if platform.system() != "Linux":
+        raise Exception("SECURITY HALT: Openzess is strictly forbidden from executing native GUI controls on the Windows host. You must run the system via WSL (start_wsl.sh).")
+    if pyautogui is None:
+        raise Exception("SYSTEM FAULT: PyAutoGUI is not connected to the Matrix Xvfb Display. Reboot WSL sandbox.")
+    return "ok"
+
 def take_screenshot() -> str:
     try:
+        verify_sandbox_environment()
         # Physical screenshot from Xvfb
         img_path = os.path.join(os.getcwd(), "temp_matrix_screen.png")
         pyautogui.screenshot(img_path)
@@ -126,6 +140,7 @@ def take_screenshot() -> str:
 
 def computer_mouse_move(x: int, y: int) -> str:
     try:
+        verify_sandbox_environment()
         pyautogui.moveTo(x, y, duration=0.2)
         return f"Mouse moved to ({x}, {y})."
     except Exception as e:
@@ -133,6 +148,7 @@ def computer_mouse_move(x: int, y: int) -> str:
 
 def computer_mouse_click(button: str = "left") -> str:
     try:
+        verify_sandbox_environment()
         pyautogui.click(button=button)
         return f"Performed {button} mouse click."
     except Exception as e:
@@ -140,6 +156,7 @@ def computer_mouse_click(button: str = "left") -> str:
 
 def computer_type_text(text: str) -> str:
     try:
+        verify_sandbox_environment()
         pyautogui.write(text, interval=0.01)
         return f"Typed text successfully."
     except Exception as e:
@@ -147,6 +164,7 @@ def computer_type_text(text: str) -> str:
 
 def computer_press_key(key: str) -> str:
     try:
+        verify_sandbox_environment()
         pyautogui.press(key)
         return f"Pressed key '{key}'."
     except Exception as e:

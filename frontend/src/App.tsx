@@ -18,6 +18,7 @@ import Changelog from './pages/Changelog';
 import Companion from './pages/Companion';
 import Tavern from './pages/Tavern';
 import Marketplace from './pages/Marketplace';
+import MatrixViewer from './pages/MatrixViewer';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -45,6 +46,7 @@ function AnimatedRoutes({ persona }: { persona: string }) {
           <Route path="/channels" element={<PageTransition><Channels /></PageTransition>} />
           <Route path="/cron-jobs" element={<PageTransition><CronJobs /></PageTransition>} />
           <Route path="/heartbeat" element={<PageTransition><Heartbeat /></PageTransition>} />
+          <Route path="/matrix" element={<PageTransition><MatrixViewer /></PageTransition>} />
           
           <Route path="/skills" element={<PageTransition><Skills /></PageTransition>} />
           <Route path="/mcp" element={<PageTransition><MCP /></PageTransition>} />
