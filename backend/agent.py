@@ -1,4 +1,10 @@
 import os
+import platform
+
+# Ensure DISPLAY is set natively for Xvfb in the Linux/WSL sandbox before any GUI library loads.
+# We do NOT set this on Windows, as PyAutoGUI uses the native Win32 API there.
+if platform.system() == "Linux":
+    os.environ["DISPLAY"] = ":99"
 import subprocess
 import requests
 import uuid
@@ -8,7 +14,11 @@ from mcp_manager import mcp_registry
 import json
 import litellm
 import background_workers
+import pyautogui
 from plugin_loader import plugin_registry, load_plugins
+
+# Set pyautogui fail-safe (moves mouse to corner aborts)
+pyautogui.FAILSAFE = False
 
 # Boot up the custom Python plugin folder dynamically:
 load_plugins()
@@ -105,6 +115,43 @@ def monitor_directory(directory: str, action: str) -> str:
     except Exception as e:
         return f"Failed to mount watchdog: {e}"
 
+def take_screenshot() -> str:
+    try:
+        # Physical screenshot from Xvfb
+        img_path = os.path.join(os.getcwd(), "temp_matrix_screen.png")
+        pyautogui.screenshot(img_path)
+        return "Screenshot captured to temp_matrix_screen.png successfully."
+    except Exception as e:
+        return f"Failed to take screenshot: {e}"
+
+def computer_mouse_move(x: int, y: int) -> str:
+    try:
+        pyautogui.moveTo(x, y, duration=0.2)
+        return f"Mouse moved to ({x}, {y})."
+    except Exception as e:
+        return f"Failed to move mouse: {e}"
+
+def computer_mouse_click(button: str = "left") -> str:
+    try:
+        pyautogui.click(button=button)
+        return f"Performed {button} mouse click."
+    except Exception as e:
+        return f"Failed to click mouse: {e}"
+
+def computer_type_text(text: str) -> str:
+    try:
+        pyautogui.write(text, interval=0.01)
+        return f"Typed text successfully."
+    except Exception as e:
+        return f"Failed to type text: {e}"
+
+def computer_press_key(key: str) -> str:
+    try:
+        pyautogui.press(key)
+        return f"Pressed key '{key}'."
+    except Exception as e:
+        return f"Failed to press key: {e}"
+
 native_tool_funcs = {
     "run_terminal_command": run_terminal_command,
     "search_the_web": search_the_web,
@@ -113,7 +160,12 @@ native_tool_funcs = {
     "read_file": read_file,
     "edit_code": edit_code,
     "schedule_background_task": schedule_background_task,
-    "monitor_directory": monitor_directory
+    "monitor_directory": monitor_directory,
+    "take_screenshot": take_screenshot,
+    "computer_mouse_move": computer_mouse_move,
+    "computer_mouse_click": computer_mouse_click,
+    "computer_type_text": computer_type_text,
+    "computer_press_key": computer_press_key
 }
 
 # Dynamically merge hot-loaded python plugins into the core native ecosystem!
@@ -215,6 +267,66 @@ NATIVE_TOOL_SCHEMAS = [
                 "required": ["directory", "action"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "take_screenshot",
+            "description": "Takes a physical screenshot of the entire Matrix virtual desktop and returns success.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "computer_mouse_move",
+            "description": "Moves the native desktop mouse pointer to specified X and Y coordinates.",
+            "parameters": {
+                "type": "object",
+                "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}},
+                "required": ["x", "y"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "computer_mouse_click",
+            "description": "Performs a mouse click at the current cursor location.",
+            "parameters": {
+                "type": "object",
+                "properties": {"button": {"type": "string", "enum": ["left", "right", "middle"]}},
+                "required": ["button"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "computer_type_text",
+            "description": "Types an exact string natively using the keyboard. Useful for data entry.",
+            "parameters": {
+                "type": "object",
+                "properties": {"text": {"type": "string"}},
+                "required": ["text"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "computer_press_key",
+            "description": "Presses a specific keyboard key (e.g., 'enter', 'tab', 'shift', 'ctrl', 'escape').",
+            "parameters": {
+                "type": "object",
+                "properties": {"key": {"type": "string"}},
+                "required": ["key"]
+            }
+        }
     }
 ]
 
@@ -299,7 +411,7 @@ class OpenzessAgent:
             if not message.tool_calls:
                 return {"reply": message.content, "tools": tool_outputs, "auth_required": False}
                 
-            dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory"]
+            dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key"]
             
             pending_calls = []
             for tc in message.tool_calls:
@@ -455,7 +567,7 @@ class OpenzessAgent:
                     yield {"type": "done", "auth_required": False, "reply": collected_content}
                     return
                     
-                dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory"]
+                dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key"]
                 
                 pending_calls = []
                 for tc in tool_calls:
