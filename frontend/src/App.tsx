@@ -20,6 +20,7 @@ import Tavern from './pages/Tavern';
 import Marketplace from './pages/Marketplace';
 import MatrixViewer from './pages/MatrixViewer';
 import WarRoom from './pages/WarRoom';
+import Welcome from './pages/Welcome';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -64,9 +65,11 @@ function AnimatedRoutes({ persona }: { persona: string }) {
 }
 
 function App() {
-  const [apiKey, setApiKey] = useState(localStorage.getItem('openzess_api_key') || '');
-  const [provider, setProvider] = useState(localStorage.getItem('openzess_provider') || 'gemini');
-  const [showSettings, setShowSettings] = useState(!apiKey && provider !== 'ollama');
+  const [provider, setProvider] = useState(() => localStorage.getItem('openzess_provider') || 'gemini');
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('openzess_api_key') || '');
+  
+  const [isSystemInitialized, setIsSystemInitialized] = useState(() => !!apiKey || provider === 'ollama');
+  const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'persona'>('general');
 
   const [persona, setPersona] = useState(localStorage.getItem('openzess_persona') || 'architect');
@@ -122,6 +125,18 @@ function App() {
     setShowSettings(false);
   };
 
+  const handleInitialGatewayAuth = (newProvider: string, newApiKey: string) => {
+      setProvider(newProvider);
+      setApiKey(newApiKey);
+      localStorage.setItem('openzess_provider', newProvider);
+      localStorage.setItem('openzess_api_key', newApiKey);
+      setIsSystemInitialized(true);
+  };
+
+  if (!isSystemInitialized) {
+      return <Welcome onComplete={handleInitialGatewayAuth} />;
+  }
+
   return (
     <ThemeProvider>
       <ToastProvider>
@@ -129,7 +144,7 @@ function App() {
         <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 font-sans relative overflow-hidden transition-colors duration-500">
           <div className="ambient-orb"></div>
           
-          {/* Settings Full Modal */}
+          {/* Persistent General Settings Modal */}
           <AnimatePresence>
             {showSettings && (
               <motion.div 
