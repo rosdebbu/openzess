@@ -1,4 +1,4 @@
-import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor } from 'lucide-react';
+import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -27,8 +27,9 @@ export default function Sidebar() {
     {
       title: 'Workspace',
       items: [
-        { name: 'Files', icon: <Folder size={18} />, path: '/files' },
+        { name: 'Personal Canvas', icon: <BookOpen size={18} />, path: '/canvas' },
         { name: 'Memory Vault', icon: <Database size={18} />, path: '/memory' },
+        { name: 'Files', icon: <Folder size={18} />, path: '/files' },
         { name: 'Skills', icon: <Wand2 size={18} />, path: '/skills' },
         { name: 'Ecosystem', icon: <Layers size={18} />, path: '/marketplace' },
         { name: 'Tools', icon: <Wrench size={18} />, path: '/tools' },

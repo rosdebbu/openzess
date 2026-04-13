@@ -568,6 +568,54 @@ async def swarm_squad(request: SwarmSquadRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ================================
+# KNOWLEDGE BASE (Personal Canvas)
+# ================================
+class NoteCreateRequest(BaseModel):
+    title: str
+    content: str
+    category: str = "General"
+
+class NoteUpdateRequest(BaseModel):
+    title: str
+    content: str
+    category: str
+
+@app.post("/api/notes")
+async def create_note(request: NoteCreateRequest):
+    try:
+        note_id = database.create_note(request.title, request.content, request.category)
+        return {"status": "created", "note_id": note_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/notes")
+async def get_notes():
+    try:
+        return {"notes": database.get_all_notes()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/notes/{note_id}")
+async def update_note(note_id: str, request: NoteUpdateRequest):
+    try:
+        success = database.update_note(note_id, request.title, request.content, request.category)
+        if not success:
+            raise HTTPException(status_code=404, detail="Note not found")
+        return {"status": "updated"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/notes/{note_id}")
+async def delete_note(note_id: str):
+    try:
+        success = database.delete_note(note_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Note not found")
+        return {"status": "deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

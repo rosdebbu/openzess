@@ -62,6 +62,15 @@ class Persona(Base):
     avatar_base64 = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class Note(Base):
+    __tablename__ = "notes"
+    id = Column(String, primary_key=True, index=True)
+    title = Column(String, index=True)
+    content = Column(String)
+    category = Column(String, default="General")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 
@@ -213,5 +222,64 @@ def delete_persona(persona_id: str):
         if p:
             db.delete(p)
             db.commit()
+    finally:
+        db.close()
+
+# --- NOTES (Personal Canvas) ---
+def create_note(title: str, content: str, category: str = "General") -> str:
+    db = SessionLocal()
+    try:
+        note_id = str(uuid.uuid4())
+        new_note = Note(
+            id=note_id,
+            title=title,
+            content=content,
+            category=category
+        )
+        db.add(new_note)
+        db.commit()
+        return note_id
+    finally:
+        db.close()
+
+def get_all_notes():
+    db = SessionLocal()
+    try:
+        results = db.query(Note).order_by(Note.updated_at.desc()).all()
+        return [{
+            "id": n.id,
+            "title": n.title,
+            "content": n.content,
+            "category": n.category,
+            "created_at": n.created_at.isoformat() if n.created_at else None,
+            "updated_at": n.updated_at.isoformat() if n.updated_at else None
+        } for n in results]
+    finally:
+        db.close()
+
+def update_note(note_id: str, title: str, content: str, category: str):
+    db = SessionLocal()
+    try:
+        note = db.query(Note).filter(Note.id == note_id).first()
+        if note:
+            note.title = title
+            note.content = content
+            note.category = category
+            # updated_at handles itself via onupdate hook in SQLAlchemy
+            db.commit()
+            return True
+        return False
+    finally:
+        db.close()
+
+def delete_note(note_id: str):
+    db = SessionLocal()
+    try:
+        note = db.query(Note).filter(Note.id == note_id).first()
+        if note:
+            db.delete(note)
+            db.commit()
+            return True
+        return False
     finally:
         db.close()
