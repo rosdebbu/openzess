@@ -7,7 +7,6 @@ if (process.platform === "linux" && process.env.DISPLAY) {
 	app.commandLine.appendSwitch("no-sandbox");
 	app.commandLine.appendSwitch("disable-gpu");
 	app.commandLine.appendSwitch("disable-dev-shm-usage");
-	app.commandLine.appendSwitch("disable-software-rasterizer");
 }
 process.env.DIST = join(__dirname, "../dist");
 process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : join(process.env.DIST, "../public");
