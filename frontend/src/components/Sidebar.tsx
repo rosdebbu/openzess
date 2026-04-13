@@ -11,6 +11,7 @@ export default function Sidebar() {
       title: 'General',
       items: [
         { name: 'New Chat', icon: <MessageSquare size={18} />, path: '/' },
+        { name: 'War Room Squad', icon: <Zap size={18} />, path: '/swarm' },
       ]
     },
     {
@@ -84,8 +85,8 @@ export default function Sidebar() {
                   <NavLink 
                     to={item.path}
                     className={({ isActive }) => `
-                      flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all font-medium text-sm border-l-2
-                      ${isActive ? 'bg-brand/10 text-brand font-semibold border-brand shadow-sm shadow-brand/5' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-surface border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'}
+                      flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-out font-medium text-sm border-l-2
+                      ${isActive ? 'bg-brand/10 text-brand font-bold border-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.1)]' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100/80 dark:hover:bg-white/5 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'}
                     `}
                   >
                     {item.icon}
@@ -94,7 +95,7 @@ export default function Sidebar() {
                 ) : (
                   <button 
                     onClick={item.action}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all font-medium text-sm border-l-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-surface border-transparent hover:border-neutral-300 dark:hover:border-neutral-700"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-out font-medium text-sm border-l-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100/80 dark:hover:bg-white/5 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700"
                   >
                     {item.icon}
                     {item.name}

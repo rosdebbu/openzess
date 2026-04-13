@@ -356,7 +356,8 @@ PROVIDER_MODELS = {
     "openai": "openai/gpt-4o-mini",
     "anthropic": "anthropic/claude-3-5-sonnet-20241022",
     "groq": "groq/llama-3.3-70b-versatile",
-    "ollama": "ollama/llama3.2"
+    "ollama": "ollama/llama3.2",
+    "deepseek": "deepseek/deepseek-chat"
 }
 
 class OpenzessAgent:
@@ -369,6 +370,8 @@ class OpenzessAgent:
             os.environ["ANTHROPIC_API_KEY"] = api_key
         elif provider == "groq":
             os.environ["GROQ_API_KEY"] = api_key
+        elif provider == "deepseek":
+            os.environ["DEEPSEEK_API_KEY"] = api_key
 
         self.model_name = PROVIDER_MODELS.get(provider, "openai/gpt-4o-mini")
         

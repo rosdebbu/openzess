@@ -37,33 +37,35 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Outer trailing aura */}
+      {/* Outer soft trailing aura */}
       <motion.div
-        className="fixed top-0 left-0 w-10 h-10 border border-brand/40 dark:border-brand/60 rounded-full pointer-events-none z-[9999] opacity-70 backdrop-blur-[1px] mix-blend-difference"
+        className="fixed top-0 left-0 w-8 h-8 bg-brand/10 dark:bg-brand/20 border border-brand/20 dark:border-brand/30 rounded-full pointer-events-none z-[9999] backdrop-blur-[2px]"
         animate={{
-          x: mousePosition.x - 20,
-          y: mousePosition.y - 20,
-          scale: isHovering ? 1.6 : 1,
+          x: mousePosition.x - 16,
+          y: mousePosition.y - 16,
+          scale: isHovering ? 1.5 : 1,
+          opacity: mousePosition.x === -100 ? 0 : 1
         }}
         transition={{
           type: 'spring',
-          stiffness: 150,
-          damping: 20,
-          mass: 0.5,
+          stiffness: 250,
+          damping: 25,
+          mass: 0.8,
         }}
       />
       
-      {/* Inner sharp dot */}
+      {/* Inner precise dot */}
       <motion.div
-        className="fixed top-0 left-0 w-2.5 h-2.5 bg-brand dark:bg-white rounded-full pointer-events-none z-[9999]"
+        className="fixed top-0 left-0 w-2 h-2 bg-brand dark:bg-brand-hover shadow-[0_0_10px_rgba(99,102,241,0.8)] rounded-full pointer-events-none z-[9999]"
         animate={{
-          x: mousePosition.x - 5,
-          y: mousePosition.y - 5,
+          x: mousePosition.x - 4,
+          y: mousePosition.y - 4,
           scale: isHovering ? 0 : 1,
+          opacity: mousePosition.x === -100 ? 0 : 1
         }}
         transition={{
           type: 'tween',
-          duration: 0.05,
+          duration: 0.02,
           ease: 'linear'
         }}
       />

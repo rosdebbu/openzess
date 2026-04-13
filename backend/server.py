@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from agent import OpenzessAgent, memory_collection
 import database
 from mcp_manager import mcp_registry
@@ -15,6 +15,7 @@ import io
 import uuid
 import shutil
 import tavern_parser
+from swarm_manager import swarm_manager
 
 app = FastAPI()
 
@@ -541,6 +542,29 @@ async def generate_tts(request: TTSRequest):
         tts.write_to_fp(mp3_fp)
         mp3_fp.seek(0)
         return StreamingResponse(mp3_fp, media_type="audio/mpeg")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ================================
+# SWARM / WAR ROOM
+# ================================
+class SwarmSquadRequest(BaseModel):
+    message: str
+    squad: List[Dict[str, Any]]
+
+    # squad is e.g. [{"role_name": "Coder", "provider": "openai", "api_key": "xxx", "system_instruction": "You are a senior dev"}, ...]
+
+@app.post("/api/swarm/squad")
+async def swarm_squad(request: SwarmSquadRequest):
+    if not request.squad:
+        raise HTTPException(status_code=400, detail="Squad configuration cannot be empty")
+        
+    try:
+        async def event_generator():
+            async for chunk in swarm_manager.dispatch_squad_stream(request.message, request.squad):
+                yield f"data: {json.dumps(chunk)}\n\n"
+        
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

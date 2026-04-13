@@ -19,6 +19,7 @@ import Companion from './pages/Companion';
 import Tavern from './pages/Tavern';
 import Marketplace from './pages/Marketplace';
 import MatrixViewer from './pages/MatrixViewer';
+import WarRoom from './pages/WarRoom';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -55,6 +56,7 @@ function AnimatedRoutes({ persona }: { persona: string }) {
           <Route path="/memory" element={<PageTransition><MemoryVault /></PageTransition>} />
           <Route path="/companion" element={<PageTransition><Companion /></PageTransition>} />
           <Route path="/changelog" element={<PageTransition><Changelog /></PageTransition>} />
+          <Route path="/swarm" element={<PageTransition><WarRoom /></PageTransition>} />
         </Routes>
       </AnimatePresence>
     </div>

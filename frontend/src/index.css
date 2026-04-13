@@ -12,10 +12,10 @@
 }
 
 .dark {
-  --surface: rgba(255, 255, 255, 0.03);
-  --border: rgba(255, 255, 255, 0.08);
-  --scrollbar: rgba(255, 255, 255, 0.1);
-  --scrollbar-hover: rgba(255, 255, 255, 0.2);
+  --surface: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.05);
+  --scrollbar: rgba(255, 255, 255, 0.08); /* Softer scrollbar */
+  --scrollbar-hover: rgba(255, 255, 255, 0.15);
   color-scheme: dark;
 }
 
@@ -39,7 +39,7 @@
   }
 
   .glass-panel {
-    @apply bg-white/60 dark:bg-neutral-900/60 backdrop-blur-2xl border border-white/40 dark:border-white/5 shadow-2xl;
+    @apply bg-white/70 dark:bg-[#0a0a0c]/60 backdrop-blur-3xl border border-black/5 dark:border-white/5 shadow-2xl;
   }
 
   .premium-shadow {
