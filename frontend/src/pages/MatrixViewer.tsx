@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import RFB from '@novnc/novnc/lib/rfb';
+import RFB from '@novnc/novnc';
 import { Monitor, Wifi, WifiOff } from 'lucide-react';
 
 export default function MatrixViewer() {

@@ -53,6 +53,10 @@ cd ..
 # Boot Frontend
 echo "[Sys] Booting Frontend UI..."
 cd frontend
+if [ -f "node_modules/electron/dist/electron.exe" ]; then
+    echo "[Sys] Purging Windows electron.exe to fetch Linux binary..."
+    rm -rf node_modules/electron
+fi
 npm install
 npm run dev -- --host &
 FRONTEND_PID=$!
