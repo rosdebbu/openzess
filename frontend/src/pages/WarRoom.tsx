@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Send, Zap, Code, FileText, Layers, LayoutPanelLeft, Key, X, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -9,8 +9,9 @@ interface Message {
   role: 'user' | 'agent';
   swarm_role?: string;
   provider?: string;
-  icon?: JSX.Element;
+  icon?: React.ReactNode;
   color?: string;
+  bg_glow?: string;
   content: string;
 }
 
@@ -18,7 +19,7 @@ interface SwarmQuadrant {
   role_name: string;
   provider: string;
   system_instruction: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
   color: string;
   bg_glow: string;
 }
@@ -166,7 +167,7 @@ export default function WarRoom() {
         done = doneReading;
         if (value) {
             buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\\n\\n');
+            const lines = buffer.split('\n\n');
             buffer = lines.pop() || '';
             
             for (const line of lines) {
@@ -181,7 +182,7 @@ export default function WarRoom() {
                                 m.id === reqId + targetRole ? { ...m, content: streamAccumulators[targetRole] } : m
                             ));
                         } else if (data.type === 'error') {
-                             streamAccumulators[targetRole] += `\\n\\n❌ Error: ${data.error} (Check your API Key / Quota)`;
+                             streamAccumulators[targetRole] += `\n\n❌ Error: ${data.error} (Check your API Key / Quota)`;
                              setMessages(prev => prev.map(m => 
                                 m.id === reqId + targetRole ? { ...m, content: streamAccumulators[targetRole] } : m
                              ));
@@ -247,12 +248,12 @@ export default function WarRoom() {
                                {msg.content}
                            </div>
                        ) : (
-                           <div className={`flex flex-col w-full rounded-2xl border px-5 py-4 shadow-sm ${msg.bg_glow} ${msg.color.replace('text-', 'border-').split(' ')[0]}`}>
+                           <div className={`flex flex-col w-full rounded-2xl border px-5 py-4 shadow-sm ${msg.bg_glow || ''} ${msg.color ? msg.color.replace('text-', 'border-').split(' ')[0] : ''}`}>
                                <div className="flex items-center gap-2 mb-3 border-b border-black/5 dark:border-white/5 pb-3">
                                    <div className="bg-white dark:bg-black/40 p-1.5 rounded-md shadow-sm">
                                        {msg.icon}
                                    </div>
-                                   <span className={`font-bold uppercase tracking-widest text-[11px] ${msg.color.split(' ')[1]}`}>
+                                   <span className={`font-bold uppercase tracking-widest text-[11px] ${msg.color ? msg.color.split(' ')[1] : ''}`}>
                                        {msg.swarm_role}
                                    </span>
                                    <span className="text-[10px] font-mono opacity-50 ml-auto uppercase">{msg.provider}</span>

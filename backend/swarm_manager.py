@@ -18,8 +18,7 @@ class SwarmManager:
             {"role_name": "Architect", "provider": "anthropic", "api_key": "...", "system_instruction": "..."}
         ]
         """
-        # Synchronous worker function to run one agent
-        def run_agent_stream(config: Dict[str, Any], queue: asyncio.Queue):
+        def run_agent_stream(config: Dict[str, Any], queue: asyncio.Queue, main_loop: asyncio.AbstractEventLoop):
             try:
                 agent = OpenzessAgent(
                     api_key=config.get("api_key", ""),
@@ -30,42 +29,24 @@ class SwarmManager:
                 for chunk in agent.chat_stream(prompt):
                     # Attach the role name to the chunk so the frontend knows whose stream this is
                     chunk["swarm_role"] = config["role_name"]
-                    
-                    # We use a threadsafe asyncio call to push to the queue
-                    # since this is running in a synchronous worker thread
-                    try:
-                        loop = asyncio.get_event_loop()
-                    except RuntimeError:
-                        # In case get_event_loop fails cross-thread
-                        queue.put_nowait(chunk)
-                        continue
-                        
-                    asyncio.run_coroutine_threadsafe(queue.put(chunk), loop)
+                    main_loop.call_soon_threadsafe(queue.put_nowait, chunk)
                     
             except Exception as e:
                 # Send error chunk
-                try:
-                    loop = asyncio.get_event_loop()
-                    asyncio.run_coroutine_threadsafe(queue.put({"type": "error", "error": str(e), "swarm_role": config["role_name"]}), loop)
-                except RuntimeError:
-                    queue.put_nowait({"type": "error", "error": str(e), "swarm_role": config["role_name"]})
+                main_loop.call_soon_threadsafe(queue.put_nowait, {"type": "error", "error": str(e), "swarm_role": config["role_name"]})
             finally:
                 # Signal completion for this specific agent
-                try:
-                    loop = asyncio.get_event_loop()
-                    asyncio.run_coroutine_threadsafe(queue.put({"type": "swarm_done", "swarm_role": config["role_name"]}), loop)
-                except RuntimeError:
-                    queue.put_nowait({"type": "swarm_done", "swarm_role": config["role_name"]})
+                main_loop.call_soon_threadsafe(queue.put_nowait, {"type": "swarm_done", "swarm_role": config["role_name"]})
 
 
         # Create an async queue to aggregate streaming chunks from all threads
         queue = asyncio.Queue()
         
         # Fire off all agents in parallel threads
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         futures = []
         for config in squad_config:
-             futures.append(loop.run_in_executor(self.executor, run_agent_stream, config, queue))
+             futures.append(loop.run_in_executor(self.executor, run_agent_stream, config, queue, loop))
         
         completed_agents = 0
         total_agents = len(squad_config)
