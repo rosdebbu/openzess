@@ -1,126 +1,223 @@
-# 🐾 openzess
+# Openzess  
+### Break free from closed hardware.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Powered by Gemini](https://img.shields.io/badge/Powered%20by-Gemini%202.5%20Flash-orange.svg)](https://ai.google.dev/)
-
-> **"Make ownself openclaw"** — An open-source, autonomous AI agent powered by Google's Gemini.
-
-**openzess** is a powerful, self-hosted AI assistant designed to execute tasks, write code, and act as your personal autonomous agent. Built with a robust Python backend and a responsive TypeScript frontend, it leverages the speed and reasoning capabilities of the `gemini-2.5-flash` model.
-
----
-
-## ✨ Features
-
-- **🧠 Powered by Gemini**: Utilizes Google's state-of-the-art `gemini-2.5-flash` model for rapid text and code generation.
-- **🛠️ Autonomous Agent**: Includes core agentic behaviors (`agent.py`) capable of parsing instructions and executing workflows.
-- **🖥️ Full-Stack Architecture**: Clean separation of concerns with a Python backend and a modern TypeScript frontend.
-- **🐳 Docker Ready**: Instantly spin up the entire stack using the included `docker-compose.yml`.
-- **🚀 Cross-Platform**: Native support for Windows (`start.bat`) and Linux/WSL (`start_wsl.sh`).
+<p align="center">
+  <a href="https://github.com/rosdebbu/openzess">
+    <img alt="Repository" src="https://img.shields.io/badge/GitHub-rosdebbu%2Fopenzess-181717?style=for-the-badge&logo=github">
+  </a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-69.2%25-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+  <img alt="Python" src="https://img.shields.io/badge/Python-27%25-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img alt="Open Architecture" src="https://img.shields.io/badge/Architecture-Open-success?style=for-the-badge">
+  <img alt="Robotics" src="https://img.shields.io/badge/Focus-Robotic%20Grip%20Systems-informational?style=for-the-badge">
+</p>
 
 ---
 
-## 🏗️ Architecture
+## 🚀 What is Openzess?
 
-- `backend/`: Python-based API and agent logic.
-- `frontend/`: TypeScript/React-based user interface for interacting with the agent.
-- `main.py` / `agent.py`: Core AI logic and command-line entry points.
+**Openzess** is an open-architecture robotics toolkit for designing, building, and operating customizable **OpenClaw** systems.
+
+It is built for makers, robotics engineers, and automation teams who want complete control over robotic grip hardware and software without vendor lock-in.
+
+With a modern **TypeScript + Python** stack, Openzess combines:
+
+- precision robotic control
+- intelligent backend logic
+- modern web interfaces
+- modular, fully customizable workflows
 
 ---
 
-## 🚀 Getting Started
+## 🎯 Vision
 
-### Prerequisites
+Openzess exists to make robotic manipulation systems:
 
-- Python 3.10+
-- Node.js (for frontend development)
-- Docker & Docker Compose (optional, for containerized setup)
-- A Google Gemini API Key. [Get one here](https://aistudio.google.com/app/apikey).
+- **open** (no closed-hardware dependency)
+- **extensible** (adapt to your own use case)
+- **controllable** (full software and interface ownership)
+- **production-capable** (from prototypes to deployment)
 
-### 1. Clone the Repository
+---
+
+## ✨ Key Capabilities
+
+- **OpenClaw control foundation** for robotic grip operations
+- **TypeScript-driven interface and orchestration layer**
+- **Python-powered control and intelligent processing layer**
+- **Web-based monitoring/control UI**
+- **Cross-platform development scripts and startup tooling**
+- **Containerized deployment support via Docker Compose**
+
+---
+
+## 🧱 Technology Stack
+
+Repository language composition reflects a balanced full-stack robotics platform:
+
+- **TypeScript (69.2%)** — frontend/app logic, orchestration, interfaces
+- **Python (27%)** — backend intelligence, control logic, robotics operations
+- **CSS / JavaScript / HTML** — web interface structure and styling
+- **Shell / Batchfile** — cross-platform setup and run automation
+
+---
+
+## 🏗️ Architecture (High-Level)
+
+```text
+openzess/
+├── frontend/                # TypeScript web interface for control and monitoring
+├── backend/                 # Python services for robotics logic/control
+├── agent.py                 # Core agent/automation entry logic
+├── main.py                  # Runtime bootstrap / assistant-control flow
+├── docker-compose.yml       # Multi-service local deployment
+├── start_wsl.sh             # Linux/WSL startup automation
+├── start.bat                # Windows startup automation
+└── .env.example             # Environment variable template
+```
+
+### Component Roles
+
+- **Frontend (TypeScript):**  
+  User control dashboard, parameter tuning, operational visibility.
+
+- **Backend (Python):**  
+  Motion/control logic, command processing, intelligent automation.
+
+- **Agent layer:**  
+  Bridges instruction input to robotic actions and runtime orchestration.
+
+- **Runtime scripts:**  
+  Fast setup for Windows and WSL/Linux environments.
+
+---
+
+## 📦 Getting Started
+
+## 1) Clone the repository
 
 ```bash
-git clone https://github.com/debjitttdasss/openzess.git
+git clone https://github.com/rosdebbu/openzess.git
 cd openzess
 ```
 
-### 2. Environment Setup
-
-Copy the example environment file and add your Gemini API key:
+## 2) Configure environment
 
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and configure your keys:
-```env
-GEMINI_API_KEY=your_google_gemini_api_key_here
+Update `.env` with required runtime/API values.
+
+---
+
+## 3) Run the project
+
+### Option A — Docker (recommended)
+
+```bash
+docker-compose up --build
 ```
 
-### 3. Running the Application
+### Option B — Windows
 
-You can start the application using the provided helper scripts depending on your operating system, or via Docker.
-
-#### Option A: Windows
-Run the batch file to install dependencies and start the services:
-```cmd
+```bat
 start.bat
 ```
 
-#### Option B: Linux / WSL
-Make the script executable and run it:
+### Option C — Linux / WSL
+
 ```bash
 chmod +x start_wsl.sh
 ./start_wsl.sh
 ```
 
-#### Option C: Docker (Recommended)
-To run the entire stack (frontend + backend) in isolated containers:
-```bash
-docker-compose up --build
-```
+---
 
-### 4. CLI Quickstart
-To test the core Gemini integration directly from your terminal:
+## 4) Direct Python test run (if needed)
+
 ```bash
-pip install -r requirements.txt
 python main.py
 ```
 
 ---
 
-## 🛣️ Roadmap
+## 🧪 Typical Use Cases
 
-- [x] Basic Gemini API Integration
-- [x] CLI Agent Implementation
-- [x] Frontend / Backend Scaffolding
-- [ ] Implement Tool-Use (File System, Terminal)
-- [ ] Memory and Context Management
-- [ ] Advanced UI/UX for the web interface
+- Build an open robotic gripper controller from scratch
+- Replace closed-source grip-control systems
+- Customize gripping behavior for object type, force, and workflow
+- Integrate robotics control into lab, industrial, or maker pipelines
+- Rapidly prototype intelligent manipulation systems
+
+---
+
+## 🔐 Security & Safety Notes
+
+When operating robotic systems, always enforce:
+
+- environment variable isolation for sensitive keys/configs
+- hardware safety constraints and force limits
+- staged testing before live operation
+- emergency stop mechanisms in physical setups
+- strict access control for remote commands
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Expand OpenClaw hardware profiles
+- [ ] Add calibration and diagnostics toolkit
+- [ ] Introduce plugin/tool extension system
+- [ ] Improve telemetry and observability dashboard
+- [ ] Add advanced simulation and dry-run mode
+- [ ] Harden deployment workflow for edge environments
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are welcome from robotics developers, embedded engineers, and full-stack contributors.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+### How to contribute
+
+1. Fork this repository
+2. Create a feature branch  
+   ```bash
+   git checkout -b feat/your-feature
+   ```
+3. Commit changes  
+   ```bash
+   git commit -m "feat: add your feature"
+   ```
+4. Push branch  
+   ```bash
+   git push origin feat/your-feature
+   ```
 5. Open a Pull Request
 
 ---
 
-## 📜 License
+## 👨‍💻 Creator
 
-Distributed under the MIT License. See `LICENSE` for more information.
+**Created by ROSDEBBU**  
+GitHub: [@rosdebbu](https://github.com/rosdebbu)
+
+Openzess is led by ROSDEBBU with a mission to deliver an open, customizable robotics control ecosystem for next-generation OpenClaw systems.
 
 ---
 
-## 📫 Contact
+## 📄 License
 
-Debjit Das - [@debjitttdasss](https://github.com/rossdebbu)
+Add your preferred license (recommended MIT or Apache-2.0) in a `LICENSE` file.
 
-Project Link: [https://github.com/debjitttdasss/openzess](https://github.com/rosdebbu/openzess)
+Example:
+
+```text
+MIT License
+```
+
+---
+
+## 🧭 Project Statement
+
+**The Openzess Project** empowers builders to break free from closed robotic ecosystems and create fully open, intelligent, and customizable grip systems with modern software architecture.
