@@ -121,6 +121,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📫 Contact
 
-Debjit Das - [@debjitttdasss](https://github.com/rossdebb)
+Debjit Das - [@debjitttdasss](https://github.com/rossdebbu)
 
-Project Link: [https://github.com/debjitttdasss/openzess](https://github.com/rosdebb/openzess)
+Project Link: [https://github.com/debjitttdasss/openzess](https://github.com/rosdebbu/openzess)
