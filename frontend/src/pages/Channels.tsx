@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, Hash, Volume2, Shield, Bell, Send, User, Bot, Loader2, Play, Square } from 'lucide-react';
+import { Radio, Hash, Volume2, Shield, Bell, Send, User, Bot, Loader2, Play, Square, MessageSquare } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useToast } from '../contexts/ToastContext';
 import { prepare, layout } from '@chenglou/pretext';
@@ -34,6 +34,10 @@ export default function Channels() {
   const [telegramToken, setTelegramToken] = useState(localStorage.getItem('openzess_telegram_token') || '');
   const [isTelegramRunning, setIsTelegramRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+  
+  // Discord State
+  const [discordToken, setDiscordToken] = useState(localStorage.getItem('openzess_discord_token') || '');
+  const [isDiscordRunning, setIsDiscordRunning] = useState(false);
   const [containerWidth, setContainerWidth] = useState(600); // fallback width
 
   useEffect(() => {
@@ -52,6 +56,11 @@ export default function Channels() {
     axios.get('http://localhost:8000/api/channels/telegram/status')
       .then(res => setIsTelegramRunning(res.data.is_running))
       .catch(e => console.error("Could not fetch telegram status"));
+
+    // Check Discord Status
+    axios.get('http://localhost:8000/api/channels/discord/status')
+      .then(res => setIsDiscordRunning(res.data.is_running))
+      .catch(e => console.error("Could not fetch discord status"));
   }, []);
 
   const toggleTelegram = async () => {
@@ -85,8 +94,40 @@ export default function Channels() {
     }
   };
 
+  const toggleDiscord = async () => {
+    if (!discordToken) {
+       showToast("Please provide a Discord Bot Token first.", "error"); return;
+    }
+    
+    setIsToggling(true);
+    localStorage.setItem('openzess_discord_token', discordToken);
+    try {
+       if (isDiscordRunning) {
+          await axios.post('http://localhost:8000/api/channels/discord/stop');
+          setIsDiscordRunning(false);
+          showToast("Discord Bridge offline.", "info");
+       } else {
+          const provider = localStorage.getItem('openzess_provider') || 'gemini';
+          const apiKey = localStorage.getItem('openzess_api_key') || '';
+          await axios.post('http://localhost:8000/api/channels/discord/start', {
+             bot_token: discordToken,
+             provider,
+             api_key: apiKey
+          });
+          setIsDiscordRunning(true);
+          showToast("Discord Bridge is now securely listening!", "success");
+       }
+    } catch(err: any) {
+       const errorMessage = err.response?.data?.detail || "Failed to toggle Discord Bridge.";
+       showToast(errorMessage, "error");
+    } finally {
+       setIsToggling(false);
+    }
+  };
+
   const channels: Channel[] = [
     { id: 'telegram', name: 'Telegram Bridge', icon: Send, unread: 0, desc: 'External Messaging Configuration.' },
+    { id: 'discord', name: 'Discord Bridge', icon: MessageSquare, unread: 0, desc: 'Setup Discord Bot integration.' },
     { id: 'general', name: 'General Logs', icon: Hash, unread: 0, desc: 'Primary broadcast network for all autonomous agents.' },
     { id: 'alerts', name: 'Alerts', icon: Bell, unread: 843, desc: 'Critical system failures and execution blocks.' },
     { id: 'deployments', name: 'Deployments', icon: Volume2, unread: 0, desc: 'CI/CD pipeline updates and server handshakes.' },
@@ -155,8 +196,9 @@ export default function Channels() {
           <div>
             <h3 className="font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
               #{currentChannel?.name}
-              {activeChannel !== 'telegram' && <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2">Pretext V-Sync</span>}
+              {activeChannel !== 'telegram' && activeChannel !== 'discord' && <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2">Pretext V-Sync</span>}
               {activeChannel === 'telegram' && isTelegramRunning && <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2 shadow-sm animate-pulse">Online</span>}
+              {activeChannel === 'discord' && isDiscordRunning && <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2 shadow-sm animate-pulse">Online</span>}
             </h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">{currentChannel?.desc}</p>
           </div>
@@ -218,6 +260,63 @@ export default function Channels() {
                         </button>
                         
                         {isTelegramRunning && (
+                           <div className="mt-6 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 text-sm flex items-start gap-3">
+                             <Shield className="shrink-0 mt-0.5" size={18} />
+                             <div>
+                                <span className="font-semibold block mb-1">Bridge Active and Secured</span>
+                                Messages sent to your connected Bot are physically executed directly on this machine's local instance.
+                             </div>
+                           </div>
+                        )}
+                     </div>
+                  </div>
+               </div>
+            ) : activeChannel === 'discord' ? (
+               <div className="flex-1 p-8 overflow-y-auto">
+                  <div className="max-w-2xl mx-auto bg-white dark:bg-surface border border-neutral-200 dark:border-border p-8 rounded-2xl shadow-sm">
+                     <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-6 shadow-sm">
+                        <MessageSquare size={32} />
+                     </div>
+                     <h2 className="text-2xl font-bold mb-2">Connect Discord</h2>
+                     <p className="text-neutral-500 mb-8 text-sm leading-relaxed">
+                       Link your Openzess local environment to a Discord Bot. Ensure your bot has the Message Content intent enabled in the Discord Developer Portal.
+                     </p>
+                     
+                     <div className="space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Bot Token</label>
+                          <input
+                            type="password"
+                            placeholder="MTAx..._xxx..."
+                            value={discordToken}
+                            onChange={e => setDiscordToken(e.target.value)}
+                            className="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
+                            disabled={isDiscordRunning}
+                          />
+                        </div>
+
+                        <button
+                           onClick={toggleDiscord}
+                           disabled={isToggling}
+                           className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold transition-all transform active:scale-[0.98] ${
+                              isDiscordRunning 
+                              ? 'bg-red-500/10 text-red-600 border border-red-500/30 hover:bg-red-500 hover:text-white shadow-xl shadow-red-500/10' 
+                              : 'bg-indigo-500 text-white hover:bg-indigo-600 shadow-xl shadow-indigo-500/20'
+                           }`}
+                        >
+                           {isToggling && <Loader2 size={18} className="animate-spin" />}
+                           {!isToggling && isDiscordRunning && <Square size={18} className="fill-current" />}
+                           {!isToggling && !isDiscordRunning && <Play size={18} className="fill-current" />}
+                           
+                           {isToggling 
+                              ? 'Switching State...' 
+                              : isDiscordRunning 
+                                 ? 'Terminate Discord Bridge' 
+                                 : 'Start Discord Listener'
+                           }
+                        </button>
+                        
+                        {isDiscordRunning && (
                            <div className="mt-6 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 text-sm flex items-start gap-3">
                              <Shield className="shrink-0 mt-0.5" size={18} />
                              <div>

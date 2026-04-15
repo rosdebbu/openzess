@@ -10,6 +10,7 @@ import database
 from mcp_manager import mcp_registry
 import background_workers
 import telegram_worker
+import discord_worker
 from gtts import gTTS
 import io
 import uuid
@@ -525,6 +526,34 @@ async def stop_telegram():
 @app.get("/api/channels/telegram/status")
 async def get_telegram_status():
     return {"is_running": telegram_worker.get_status()}
+
+# ================================
+# DISCORD CHANNEL
+# ================================
+class DiscordStartRequest(BaseModel):
+    bot_token: str
+    provider: str
+    api_key: str
+
+@app.post("/api/channels/discord/start")
+async def start_discord(request: DiscordStartRequest):
+    try:
+        success = discord_worker.start_discord_listener(request.bot_token, request.provider, request.api_key)
+        return {"status": "started" if success else "failed"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/channels/discord/stop")
+async def stop_discord():
+    try:
+        discord_worker.stop_discord_listener()
+        return {"status": "stopped"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/channels/discord/status")
+async def get_discord_status():
+    return {"is_running": discord_worker.get_status()}
 
 # ================================
 # TTS ENGINE
