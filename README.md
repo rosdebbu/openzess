@@ -220,4 +220,4 @@ MIT License
 
 ## 🧭 Project Statement
 
-**The Openzess Project** empowers builders to break free from closed robotic ecosystems and create fully open, intelligent, and customizable grip systems with modern software architecture.
+**The Openzess Project** empowers builders to break free from closed robotic ecosystems and create fully open, intelligent, and customizable grip systems with modern software architecture....
