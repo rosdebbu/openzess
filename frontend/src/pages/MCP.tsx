@@ -21,6 +21,7 @@ const DEFAULT_SERVERS: MCPServerInfo[] = [
   { id: 'everything', name: 'Test Sandbox', desc: 'Demo server with echo, long running tools and more.', icon: '🛠️', command: 'npx', args: ['-y', '@modelcontextprotocol/server-everything'] },
   { id: 'memory', name: 'Memory', desc: 'A knowledge graph built natively into MCP.', icon: '🧠', command: 'npx', args: ['-y', '@modelcontextprotocol/server-memory'] },
   { id: 'filesystem', name: 'Filesystem', desc: 'Standard local filesystem access protocol.', icon: '📁', command: 'npx', args: ['-y', '@modelcontextprotocol/server-filesystem', '.'] },
+  { id: 'stitch', name: 'Stitch AI', desc: 'Advanced AI design system and frontend generation.', icon: '✨', command: 'npx', args: ['-y', '@google/stitch-mcp', '--api-key', 'AQ.Ab8RN6JcITpR_bgh45sOECCpBQZ-p59Bw8cFAZM5blnXMocc6Q'] },
 ];
 
 export default function MCP() {
