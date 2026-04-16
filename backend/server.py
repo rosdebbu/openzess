@@ -79,6 +79,8 @@ async def chat(request: ChatRequest):
         # Hydrate from DB
         try:
             db_messages = database.get_session_messages(session_id)
+            # Presentation Speed Limit: Only keep last 40 items (20 conversational pairs)
+            db_messages = db_messages[-40:]
         except HTTPException:
             # Session doesn't exist yet but ID was hard-provided (e.g., telegram worker)
             title = "Telegram Chat" if session_id.startswith("telegram_") else "External Chat"
@@ -173,7 +175,49 @@ async def list_sessions():
 async def get_messages(session_id: str):
     try:
         messages = database.get_session_messages(session_id)
-        return {"messages": messages}
+        # Presentation speed optimization implies we can also limit frontend load to 40
+        return {"messages": messages[-40:]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/messages/{message_id}")
+async def delete_message_endpoint(message_id: int):
+    try:
+        session_id = database.delete_message(message_id)
+        if hasattr(session_id, 'status_code') or not session_id:
+            raise HTTPException(status_code=404, detail="Message not found")
+            
+        # If the deleted message belonged to an active session in memory, we should rehydrate that session
+        # so the Agent forgets the deleted context
+        if session_id in sessions:
+            agent = sessions[session_id]
+            # Fetch all remaining messages for this session
+            history = database.get_session_messages(session_id)
+            # Rehydrate the exact agent state with the newly truncated history
+            new_agent = OpenzessAgent(
+                api_key=agent.key or os.environ.get("GEMINI_API_KEY", ""), 
+                provider="gemini", # Standard fallback, front-end context sets it during generation if needed
+                history=[{"role": m["role"], "content": m["content"]} for m in history],
+                system_instruction=None
+            )
+            # Retain the key variable
+            new_agent.key = agent.key
+            new_agent.tools = agent.tools
+            sessions[session_id] = new_agent
+            
+        return {"status": "ok", "deleted_id": message_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/sessions/{session_id}")
+async def delete_session_endpoint(session_id: str):
+    try:
+        success = database.delete_session(session_id)
+        if session_id in sessions:
+            del sessions[session_id]
+        if not success:
+            raise HTTPException(status_code=404, detail="Session not found")
+        return {"status": "deleted"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

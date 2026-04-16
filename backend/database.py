@@ -104,8 +104,20 @@ def add_message(session_id: str, role: str, content: str):
 def get_all_sessions():
     db = SessionLocal()
     try:
-        results = db.query(Session).order_by(Session.created_at.desc()).all()
+        results = db.query(Session).order_by(Session.created_at.desc()).limit(20).all()
         return [{"id": s.id, "title": s.title, "created_at": s.created_at.isoformat()} for s in results]
+    finally:
+        db.close()
+
+def delete_session(session_id: str):
+    db = SessionLocal()
+    try:
+        session = db.query(Session).filter(Session.id == session_id).first()
+        if session:
+            db.delete(session)
+            db.commit()
+            return True
+        return False
     finally:
         db.close()
 
@@ -278,6 +290,18 @@ def delete_note(note_id: str):
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             db.delete(note)
+            db.commit()
+            return True
+        return False
+    finally:
+        db.close()
+
+def delete_message(message_id: int):
+    db = SessionLocal()
+    try:
+        msg = db.query(Message).filter(Message.id == message_id).first()
+        if msg:
+            db.delete(msg)
             db.commit()
             return True
         return False

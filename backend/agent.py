@@ -357,11 +357,17 @@ PROVIDER_MODELS = {
     "anthropic": "anthropic/claude-3-5-sonnet-20241022",
     "groq": "groq/llama-3.3-70b-versatile",
     "ollama": "ollama/llama3.2",
-    "deepseek": "deepseek/deepseek-chat"
+    "deepseek": "openrouter/deepseek/deepseek-chat",
+    "deepseek2": "openrouter/deepseek/deepseek-chat",
+    "deepseek3": "openrouter/deepseek/deepseek-chat",
+    "qwen": "openrouter/qwen/qwen-2.5-72b-instruct",
+    "glm": "openrouter/zhipu/glm-4",
+    "kimi": "openrouter/moonshotai/moonshot-v1-8k"
 }
 
 class OpenzessAgent:
     def __init__(self, api_key: str, provider: str = "gemini", history: list = None, system_instruction: str = None, allowed_tools: list = None):
+        self.api_key = api_key
         if provider == "gemini":
             os.environ["GEMINI_API_KEY"] = api_key
         elif provider == "openai":
@@ -370,8 +376,7 @@ class OpenzessAgent:
             os.environ["ANTHROPIC_API_KEY"] = api_key
         elif provider == "groq":
             os.environ["GROQ_API_KEY"] = api_key
-        elif provider == "deepseek":
-            os.environ["DEEPSEEK_API_KEY"] = api_key
+        # OpenRouter keys will be passed directly into litellm.completion rather than via env vars to avoid thread conflicts
 
         self.model_name = PROVIDER_MODELS.get(provider, "openai/gpt-4o-mini")
         
@@ -418,7 +423,8 @@ class OpenzessAgent:
             response = litellm.completion(
                 model=self.model_name,
                 messages=self.messages,
-                tools=self.tools if self.tools else None
+                tools=self.tools if self.tools else None,
+                api_key=self.api_key
             )
             
             message = response.choices[0].message
@@ -545,7 +551,8 @@ class OpenzessAgent:
                     model=self.model_name,
                     messages=self.messages,
                     tools=self.tools if self.tools else None,
-                    stream=True
+                    stream=True,
+                    api_key=self.api_key
                 )
                 
                 collected_content = ""

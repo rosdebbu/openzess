@@ -9,9 +9,8 @@ export default function Sidebar() {
   const navSections = [
     {
       title: 'General',
-      items: [
-        { name: 'New Chat', icon: <MessageSquare size={18} />, path: '/' },
-        { name: 'War Room Squad', icon: <Zap size={18} />, path: '/swarm' },
+        { name: 'Active Chat', icon: <MessageSquare size={18} />, path: '/' },
+        { name: 'CollaborationRoom', icon: <Zap size={18} />, path: '/swarm' },
       ]
     },
     {

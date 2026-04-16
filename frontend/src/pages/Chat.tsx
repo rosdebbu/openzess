@@ -25,6 +25,7 @@ export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState<ToolExecution[]>([]);
   const [pendingCalls, setPendingCalls] = useState<any[] | null>(null);
+  const [useTools, setUseTools] = useState(() => localStorage.getItem('openzess_use_tools') !== 'false');
   
   const [activeArtifact, setActiveArtifact] = useState<string | null>(null);
   const [lastProcessedMsgId, setLastProcessedMsgId] = useState<string | null>(null);
@@ -38,13 +39,29 @@ export default function Chat() {
 
   useEffect(() => {
     if (sessionId && !isStreamingRef.current) {
+      localStorage.setItem('openzess_current_session', sessionId);
       loadSessionHistory(sessionId);
-    } else {
-      setMessages([]);
-      setTerminalLogs([]);
-      setPendingCalls(null);
-      setActiveArtifact(null);
-      setLastProcessedMsgId(null);
+    } else if (!sessionId) {
+      const isNewReq = searchParams.get('new') === 'true';
+      const storedSession = localStorage.getItem('openzess_current_session');
+      
+      if (isNewReq) {
+         localStorage.removeItem('openzess_current_session');
+         setSearchParams({}, { replace: true });
+         setMessages([]);
+         setTerminalLogs([]);
+         setPendingCalls(null);
+         setActiveArtifact(null);
+         setLastProcessedMsgId(null);
+      } else if (storedSession) {
+         setSearchParams({ session_id: storedSession }, { replace: true });
+      } else {
+         setMessages([]);
+         setTerminalLogs([]);
+         setPendingCalls(null);
+         setActiveArtifact(null);
+         setLastProcessedMsgId(null);
+      }
     }
   }, [sessionId]);
 
@@ -173,7 +190,10 @@ export default function Chat() {
         }
     }
     
-    if (triggerKeyword && activePersona) {
+    if (!useTools) {
+       // User opted for Fast Chat mode (Tools disabled entirely)
+       // allowedTools remains empty []
+    } else if (triggerKeyword && activePersona) {
        // Deep Hot Swap Activated for Swarm Agent
        systemInstruction = activePersona.instruction;
        const t = activePersona.tools;
@@ -366,6 +386,21 @@ export default function Chat() {
       }
   };
 
+  const handleToolToggle = () => {
+    const val = !useTools;
+    setUseTools(val);
+    localStorage.setItem('openzess_use_tools', val.toString());
+  };
+
+  const handleDeleteMessage = async (msgId: string) => {
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      if (!msgId.includes('r') && msgId !== 'err' && sessionId) {
+          try {
+              await axios.delete(`http://localhost:8000/api/messages/${msgId}?session_id=${sessionId}`);
+          } catch(e) { console.error("Failed to delete", e); }
+      }
+  };
+
   return (
     <div className="flex flex-1 h-full w-full bg-neutral-50 dark:bg-neutral-950 transition-colors overflow-hidden">
       <div className={`flex flex-col relative h-full transition-all duration-500 ease-in-out shrink-0 ${activeArtifact ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'}`}>
@@ -400,9 +435,9 @@ export default function Chat() {
                   key={msg.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex max-w-[90%] ${msg.role === 'user' ? 'self-end' : 'self-start'}`}
+                  className={`flex max-w-[90%] group ${msg.role === 'user' ? 'self-end' : 'self-start'}`}
                 >
-                  <div className={`px-5 py-4 rounded-2xl leading-relaxed ${
+                  <div className={`px-5 py-4 rounded-2xl leading-relaxed relative ${
                     msg.role === 'user' 
                       ? 'bg-neutral-200/50 dark:bg-neutral-800/80 text-neutral-900 border border-neutral-200 dark:border-transparent dark:text-neutral-100 whitespace-pre-wrap' 
                       : 'bg-transparent text-neutral-800 dark:text-neutral-200 w-full prose dark:prose-invert prose-brand max-w-none prose-p:leading-relaxed prose-pre:bg-neutral-100 dark:prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-border'
@@ -417,6 +452,14 @@ export default function Chat() {
                          <div className="pt-1 w-full"><ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown></div>
                       </div>
                     )}
+
+                    <button 
+                      onClick={() => handleDeleteMessage(msg.id)}
+                      className={`absolute -top-3 -right-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-rose-500 hover:border-rose-500 p-1.5 rounded-full opacity-0 group-hover:opacity-100 shadow-sm transition-all hover:scale-110`}
+                      title="Permanently Delete Message"
+                    >
+                      <X size={12} />
+                    </button>
                   </div>
                 </motion.div>
               ))}
@@ -485,6 +528,14 @@ export default function Chat() {
                 rows={1}
               />
               <div className="flex gap-2 mb-1 shrink-0">
+                  <button 
+                    onClick={handleToolToggle}
+                    disabled={isLoading}
+                    title={useTools ? "Tools Enabled (Deep Thinking Mode)" : "Tools Disabled (Lightning Fast Mode)"}
+                    className={`rounded-2xl w-12 h-12 flex items-center justify-center transition-all ${useTools ? 'bg-indigo-100 dark:bg-indigo-900/30 text-brand' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-neutral-600'}`}
+                  >
+                    <Terminal size={18} />
+                  </button>
                   <button 
                     onClick={toggleListen}
                     disabled={isLoading}

@@ -2,6 +2,8 @@ import asyncio
 import concurrent.futures
 from typing import List, Dict, Any
 import json
+import time
+import random
 from agent import OpenzessAgent
 
 class SwarmManager:
@@ -18,8 +20,12 @@ class SwarmManager:
             {"role_name": "Architect", "provider": "anthropic", "api_key": "...", "system_instruction": "..."}
         ]
         """
-        def run_agent_stream(config: Dict[str, Any], queue: asyncio.Queue, main_loop: asyncio.AbstractEventLoop):
+        def run_agent_stream(config: Dict[str, Any], queue: asyncio.Queue, main_loop: asyncio.AbstractEventLoop, delay_ms: int):
             try:
+                # Add a synthetic stagger to prevent Windows WinError 10038 socket exhaustion and OpenRouter incomplete chunk limits
+                if delay_ms > 0:
+                    time.sleep(delay_ms / 1000.0)
+
                 agent = OpenzessAgent(
                     api_key=config.get("api_key", ""),
                     provider=config.get("provider", "gemini"),
@@ -42,11 +48,12 @@ class SwarmManager:
         # Create an async queue to aggregate streaming chunks from all threads
         queue = asyncio.Queue()
         
-        # Fire off all agents in parallel threads
+        # Fire off all agents in parallel threads with a stagger (250ms per agent) to prevent socket limits
         loop = asyncio.get_running_loop()
         futures = []
-        for config in squad_config:
-             futures.append(loop.run_in_executor(self.executor, run_agent_stream, config, queue, loop))
+        for i, config in enumerate(squad_config):
+             delay = i * 400  # 400ms stagger between each API call launch
+             futures.append(loop.run_in_executor(self.executor, run_agent_stream, config, queue, loop, delay))
         
         completed_agents = 0
         total_agents = len(squad_config)

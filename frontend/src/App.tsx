@@ -195,6 +195,12 @@ function App() {
                            <option value="openai" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">OpenAI (gpt-4o-mini)</option>
                            <option value="anthropic" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Anthropic (claude-3-5-sonnet-20241022)</option>
                            <option value="groq" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Groq (llama-3.3-70b-versatile)</option>
+                           <option value="deepseek" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">DeepSeek 1 (Reviewer)</option>
+                           <option value="deepseek2" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">DeepSeek 2 (Strategist)</option>
+                           <option value="deepseek3" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">DeepSeek 3 (Devil's Advocate)</option>
+                           <option value="qwen" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Qwen (qwen-2.5-72b-instruct)</option>
+                           <option value="glm" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">GLM (glm-4)</option>
+                           <option value="kimi" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Kimi (moonshot-v1-8k)</option>
                            <option value="ollama" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Local System (Ollama)</option>
                         </select>
                         

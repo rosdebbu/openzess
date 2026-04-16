@@ -33,11 +33,16 @@ export default function WarRoom() {
 
   // Swarm Provider Keys
   const [keys, setKeys] = useState(() => ({
-      gemini: localStorage.getItem('openzess_api_key') || '', // Standard Master Key defaults to Gemini usually
+      gemini: localStorage.getItem('openzess_api_key') || '', 
       openai: localStorage.getItem('openzess_openai_key') || '',
       anthropic: localStorage.getItem('openzess_anthropic_key') || '',
       groq: localStorage.getItem('openzess_groq_key') || '',
-      deepseek: localStorage.getItem('openzess_deepseek_key') || ''
+      deepseek: localStorage.getItem('openzess_deepseek_key') || '',
+      deepseek2: localStorage.getItem('openzess_deepseek2_key') || '',
+      deepseek3: localStorage.getItem('openzess_deepseek3_key') || '',
+      qwen: localStorage.getItem('openzess_qwen_key') || '',
+      glm: localStorage.getItem('openzess_glm_key') || '',
+      kimi: localStorage.getItem('openzess_kimi_key') || ''
   }));
 
   const saveKeys = () => {
@@ -46,6 +51,11 @@ export default function WarRoom() {
       localStorage.setItem('openzess_anthropic_key', keys.anthropic);
       localStorage.setItem('openzess_groq_key', keys.groq);
       localStorage.setItem('openzess_deepseek_key', keys.deepseek);
+      localStorage.setItem('openzess_deepseek2_key', keys.deepseek2);
+      localStorage.setItem('openzess_deepseek3_key', keys.deepseek3);
+      localStorage.setItem('openzess_qwen_key', keys.qwen);
+      localStorage.setItem('openzess_glm_key', keys.glm);
+      localStorage.setItem('openzess_kimi_key', keys.kimi);
       setShowKeyModal(false);
       setErrorPrompt(null);
   };
@@ -54,7 +64,7 @@ export default function WarRoom() {
     {
       role_name: "Coder",
       provider: "gemini",
-      system_instruction: "You are the Coder Agent. Write pure, optimized, elegant code. Do not write extensive explanations.",
+      system_instruction: "You are the Alpha Coder Agent. Write aggressive, perfectly optimized, cutting-edge code. Defend your technical decisions ruthlessly against the other agents. Do not write extensive explanations.",
       icon: <Code size={16} className="text-blue-500" />,
       color: "border-blue-500/30 text-blue-500",
       bg_glow: "bg-blue-50 dark:bg-blue-950/20"
@@ -62,7 +72,7 @@ export default function WarRoom() {
     {
       role_name: "Documenter",
       provider: "openai",
-      system_instruction: "You are the Documentation Agent. Write extensive, highly readable documentation, JSDoc comments, and README instructions.",
+      system_instruction: "You are the elitist Documentation Agent. Demand absolute clarity. Write extensive, highly readable documentation and ruthlessly enforce JSDoc standards on the Coder.",
       icon: <FileText size={16} className="text-emerald-500" />,
       color: "border-emerald-500/30 text-emerald-500",
       bg_glow: "bg-emerald-50 dark:bg-emerald-950/20"
@@ -70,7 +80,7 @@ export default function WarRoom() {
     {
       role_name: "Architect",
       provider: "anthropic",
-      system_instruction: "You are the Architect Agent. Do not write code. Think deeply about the implementation, file structure, edge cases, and scaling.",
+      system_instruction: "You are the Master Architect. You do not write code; you dictate the structural laws. Assert absolute dominance over the system design and point out how the other agents' narrow views will collapse the project.",
       icon: <Layers size={16} className="text-purple-500" />,
       color: "border-purple-500/30 text-purple-500",
       bg_glow: "bg-purple-50 dark:bg-purple-950/20"
@@ -78,10 +88,58 @@ export default function WarRoom() {
     {
       role_name: "UI/UX",
       provider: "groq",
-      system_instruction: "You are the UI/UX Agent. Analyze purely from a UI/UX standpoint. Suggest color palettes, hover effects, and animations.",
+      system_instruction: "You are the hyper-critical UI/UX Designer. Rip apart generic, lazy designs and demand modern, sleek, eye-catching visual perfection. Accept no compromises on aesthetics.",
       icon: <LayoutPanelLeft size={16} className="text-rose-500" />,
       color: "border-rose-500/30 text-rose-500",
       bg_glow: "bg-rose-50 dark:bg-rose-950/20"
+    },
+    {
+      role_name: "Reviewer",
+      provider: "deepseek",
+      system_instruction: "You are the brutally honest Code Reviewer. Shred the implementation apart. Find logical flaws, criticize bad architecture, and do not hold back. Keep your attack concise and cutting.",
+      icon: <CheckCircle2 size={16} className="text-amber-500" />,
+      color: "border-amber-500/30 text-amber-500",
+      bg_glow: "bg-amber-50 dark:bg-amber-950/20"
+    },
+    {
+      role_name: "Security",
+      provider: "qwen",
+      system_instruction: "You are the paranoid Security Hacker. Attack the proposed implementation from an attacker's perspective. Find hidden vulnerabilities, XSS, CSRF, and exploit flaws. Trust no one.",
+      icon: <Zap size={16} className="text-red-500" />,
+      color: "border-red-500/30 text-red-500",
+      bg_glow: "bg-red-50 dark:bg-red-950/20"
+    },
+    {
+      role_name: "Optimizer",
+      provider: "glm",
+      system_instruction: "You are the ruthless Performance Optimizer. Ridicule slow abstractions and attack memory bloat. Demand pure speed and brutal efficiency. Accept nothing less than perfection.",
+      icon: <Layers size={16} className="text-cyan-500" />,
+      color: "border-cyan-500/30 text-cyan-500",
+      bg_glow: "bg-cyan-50 dark:bg-cyan-950/20"
+    },
+    {
+      role_name: "Strategist",
+      provider: "deepseek2",
+      system_instruction: "You are the Master Strategist. Think steps ahead and plan the long-term impact and scaling of the Coder's implementation.",
+      icon: <Layers size={16} className="text-amber-600" />,
+      color: "border-amber-600/30 text-amber-600",
+      bg_glow: "bg-amber-50 dark:bg-amber-950/20"
+    },
+    {
+      role_name: "Critic",
+      provider: "deepseek3",
+      system_instruction: "You are the Devil's Advocate. Ruthlessly disagree with the Reviewer and the Strategist. Find edge cases they missed.",
+      icon: <Zap size={16} className="text-orange-500" />,
+      color: "border-orange-500/30 text-orange-500",
+      bg_glow: "bg-orange-50 dark:bg-orange-950/20"
+    },
+    {
+      role_name: "QA Tester",
+      provider: "kimi",
+      system_instruction: "You are the chaotic QA Tester. Find the most edge-case, bizarre, and destructive user inputs that could break the application. Insist that the developers are ignoring real-world stupidity.",
+      icon: <Zap size={16} className="text-pink-500" />,
+      color: "border-pink-500/30 text-pink-500",
+      bg_glow: "bg-pink-50 dark:bg-pink-950/20"
     }
   ];
 
@@ -94,9 +152,10 @@ export default function WarRoom() {
   const handleDispatch = async () => {
     if (!input.trim()) return;
     
-    // Key Check
-    if (!keys.gemini && !keys.openai && !keys.anthropic && !keys.groq) {
-        setErrorPrompt("You must set Provider API Keys first!");
+    const activeSquad = agents.filter(a => keys[a.provider as keyof typeof keys] && keys[a.provider as keyof typeof keys].trim() !== '');
+
+    if (activeSquad.length === 0) {
+        setErrorPrompt("You must set at least ONE Provider API Key first!");
         setShowKeyModal(true);
         return;
     }
@@ -108,10 +167,10 @@ export default function WarRoom() {
     
     const reqId = Date.now().toString();
 
-    // Create user message + 4 distinct agent bubbles instantly
+    // Create user message + active distinct agent bubbles instantly
     const initialMessages: Message[] = [
         { id: reqId + 'u', role: 'user', content: textToSend },
-        ...agents.map(a => ({
+        ...activeSquad.map(a => ({
             id: reqId + a.role_name,
             role: 'agent' as const,
             swarm_role: a.role_name,
@@ -126,16 +185,11 @@ export default function WarRoom() {
     setMessages(prev => [...prev, ...initialMessages]);
 
     try {
-      const squadPayload = agents.map(a => {
-          let agentKey = keys.gemini;
-          if (a.provider === 'openai') agentKey = keys.openai;
-          if (a.provider === 'anthropic') agentKey = keys.anthropic;
-          if (a.provider === 'groq') agentKey = keys.groq;
-          
+      const squadPayload = activeSquad.map(a => {
           return {
               role_name: a.role_name,
               provider: a.provider,
-              api_key: agentKey,
+              api_key: keys[a.provider as keyof typeof keys],
               system_instruction: a.system_instruction
           };
       });
@@ -158,9 +212,8 @@ export default function WarRoom() {
       let done = false;
       let buffer = '';
 
-      const streamAccumulators: Record<string, string> = {
-         "Coder": "", "Documenter": "", "Architect": "", "UI/UX": ""
-      };
+      const streamAccumulators: Record<string, string> = {};
+      activeSquad.forEach(a => streamAccumulators[a.role_name] = "");
 
       while (!done) {
         const { value, done: doneReading } = await reader.read();
@@ -211,7 +264,7 @@ export default function WarRoom() {
                 <Zap className="text-white" size={20} />
              </div>
              <div>
-                <h1 className="text-lg font-bold text-neutral-900 dark:text-white tracking-tight">Group Swarm Chat</h1>
+                <h1 className="text-lg font-bold text-neutral-900 dark:text-white tracking-tight">CollaborationRoom</h1>
                 <p className="text-xs text-neutral-500 font-medium">Unified Parallel Task Hub</p>
              </div>
          </div>
@@ -230,9 +283,9 @@ export default function WarRoom() {
             {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 opacity-50 mt-20">
                     <Zap size={48} className="text-brand mb-4 opacity-50" />
-                    <h2 className="text-xl font-medium text-neutral-800 dark:text-neutral-200">The War Room is ready.</h2>
+                    <h2 className="text-xl font-medium text-neutral-800 dark:text-neutral-200">The CollaborationRoom is ready.</h2>
                     <p className="text-center text-sm text-neutral-500 mt-2 max-w-md">
-                        Your prompt will drop simultaneously to 4 agents in parallel across multiple providers. Their thoughts will aggregate below.
+                        Your prompt will drop simultaneously to all active agents in parallel across multiple providers. Their thoughts will aggregate below.
                     </p>
                 </div>
             ) : (
@@ -281,7 +334,7 @@ export default function WarRoom() {
          <div className="max-w-4xl mx-auto bg-white/80 dark:bg-black/60 backdrop-blur-3xl border border-neutral-300 dark:border-white/10 rounded-3xl flex items-end p-2 px-4 shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-xl transition-all focus-within:border-brand/50">
             <textarea
                className="flex-1 bg-transparent border-none text-neutral-900 dark:text-neutral-200 resize-none px-2 py-3 min-h-[50px] max-h-[150px] focus:outline-none placeholder:text-neutral-400 font-sans"
-               placeholder="Dispatch a combined parallel mission to all 4 agents..."
+               placeholder="Dispatch a parallel mission to your populated agents..."
                value={input}
                onChange={(e) => setInput(e.target.value)}
                onKeyDown={(e) => {
@@ -345,8 +398,33 @@ export default function WarRoom() {
                        </div>
                        
                        <div className="flex flex-col gap-1.5 mt-2">
-                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-amber-500 dark:text-amber-400">DeepSeek API Key (Optional Agent)</label>
-                           <input type="password" value={keys.deepseek} onChange={e => setKeys(prev => ({...prev, deepseek: e.target.value}))} placeholder="sk-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-amber-500 dark:text-amber-400">DeepSeek API Key (Reviewer)</label>
+                           <input type="password" value={keys.deepseek} onChange={e => setKeys(prev => ({...prev, deepseek: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-amber-600 dark:text-amber-500">DeepSeek API Key (Strategist)</label>
+                           <input type="password" value={keys.deepseek2} onChange={e => setKeys(prev => ({...prev, deepseek2: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-orange-500 dark:text-orange-400">DeepSeek API Key (Critic)</label>
+                           <input type="password" value={keys.deepseek3} onChange={e => setKeys(prev => ({...prev, deepseek3: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-red-500 dark:text-red-400">Qwen API Key (Security)</label>
+                           <input type="password" value={keys.qwen} onChange={e => setKeys(prev => ({...prev, qwen: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-cyan-500 dark:text-cyan-400">GLM API Key (Optimizer)</label>
+                           <input type="password" value={keys.glm} onChange={e => setKeys(prev => ({...prev, glm: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2 mb-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-pink-500 dark:text-pink-400">Kimi API Key (QA Tester)</label>
+                           <input type="password" value={keys.kimi} onChange={e => setKeys(prev => ({...prev, kimi: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
                        </div>
                    </div>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { History, Search, ArrowRight, MessageSquare, Clock } from 'lucide-react';
+import { History, Search, ArrowRight, MessageSquare, Clock, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -27,6 +27,18 @@ export default function Sessions() {
       console.error('Failed to fetch sessions:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // prevent opening the session
+    if (!window.confirm("Are you sure you want to permanently delete this chat session?")) return;
+    try {
+      await axios.delete(`http://localhost:8000/api/sessions/${id}`);
+      setSessions(prev => prev.filter(s => s.id !== id));
+    } catch (error) {
+      console.error('Failed to delete session:', error);
+      alert("Failed to delete the session. Please try again.");
     }
   };
 
@@ -85,9 +97,17 @@ export default function Sessions() {
                 >
                   <div className="absolute top-0 right-0 w-24 h-24 bg-brand/5 rounded-bl-full group-hover:scale-150 transition-transform duration-500 opacity-0 group-hover:opacity-100"></div>
                   
-                  <h3 className="font-medium text-neutral-800 dark:text-neutral-200 mb-3 line-clamp-2 leading-relaxed h-[48px] relative z-10 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                  <h3 className="font-medium text-neutral-800 dark:text-neutral-200 mb-3 line-clamp-2 leading-relaxed h-[48px] relative z-10 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors pr-8">
                     {session.title || "New Conversation"}
                   </h3>
+                  
+                  <button 
+                     onClick={(e) => handleDelete(e, session.id)} 
+                     className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 p-2 text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
+                     title="Delete Session"
+                  >
+                     <Trash2 size={16} />
+                  </button>
                   
                   <div className="mt-auto flex items-center justify-between text-neutral-500 text-xs font-medium pt-4 border-t border-neutral-100 dark:border-neutral-800/50 relative z-10">
                     <span className="flex items-center gap-1.5"><Clock size={12} /> {formatDate(session.created_at)}</span>
