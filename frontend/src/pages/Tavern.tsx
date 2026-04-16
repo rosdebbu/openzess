@@ -97,8 +97,8 @@ export default function Tavern() {
     try {
       const res = await axios.post('http://localhost:8000/api/tavern/chat', {
         message: userMsg,
-        api_key: localStorage.getItem('openzess_api_key'),
-        provider: localStorage.getItem('openzess_provider') || 'gemini',
+        api_key: localStorage.getItem('openzess_api_key') || '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',
+        provider: localStorage.getItem('openzess_provider') || 'glm',
         session_id: roomSessionId,
         target_persona_id: targetPersona,
         stream: false
@@ -140,8 +140,8 @@ export default function Tavern() {
      try {
        const res = await axios.post('http://localhost:8000/api/tavern/chat', {
          message: `[System]: The group is waiting. It's your turn to speak, ${name}. Respond to the ongoing conversation naturally. DO NOT prefix your message with your name.`,
-         api_key: localStorage.getItem('openzess_api_key'),
-         provider: localStorage.getItem('openzess_provider') || 'gemini',
+         api_key: localStorage.getItem('openzess_api_key') || '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',
+         provider: localStorage.getItem('openzess_provider') || 'glm',
          session_id: roomSessionId,
          target_persona_id: nextPersonaId,
          stream: false

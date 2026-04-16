@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Swords, Box, Zap, Sparkles, Copy, CheckCircle2, Key, X, Layers } from 'lucide-react';
+import { Send, Swords, Box, Zap, Sparkles, Copy, CheckCircle2, Key, X, Layers, Trophy, RotateCcw, Crown, Cpu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -7,58 +7,136 @@ import remarkGfm from 'remark-gfm';
 interface ArenaModel {
     id: string;
     name: string;
-    provider: string; // backend mapping key
+    label: string;
+    provider: string;
     storageKey: string;
     icon: any;
-    color: string;
-    bgGlow: string;
+    accentColor: string;
+    glowColor: string;
+    gradientFrom: string;
+    gradientTo: string;
 }
 
-const MODELS: ArenaModel[] = [
+const ALL_MODELS: ArenaModel[] = [
     {
         id: 'deepseek',
-        name: 'DeepSeek (V3)',
+        name: 'DeepSeek',
+        label: 'V3 · Reviewer',
         provider: 'deepseek',
         storageKey: 'openzess_deepseek_key',
-        icon: <Zap size={20} className="text-fuchsia-500" />,
-        color: 'border-fuchsia-500/30 text-fuchsia-500',
-        bgGlow: 'bg-fuchsia-500/10'
+        icon: <Zap size={22} />,
+        accentColor: 'text-fuchsia-400',
+        glowColor: 'shadow-fuchsia-500/20',
+        gradientFrom: 'from-fuchsia-600',
+        gradientTo: 'to-purple-700',
     },
     {
         id: 'qwen',
-        name: 'Qwen (Max)',
+        name: 'Qwen',
+        label: 'Max · Strategist',
         provider: 'qwen',
         storageKey: 'openzess_qwen_key',
-        icon: <Box size={20} className="text-cyan-500" />,
-        color: 'border-cyan-500/30 text-cyan-500',
-        bgGlow: 'bg-cyan-500/10'
+        icon: <Box size={22} />,
+        accentColor: 'text-cyan-400',
+        glowColor: 'shadow-cyan-500/20',
+        gradientFrom: 'from-cyan-600',
+        gradientTo: 'to-blue-700',
     },
     {
         id: 'gemini',
-        name: 'Gemini (Pro)',
+        name: 'Gemini',
+        label: 'Pro · Architect',
         provider: 'gemini',
-        storageKey: 'openzess_api_key', 
-        icon: <Sparkles size={20} className="text-amber-500" />,
-        color: 'border-amber-500/30 text-amber-500',
-        bgGlow: 'bg-amber-500/10'
+        storageKey: 'openzess_api_key',
+        icon: <Sparkles size={22} />,
+        accentColor: 'text-amber-400',
+        glowColor: 'shadow-amber-500/20',
+        gradientFrom: 'from-amber-500',
+        gradientTo: 'to-orange-600',
+    },
+    {
+        id: 'glm',
+        name: 'GLM',
+        label: 'GLM-4 · Analyst',
+        provider: 'glm',
+        storageKey: 'openzess_glm_key',
+        icon: <Cpu size={22} />,
+        accentColor: 'text-emerald-400',
+        glowColor: 'shadow-emerald-500/20',
+        gradientFrom: 'from-emerald-500',
+        gradientTo: 'to-teal-700',
+    },
+    {
+        id: 'openai',
+        name: 'OpenAI',
+        label: 'GPT-4o · Writer',
+        provider: 'openai',
+        storageKey: 'openzess_openai_key',
+        icon: <Layers size={22} />,
+        accentColor: 'text-neutral-400',
+        glowColor: 'shadow-neutral-500/20',
+        gradientFrom: 'from-neutral-600',
+        gradientTo: 'to-neutral-900',
+    },
+    {
+        id: 'anthropic',
+        name: 'Anthropic',
+        label: 'Claude 3.5 · Planner',
+        provider: 'anthropic',
+        storageKey: 'openzess_anthropic_key',
+        icon: <Box size={22} />,
+        accentColor: 'text-amber-700',
+        glowColor: 'shadow-amber-700/20',
+        gradientFrom: 'from-orange-600',
+        gradientTo: 'to-amber-800',
+    },
+    {
+        id: 'groq',
+        name: 'Groq',
+        label: 'Llama 3 · Speed',
+        provider: 'groq',
+        storageKey: 'openzess_groq_key',
+        icon: <Zap size={22} />,
+        accentColor: 'text-rose-400',
+        glowColor: 'shadow-rose-500/20',
+        gradientFrom: 'from-rose-500',
+        gradientTo: 'to-red-700',
+    },
+    {
+        id: 'kimi',
+        name: 'Kimi',
+        label: 'Moonshot · Local',
+        provider: 'kimi',
+        storageKey: 'openzess_kimi_key',
+        icon: <Sparkles size={22} />,
+        accentColor: 'text-indigo-400',
+        glowColor: 'shadow-indigo-500/20',
+        gradientFrom: 'from-indigo-500',
+        gradientTo: 'to-blue-700',
     }
 ];
 
 export default function DebateArena() {
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [responses, setResponses] = useState<Record<string, string>>({
-        deepseek: '', qwen: '', gemini: ''
+    const [responses, setResponses] = useState<Record<string, string>>(() => {
+        const init: any = {};
+        ALL_MODELS.forEach(m => init[m.id] = '');
+        return init;
     });
-    const [statuses, setStatuses] = useState<Record<string, 'idle' | 'generating' | 'done' | 'error'>>({
-        deepseek: 'idle', qwen: 'idle', gemini: 'idle'
+    const [statuses, setStatuses] = useState<Record<string, 'idle' | 'generating' | 'done' | 'error'>>(() => {
+        const init: any = {};
+        ALL_MODELS.forEach(m => init[m.id] = 'idle');
+        return init;
     });
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [showKeyModal, setShowKeyModal] = useState(false);
-    
+    const [selectedWinner, setSelectedWinner] = useState<string | null>(null);
+    const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
     // Warroom Provider Keys
     const [keys, setKeys] = useState(() => ({
-        gemini: localStorage.getItem('openzess_api_key') || '', 
+        gemini: localStorage.getItem('openzess_api_key') || '',
         openai: localStorage.getItem('openzess_openai_key') || '',
         anthropic: localStorage.getItem('openzess_anthropic_key') || '',
         groq: localStorage.getItem('openzess_groq_key') || '',
@@ -66,9 +144,15 @@ export default function DebateArena() {
         deepseek2: localStorage.getItem('openzess_deepseek2_key') || '',
         deepseek3: localStorage.getItem('openzess_deepseek3_key') || '',
         qwen: localStorage.getItem('openzess_qwen_key') || '',
-        glm: localStorage.getItem('openzess_glm_key') || '',
+        glm: localStorage.getItem('openzess_glm_key') || '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',
         kimi: localStorage.getItem('openzess_kimi_key') || ''
     }));
+
+    // Derive active models dynamically based on which keys exist!
+    const activeModels = ALL_MODELS.filter(m => {
+        const keyItem = (keys as any)[m.id === 'gemini' ? 'gemini' : m.id];
+        return keyItem && keyItem.trim().length > 0;
+    });
 
     const saveKeys = () => {
         localStorage.setItem('openzess_api_key', keys.gemini);
@@ -90,17 +174,27 @@ export default function DebateArena() {
         setTimeout(() => setCopiedId(null), 2000);
     };
 
+    // Auto-scroll each panel as content streams
+    useEffect(() => {
+        activeModels.forEach(m => {
+            const el = scrollRefs.current[m.id];
+            if (el && statuses[m.id] === 'generating') {
+                el.scrollTop = el.scrollHeight;
+            }
+        });
+    }, [responses, statuses]);
+
     const fetchStream = async (model: ArenaModel, userPrompt: string) => {
         setStatuses(prev => ({...prev, [model.id]: 'generating'}));
         setResponses(prev => ({...prev, [model.id]: ''}));
-        
-        const apiKey = localStorage.getItem(model.storageKey);
+
+        const apiKey = localStorage.getItem(model.storageKey) || (model.provider === 'glm' ? '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' : null);
         if (!apiKey) {
-            setResponses(prev => ({...prev, [model.id]: `❌ Error: Missing API Key for ${model.name}. Please set it in Warroom keys.`}));
+            setResponses(prev => ({...prev, [model.id]: `⚠️ No API key set for **${model.name}**.\n\nClick **Provider Keys** at the top to add one.`}));
             setStatuses(prev => ({...prev, [model.id]: 'error'}));
             return;
         }
-        
+
         try {
             const response = await fetch('http://localhost:8000/api/chat', {
                 method: 'POST',
@@ -116,13 +210,13 @@ export default function DebateArena() {
 
             if (!response.ok) throw new Error("HTTP " + response.status);
             if (!response.body) throw new Error("No response body");
-            
+
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let buffer = '';
             let fullText = '';
             let done = false;
-            
+
             while (!done) {
                 const { value, done: doneReading } = await reader.read();
                 done = doneReading;
@@ -130,7 +224,7 @@ export default function DebateArena() {
                     buffer += decoder.decode(value, { stream: true });
                     const lines = buffer.split('\n\n');
                     buffer = lines.pop() || '';
-                    
+
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
                             try {
@@ -138,6 +232,8 @@ export default function DebateArena() {
                                 if (data.type === 'content') {
                                     fullText += data.content;
                                     setResponses(prev => ({...prev, [model.id]: fullText}));
+                                } else if (data.type === 'error') {
+                                    throw new Error(data.error || "Unknown server error");
                                 }
                             } catch(e) {}
                         }
@@ -146,174 +242,362 @@ export default function DebateArena() {
             }
             setStatuses(prev => ({...prev, [model.id]: 'done'}));
         } catch(err: any) {
-            setResponses(prev => ({...prev, [model.id]: `❌ Error: ${err.message}`}));
+            setResponses(prev => ({...prev, [model.id]: `❌ **Error:** ${err.message}`}));
             setStatuses(prev => ({...prev, [model.id]: 'error'}));
         }
     };
 
     const handleFight = async () => {
-        if (!prompt.trim() || isLoading) return;
+        if (!prompt.trim() || isLoading || activeModels.length === 0) return;
         setIsLoading(true);
-        
-        // Execute all 3 fetches completely in parallel
-        await Promise.all(MODELS.map(m => fetchStream(m, prompt)));
-        
+        setSelectedWinner(null);
+
+        await Promise.all(activeModels.map(m => fetchStream(m, prompt)));
+
+        setIsLoading(false);
+    };
+
+    const handleReset = () => {
+        setPrompt('');
+        setResponses(prev => {
+            const next = {...prev};
+            ALL_MODELS.forEach(m => next[m.id] = '');
+            return next;
+        });
+        setStatuses(prev => {
+            const next = {...prev};
+            ALL_MODELS.forEach(m => next[m.id] = 'idle');
+            return next;
+        });
+        setSelectedWinner(null);
         setIsLoading(false);
     };
 
     const hasStarted = Object.values(statuses).some(s => s !== 'idle');
+    const allDone = Object.values(statuses).every(s => s === 'done' || s === 'error');
+
+    const statusDot = (s: string) => {
+        if (s === 'generating') return 'bg-amber-400 animate-pulse';
+        if (s === 'done') return 'bg-emerald-400';
+        if (s === 'error') return 'bg-red-400';
+        return 'bg-neutral-600';
+    };
 
     return (
-        <div className="flex flex-col h-full w-full bg-neutral-100 dark:bg-black/90 transition-colors overflow-hidden relative">
-            {/* Header Area */}
-            <div className="shrink-0 p-8 pb-4 z-10 bg-gradient-to-b from-white to-transparent dark:from-black dark:to-transparent flex flex-col relative">
-                
-                <button 
-                  onClick={() => setShowKeyModal(true)}
-                  className="absolute top-8 right-8 flex items-center justify-center gap-2 px-4 py-2 bg-white/5 dark:bg-white/10 hover:bg-white/10 dark:hover:bg-white/20 border border-white/10 rounded-xl text-neutral-600 dark:text-neutral-300 transition-all font-medium text-sm backdrop-blur-md"
-                >
-                  <Key size={16} /> 
-                  <span className="hidden sm:inline">Provider Keys</span>
-                </button>
-                
-                <div className="flex flex-col items-center max-w-4xl mx-auto text-center mb-8 mt-2">
-                    <motion.div 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 bg-gradient-to-br from-rose-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(244,63,94,0.3)] mb-4"
+        <div className="flex flex-col h-full w-full bg-neutral-50 dark:bg-[#0a0a0f] transition-colors overflow-hidden relative">
+            {!hasStarted ? (
+                /* ── Initial Hero State ── */
+                <div className="h-full flex flex-col items-center justify-center p-6 relative">
+                    <button
+                        onClick={() => setShowKeyModal(true)}
+                        className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-neutral-100/80 dark:bg-white/[0.04] hover:bg-neutral-200 dark:hover:bg-white/10 border border-neutral-200/50 dark:border-white/[0.06] rounded-xl text-neutral-600 dark:text-neutral-300 transition-all text-sm font-medium z-10"
                     >
-                        <Swords size={32} className="text-white" />
+                        <Key size={14} />
+                        <span className="hidden md:inline">Keys</span>
+                    </button>
+                    
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center text-center max-w-2xl w-full z-10">
+                        <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(244,63,94,0.3)] mb-6">
+                            <Swords size={40} className="text-white" />
+                        </div>
+                        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-neutral-900 dark:text-white mb-3 leading-tight">Warroom Debate</h1>
+                        <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-400 mb-10">
+                            Drop a complex problem and watch up to {ALL_MODELS.length} connected agents race to solve it in parallel.
+                            Currently tracking <strong className="text-brand">{activeModels.length}</strong> active agents.
+                        </p>
+                        
+                        <div className="w-full bg-white dark:bg-[#111118]/80 backdrop-blur-xl border border-neutral-200/60 dark:border-white/[0.06] rounded-[24px] flex flex-col shadow-xl transition-all focus-within:border-brand/40 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.08)]">
+                            <textarea
+                                className="w-full bg-transparent border-none text-neutral-900 dark:text-neutral-200 text-base md:text-lg resize-none px-6 py-5 min-h-[120px] focus:outline-none placeholder:text-neutral-400 font-sans"
+                                placeholder="What logic puzzle or coding architecture do you need debated?..."
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleFight();
+                                    }
+                                }}
+                            />
+                            <div className="flex items-center justify-between px-3 pb-3 pt-2 border-t border-neutral-100 dark:border-white/[0.04]">
+                                <div className="text-xs text-neutral-400 pl-3">Press Enter to send</div>
+                                <button 
+                                    className="bg-brand hover:bg-brand-hover text-white rounded-xl w-12 h-12 shrink-0 flex items-center justify-center transition-all disabled:opacity-30 shadow-md"
+                                    onClick={handleFight}
+                                    disabled={!prompt.trim() || isLoading}
+                                >
+                                    <Send size={20} className="translate-x-0.5" />
+                                </button>
+                            </div>
+                        </div>
                     </motion.div>
-                    <h1 className="text-3xl font-black tracking-tight text-neutral-900 dark:text-white mb-2">Warroom Debate</h1>
-                    <p className="text-neutral-500 dark:text-neutral-400">Head-to-Head Parallel Generation. You are the judge.</p>
                 </div>
-                
-                {/* Prompt bar */}
-                <div className="w-full max-w-5xl mx-auto bg-white/70 dark:bg-neutral-900/60 backdrop-blur-xl border border-white/40 dark:border-white/5 rounded-3xl flex items-end p-2.5 px-4 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] transition-all focus-within:border-brand/40">
-                    <textarea
-                        className="flex-1 bg-transparent border-none text-neutral-900 dark:text-neutral-200 text-base resize-none px-4 py-4 min-h-[60px] max-h-[250px] focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-600 font-sans leading-relaxed"
-                        placeholder="Drop a complex problem here, and watch them race to solve it..."
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                handleFight();
-                            }
-                        }}
-                        disabled={isLoading}
-                        rows={prompt.split('\n').length > 1 ? Math.min(prompt.split('\n').length, 8) : 1}
-                    />
-                    <button 
-                        className="bg-brand hover:bg-brand-hover text-white rounded-2xl w-14 h-14 shrink-0 flex items-center justify-center transition-all disabled:opacity-30 shadow-lg shadow-brand/20 active:scale-95 mb-1 mr-1"
-                        onClick={handleFight} 
-                        disabled={!prompt.trim() || isLoading}
+            ) : (
+                /* ── Active Arena State ── */
+                <>
+                    {/* ── Compact Top Bar ── */}
+                    <div className="shrink-0 px-5 pt-14 pb-4 flex items-center gap-4 border-b border-neutral-200/60 dark:border-white/5 bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl z-20">
+                {/* Left: Title */}
+                <div className="flex items-center gap-3 shrink-0">
+                    <div className="w-9 h-9 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+                        <Swords size={18} className="text-white" />
+                    </div>
+                    <div>
+                        <h1 className="text-base font-bold tracking-tight text-neutral-900 dark:text-white leading-tight">Warroom Debate</h1>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 leading-tight">4-way parallel generation</p>
+                    </div>
+                </div>
+
+                {/* Center: Prompt Bar */}
+                <div className="flex-1 max-w-3xl mx-auto">
+                    <div className="flex items-center bg-neutral-100/80 dark:bg-white/[0.04] border border-neutral-200/50 dark:border-white/[0.06] rounded-2xl px-1 py-1 transition-all focus-within:border-brand/40 focus-within:shadow-[0_0_0_3px_rgba(var(--brand-rgb),0.08)]">
+                        <input
+                            className="flex-1 bg-transparent border-none text-sm text-neutral-900 dark:text-neutral-200 px-4 py-2.5 focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-600 font-sans"
+                            placeholder="Drop a complex problem here, and watch them race to solve it..."
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleFight();
+                                }
+                            }}
+                            disabled={isLoading}
+                        />
+                        {hasStarted && (
+                            <button
+                                onClick={handleReset}
+                                className="p-2 text-neutral-400 hover:text-neutral-700 dark:hover:text-white rounded-xl hover:bg-neutral-200/60 dark:hover:bg-white/10 transition-colors mr-1"
+                                title="Reset Arena"
+                            >
+                                <RotateCcw size={16} />
+                            </button>
+                        )}
+                        <button
+                            className="bg-brand hover:bg-brand-hover text-white rounded-xl w-10 h-10 shrink-0 flex items-center justify-center transition-all disabled:opacity-30 shadow-md shadow-brand/20 active:scale-95"
+                            onClick={handleFight}
+                            disabled={!prompt.trim() || isLoading}
+                        >
+                            <Send size={16} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Right: Actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                    {hasStarted && allDone && (
+                        <div className="hidden lg:flex items-center gap-1.5 text-xs text-emerald-500 font-medium bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                            <CheckCircle2 size={13} /> All Complete
+                        </div>
+                    )}
+                    <button
+                        onClick={() => setShowKeyModal(true)}
+                        className="flex items-center gap-2 px-3 py-2 bg-neutral-100/80 dark:bg-white/[0.06] hover:bg-neutral-200/80 dark:hover:bg-white/10 border border-neutral-200/50 dark:border-white/[0.08] rounded-xl text-neutral-600 dark:text-neutral-300 transition-all text-sm font-medium"
                     >
-                        <Send size={20} className="translate-y-[1px] translate-x-[1px]" />
+                        <Key size={14} />
+                        <span className="hidden md:inline">Keys</span>
                     </button>
                 </div>
             </div>
 
-            {/* Battle Arena Columns */}
-            <div className="flex-1 w-full max-w-[1600px] mx-auto px-6 pb-6 pt-2 flex gap-6 overflow-hidden">
-                {!hasStarted ? (
-                    <div className="w-full h-full flex items-center justify-center pointer-events-none opacity-40">
-                        <Swords size={200} className="text-neutral-200 dark:text-neutral-800" />
+            {/* ── Bento Grid Arena ── */}
+            <div className="flex-1 p-3 md:p-4 overflow-hidden">
+                {activeModels.length === 0 ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-neutral-200 dark:border-white/10 rounded-3xl">
+                        <Key className="text-neutral-400 mb-4" size={48} />
+                        <h2 className="text-lg font-bold text-neutral-800 dark:text-white mb-2">Configure Your Arena</h2>
+                        <p className="text-sm text-neutral-500 max-w-sm mb-6">You must provide at least one API key in the "Keys" menu above to launch a debate grid.</p>
+                        <button onClick={() => setShowKeyModal(true)} className="bg-brand text-white px-6 py-2.5 rounded-xl font-medium shadow-lg hover:bg-brand-hover transition-colors">
+                            Setup Provider Keys
+                        </button>
                     </div>
                 ) : (
-                    <>
-                        {MODELS.map((model) => (
-                            <div key={model.id} className="flex-1 flex flex-col min-w-0 bg-white/40 dark:bg-neutral-900/40 border border-neutral-200/50 dark:border-neutral-800/50 rounded-3xl overflow-hidden shadow-sm backdrop-blur-sm">
-                                {/* Column Header */}
-                                <div className={`px-6 py-4 border-b border-neutral-200/50 dark:border-neutral-800/50 flex items-center justify-between ${model.bgGlow} shrink-0`}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-white dark:bg-black p-2 rounded-xl shadow-sm">
-                                            {model.icon}
+                    <div className={`h-full grid gap-3 md:gap-4 ${
+                        activeModels.length === 1 ? 'grid-cols-1' :
+                        activeModels.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                        activeModels.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
+                        activeModels.length === 4 ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4' :
+                        activeModels.length === 5 ? 'grid-cols-1 md:grid-cols-3' :
+                        activeModels.length === 6 ? 'grid-cols-1 md:grid-cols-3' : 
+                        activeModels.length === 7 ? 'grid-cols-1 md:grid-cols-4' :
+                        'grid-cols-1 md:grid-cols-4'
+                    }`}>
+                        {activeModels.map((model, index) => {
+                            const isStarted = statuses[model.id] !== 'idle';
+                            const isWinner = selectedWinner === model.id;
+
+                            // We use uniform col spans for dynamically sized grids so it gracefully wraps!
+                            const gridClass = "col-span-1";
+
+                            return (
+                            <motion.div
+                                key={model.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.08, type: 'spring', stiffness: 300, damping: 30 }}
+                                className={`
+                                    ${gridClass}
+                                    relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300
+                                    bg-white/70 dark:bg-[#111118]/80
+                                    border
+                                    ${isWinner
+                                        ? 'border-amber-400/60 shadow-[0_0_30px_rgba(251,191,36,0.15)]'
+                                        : 'border-neutral-200/50 dark:border-white/[0.06] hover:border-neutral-300/80 dark:hover:border-white/[0.12]'
+                                    }
+                                    backdrop-blur-sm
+                                    group
+                                `}
+                            >
+                                {/* Winner badge */}
+                                {isWinner && (
+                                    <div className="absolute top-3 right-3 z-10 flex items-center gap-1 text-[10px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg uppercase tracking-wider">
+                                        <Crown size={11} /> Winner
+                                    </div>
+                                )}
+
+                                {/* Card Header */}
+                                <div className="shrink-0 px-4 py-3 flex items-center gap-3 border-b border-neutral-200/30 dark:border-white/[0.04]">
+                                    <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} flex items-center justify-center text-white shadow-md ${model.glowColor}`}>
+                                        {model.icon}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-bold text-sm text-neutral-900 dark:text-white tracking-wide">{model.name}</h3>
+                                            <div className={`w-1.5 h-1.5 rounded-full ${statusDot(statuses[model.id])}`} />
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-neutral-900 dark:text-white tracking-wide">{model.name}</h3>
-                                            <p className="text-[10px] text-neutral-500 uppercase tracking-widest font-mono font-semibold">
-                                                {statuses[model.id] === 'generating' ? 'Writing...' : statuses[model.id].toUpperCase()}
+                                        <p className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono tracking-wide">{model.label}</p>
+                                    </div>
+
+                                    {/* Action buttons */}
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {statuses[model.id] === 'done' && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleCopy(model.id, responses[model.id])}
+                                                    className="p-1.5 text-neutral-400 hover:text-brand rounded-lg hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                                                    title="Copy"
+                                                >
+                                                    {copiedId === model.id ? <CheckCircle2 size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                                                </button>
+                                                {allDone && (
+                                                    <button
+                                                        onClick={() => setSelectedWinner(isWinner ? null : model.id)}
+                                                        className={`p-1.5 rounded-lg transition-colors ${isWinner ? 'text-amber-500 bg-amber-500/10' : 'text-neutral-400 hover:text-amber-500 hover:bg-amber-500/10'}`}
+                                                        title="Pick as winner"
+                                                    >
+                                                        <Trophy size={14} />
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Card Body */}
+                                <div
+                                    ref={(el) => { scrollRefs.current[model.id] = el; }}
+                                    className="flex-1 overflow-y-auto custom-scrollbar relative"
+                                >
+                                    {!isStarted ? (
+                                        /* ── Idle State: Beautiful preview card ── */
+                                        <div className="h-full flex flex-col items-center justify-center p-6 text-center">
+                                            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} flex items-center justify-center text-white/80 mb-4 shadow-xl ${model.glowColor} opacity-60`}>
+                                                {model.icon}
+                                            </div>
+                                            <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1">{model.name}</p>
+                                            <p className="text-[11px] text-neutral-400 dark:text-neutral-500 leading-relaxed max-w-[200px]">
+                                                Awaiting prompt. This agent will provide an independent response.
                                             </p>
+                                            <div className="mt-4 flex items-center gap-1">
+                                                <div className="w-8 h-[2px] rounded-full bg-neutral-200 dark:bg-neutral-800" />
+                                                <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} opacity-40`} />
+                                                <div className="w-8 h-[2px] rounded-full bg-neutral-200 dark:bg-neutral-800" />
+                                            </div>
                                         </div>
-                                    </div>
-                                    {statuses[model.id] === 'done' && (
-                                        <button 
-                                            onClick={() => handleCopy(model.id, responses[model.id])}
-                                            className="p-2 bg-white/50 dark:bg-black/50 hover:bg-white dark:hover:bg-neutral-800 rounded-xl transition-colors shadow-sm text-neutral-500 hover:text-brand"
-                                            title="Copy Result"
-                                        >
-                                            {copiedId === model.id ? <CheckCircle2 size={16} className="text-emerald-500" /> : <Copy size={16} />}
-                                        </button>
-                                    )}
-                                </div>
-                                
-                                {/* Content Area */}
-                                <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar relative">
-                                    <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-neutral-100 dark:prose-pre:bg-black/50 prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-neutral-800 focus:outline-none">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                            {responses[model.id]}
-                                        </ReactMarkdown>
-                                    </div>
-                                    {statuses[model.id] === 'generating' && (
-                                        <div className="mt-4 flex gap-1 items-center pb-8">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: '0ms' }} />
-                                            <div className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: '150ms' }} />
-                                            <div className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    ) : (
+                                        /* ── Active: Markdown content ── */
+                                        <div className="px-4 py-4">
+                                            <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-p:my-2 prose-headings:my-3 prose-pre:bg-neutral-100 dark:prose-pre:bg-black/60 prose-pre:border prose-pre:border-neutral-200/50 dark:prose-pre:border-neutral-800 prose-pre:rounded-xl prose-code:text-xs">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                    {responses[model.id]}
+                                                </ReactMarkdown>
+                                            </div>
+                                            {statuses[model.id] === 'generating' && (
+                                                <div className="mt-3 flex gap-1.5 items-center pb-4">
+                                                    <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${model.gradientFrom} ${model.gradientTo} animate-bounce`} style={{ animationDelay: '0ms' }} />
+                                                    <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${model.gradientFrom} ${model.gradientTo} animate-bounce`} style={{ animationDelay: '150ms' }} />
+                                                    <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${model.gradientFrom} ${model.gradientTo} animate-bounce`} style={{ animationDelay: '300ms' }} />
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
-                            </div>
-                        ))}
-                    </>
+
+                                {/* Subtle number badge */}
+                                <div className="absolute bottom-3 right-3 text-[10px] font-mono font-bold text-neutral-300 dark:text-neutral-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    #{index + 1}
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+                </div>
                 )}
             </div>
+            </>
+            )}
 
-            {/* Provider Keys Modal */}
+            {/* ── Provider Keys Modal ── */}
             <AnimatePresence>
                 {showKeyModal && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
+                        onClick={() => setShowKeyModal(false)}
                     >
-                        <motion.div 
-                            initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+                            className="bg-white dark:bg-[#111118] border border-neutral-200 dark:border-neutral-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-neutral-50 dark:bg-neutral-950/50">
+                            <div className="p-5 border-b border-neutral-200/60 dark:border-white/[0.06] flex justify-between items-center">
                                 <div>
-                                    <h2 className="text-xl font-bold flex items-center gap-2 text-neutral-900 dark:text-white">
-                                        <Key className="text-amber-500" size={24} /> Provider Matrix Keys
+                                    <h2 className="text-lg font-bold flex items-center gap-2 text-neutral-900 dark:text-white">
+                                        <Key className="text-amber-500" size={20} /> Provider Keys
                                     </h2>
-                                    <p className="text-sm text-neutral-500 mt-1">Set the API keys for the models you want to use in the Arena.</p>
+                                    <p className="text-xs text-neutral-400 mt-0.5">Configure API keys for each arena model.</p>
                                 </div>
-                                <button onClick={() => setShowKeyModal(false)} className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white p-2 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors">
-                                    <X size={20} />
+                                <button onClick={() => setShowKeyModal(false)} className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors">
+                                    <X size={18} />
                                 </button>
                             </div>
-                            
-                            <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6">
-                                <div className="space-y-4">
-                                    <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Core Models</h3>
-                                    
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2"><Sparkles size={16} className="text-amber-500"/> Gemini API Key (Default)</label>
-                                        <input type="password" value={keys.gemini} onChange={(e) => setKeys({...keys, gemini: e.target.value})} className="w-full bg-neutral-100 dark:bg-black/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand transition-colors" placeholder="AIzaSy..." />
+
+                            <div className="p-5 overflow-y-auto custom-scrollbar flex flex-col gap-4">
+                                {ALL_MODELS.map(model => (
+                                    <div key={model.id} className="flex flex-col gap-1.5">
+                                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
+                                            <span className={`w-5 h-5 rounded-md bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} flex items-center justify-center text-white`}>
+                                                {/* small icon replica */}
+                                                <span style={{ transform: 'scale(0.6)' }}>{model.icon}</span>
+                                            </span>
+                                            {model.name} API Key
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={(keys as any)[model.id === 'gemini' ? 'gemini' : model.id] || ''}
+                                            onChange={(e) => setKeys(prev => ({ ...prev, [model.id === 'gemini' ? 'gemini' : model.id]: e.target.value }))}
+                                            className="w-full bg-neutral-50 dark:bg-black/40 border border-neutral-200/80 dark:border-white/[0.08] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand/50 transition-colors font-mono"
+                                            placeholder="sk-..."
+                                        />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2"><Zap size={16} className="text-fuchsia-500"/> DeepSeek API Key (Reviewer)</label>
-                                        <input type="password" value={keys.deepseek} onChange={(e) => setKeys({...keys, deepseek: e.target.value})} className="w-full bg-neutral-100 dark:bg-black/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand transition-colors" placeholder="sk-or-v1-..." />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2"><Box size={16} className="text-cyan-500"/> Qwen API Key (Strategist)</label>
-                                        <input type="password" value={keys.qwen} onChange={(e) => setKeys({...keys, qwen: e.target.value})} className="w-full bg-neutral-100 dark:bg-black/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand transition-colors" placeholder="sk-or-v1-..." />
-                                    </div>
-                                </div>
+                                ))}
                             </div>
-                            
-                            <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 flex justify-end">
-                                <button onClick={saveKeys} className="bg-brand hover:bg-brand-hover text-white px-6 py-2.5 rounded-xl font-medium transition-colors shadow-lg shadow-brand/20">
-                                    Save Keys to Vault
+
+                            <div className="p-5 border-t border-neutral-200/60 dark:border-white/[0.06] flex justify-end gap-2">
+                                <button onClick={() => setShowKeyModal(false)} className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors">
+                                    Cancel
+                                </button>
+                                <button onClick={saveKeys} className="bg-brand hover:bg-brand-hover text-white px-5 py-2 rounded-xl font-medium text-sm transition-colors shadow-lg shadow-brand/20">
+                                    Save Keys
                                 </button>
                             </div>
                         </motion.div>
