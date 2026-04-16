@@ -1,5 +1,5 @@
 import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -7,6 +7,14 @@ import { useTheme } from '../context/ThemeContext';
 export default function Sidebar() {
   const { theme, toggleTheme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  useEffect(() => {
+    const handleZenMode = (e: any) => {
+      setIsCollapsed(e.detail);
+    };
+    window.addEventListener('toggle-zen-mode', handleZenMode);
+    return () => window.removeEventListener('toggle-zen-mode', handleZenMode);
+  }, []);
   
   const navSections = [
     {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -27,6 +27,8 @@ export default function Chat() {
   const [pendingCalls, setPendingCalls] = useState<any[] | null>(null);
   const [useTools, setUseTools] = useState(() => localStorage.getItem('openzess_use_tools') !== 'false');
   const [useSwarm, setUseSwarm] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
+  const [zenMode, setZenMode] = useState(false);
   
   const [activeArtifact, setActiveArtifact] = useState<string | null>(null);
   const [lastProcessedMsgId, setLastProcessedMsgId] = useState<string | null>(null);
@@ -36,6 +38,7 @@ export default function Chat() {
   const recognitionRef = useRef<any>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
@@ -411,65 +414,157 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-1 h-full w-full bg-neutral-50 dark:bg-neutral-950 transition-colors overflow-hidden">
-      <div className={`flex flex-col relative h-full transition-all duration-500 ease-in-out shrink-0 ${activeArtifact ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'}`}>
-        {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-10 mt-[-100px]">
-            <motion.div 
-               initial={{ scale: 0.9, opacity: 0 }} 
-               animate={{ scale: 1, opacity: 1 }} 
-               className="w-20 h-20 bg-gradient-to-br from-brand to-brand-hover rounded-full flex items-center justify-center shadow-lg shadow-brand/20 mb-6 border-4 border-neutral-900"
-            >
-              <Sparkles size={32} className="text-white" />
-            </motion.div>
-            <h2 className="text-2xl font-medium mb-3 text-neutral-900 dark:text-neutral-100">can I help you today?</h2>
-            <p className="text-neutral-600 dark:text-neutral-400 mb-10 text-sm">Mention Swarm agents (e.g. @scraper or @codegen) to swap dynamically.</p>
-            
-            <div className="flex flex-col gap-3 w-full max-w-lg">
-              <button onClick={() => handleSend("List the files in this directory.")} className="bg-white dark:bg-surface hover:bg-neutral-50 dark:hover:bg-neutral-800/50 shadow-sm dark:shadow-none transition-colors border border-neutral-200 dark:border-border p-4 rounded-xl flex items-center justify-between group">
-                <span className="flex items-center gap-3 text-neutral-800 dark:text-neutral-300 font-medium text-sm"><Code size={16} className="text-brand" /> Check local files</span>
-                <span className="text-neutral-500 group-hover:translate-x-1 transition-transform">→</span>
-              </button>
-              <button onClick={() => handleSend("@scraper Search the web for the latest React news.")} className="bg-white dark:bg-surface hover:bg-neutral-50 dark:hover:bg-neutral-800/50 shadow-sm dark:shadow-none transition-colors border border-neutral-200 dark:border-border p-4 rounded-xl flex items-center justify-between group">
-                <span className="flex items-center gap-3 text-neutral-800 dark:text-neutral-300 font-medium text-sm"><Globe size={16} className="text-emerald-500" /> Delegate search to Scraper</span>
-                <span className="text-neutral-500 group-hover:translate-x-1 transition-transform">→</span>
-              </button>
+    <div className={`flex flex-1 h-full w-full bg-[#0E1117] transition-all overflow-hidden relative ${zenMode ? 'p-6' : 'p-0'}`}>
+      <div className={`flex flex-col relative h-full transition-all duration-500 ease-in-out shrink-0 ${activeArtifact ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'} ${zenMode ? 'rounded-3xl border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.05)] bg-[#121614]/50 overflow-hidden backdrop-blur-sm scale-[0.98]' : ''}`}>
+        
+        {/* Top Control Bar (OpenClaw Style) */}
+        <div className={`w-full px-10 pt-6 pb-2 z-30 flex items-center justify-between shrink-0 transition-all ${zenMode ? 'px-12 pt-8' : ''}`}>
+            {/* Left Header - Dropdowns */}
+            <div className="flex items-center gap-3">
+               <div className="relative">
+                  <select className="appearance-none bg-[#1A1C23] border border-transparent hover:bg-[#252830] text-neutral-300 text-[13px] font-medium py-2.5 pl-4 pr-10 rounded-[12px] transition-all cursor-pointer focus:outline-none focus:ring-0 min-w-[220px]">
+                     <option>main</option>
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none" />
+               </div>
+               <div className="relative group/select">
+                  <div className="absolute inset-0 bg-transparent border-2 border-emerald-500/50 rounded-[14px] pointer-events-none -m-[1px]" />
+                  <select 
+                     className="appearance-none bg-transparent hover:bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.05)] text-neutral-200 text-[13px] font-medium py-2.5 pl-4 pr-10 rounded-[12px] transition-all cursor-pointer focus:outline-none focus:ring-0 min-w-[300px] outline-none"
+                     defaultValue="gemini-3.1-flash-lite-preview-google"
+                  >
+                     <option className="bg-[#0E1117]" value="gemini-3.1-flash-lite-preview-google">gemini-3.1-flash-lite-preview · google</option>
+                     <option className="bg-[#0E1117]" value="gemini-2.5-flash">gemini 2.5 flash</option>
+                     <option className="bg-[#0E1117]" value="openai">openai</option>
+                     <option className="bg-[#0E1117]" value="deepseek">deepseek</option>
+                     <option className="bg-[#0E1117]" value="mistral-ai">mistral AI</option>
+                     <option className="bg-[#0E1117]" value="groq">groq</option>
+                     <option className="bg-[#0E1117]" value="cohere">cohere</option>
+                     <option className="bg-[#0E1117]" value="glm">glm</option>
+                     <option className="bg-[#0E1117]" value="gemma">gemma</option>
+                     <option className="bg-[#0E1117]" value="qwen">qwen</option>
+                     <option className="bg-[#0E1117]" value="kimi">kimi</option>
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none group-hover/select:text-emerald-400 transition-colors" />
+               </div>
             </div>
+
+            {/* Right Header - Actions */}
+            <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => {
+                     setMessages([]);
+                     setTerminalLogs([]);
+                     setPendingCalls(null);
+                     setActiveArtifact(null);
+                     setSearchParams({ new: 'true' }, { replace: true });
+                  }}
+                  title="New Chat / Refresh" 
+                  className="w-[42px] h-[42px] rounded-[14px] bg-[#1A1C23] border border-transparent flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#252830] transition-all"
+                >
+                    <RotateCcw size={18} />
+                </button>
+                <div className="w-[1px] h-6 bg-neutral-800 mx-1"></div>
+                <button 
+                  onClick={() => setShowLogs(!showLogs)}
+                  title="Memory Vault / Tool Output" 
+                  className={`w-[42px] h-[42px] rounded-[14px] transition-all group flex items-center justify-center ${showLogs ? 'bg-[#121614] border-2 border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.3)] text-emerald-400' : 'bg-[#121614] border-2 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.1)] text-emerald-500 hover:bg-emerald-500/10'}`}
+                >
+                    <Brain size={18} className="transition-transform group-hover:scale-110" />
+                </button>
+                <button 
+                  onClick={() => {
+                     const newZen = !zenMode;
+                     setZenMode(newZen);
+                     window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
+                  }}
+                  title="Focus Mode (Zoom Out)" 
+                  className={`w-[42px] h-[42px] rounded-[14px] transition-all flex items-center justify-center ${zenMode ? 'bg-[#121614] border border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-[#1A1C23] border border-transparent text-neutral-400 hover:text-white hover:bg-[#252830]'}`}
+                >
+                    <Focus size={18} />
+                </button>
+                <button 
+                  onClick={() => navigate('/sessions')}
+                  title="View Details / History" 
+                  className="w-[42px] h-[42px] rounded-[14px] bg-[#121614] border-2 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.1)] flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 transition-all group"
+                >
+                    <Clock size={18} className="group-hover:scale-110 transition-transform" />
+                </button>
+            </div>
+        </div>
+
+        {messages.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-10 relative overflow-hidden pointer-events-none select-none">
+             {/* Emptied state per user request */}
+             <div className="w-16 h-16 bg-neutral-900/50 rounded-full flex items-center justify-center opacity-30 shadow-inner">
+                <Sparkles size={24} className="text-neutral-500" />
+             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto w-full px-10 py-8 flex flex-col gap-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto w-full px-10 py-4 flex flex-col gap-6 custom-scrollbar">
             <div className="flex flex-col gap-6 max-w-4xl w-full mx-auto pb-4">
               {messages.map((msg) => (
                 <motion.div 
                   key={msg.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex max-w-[90%] group ${msg.role === 'user' ? 'self-end' : 'self-start'}`}
+                  className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start ml-2 lg:ml-12'} mb-4`}
                 >
-                  <div className={`px-5 py-4 rounded-2xl leading-relaxed relative ${
-                    msg.role === 'user' 
-                      ? 'bg-neutral-200/50 dark:bg-neutral-800/80 text-neutral-900 border border-neutral-200 dark:border-transparent dark:text-neutral-100 whitespace-pre-wrap' 
-                      : 'bg-transparent text-neutral-800 dark:text-neutral-200 w-full prose dark:prose-invert prose-brand max-w-none prose-p:leading-relaxed prose-pre:bg-neutral-100 dark:prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-border'
-                  }`}>
-                    {msg.role === 'user' ? (
-                      msg.content
-                    ) : (
-                      <div className="flex gap-4">
-                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand to-brand-hover shrink-0 flex items-center justify-center shadow-lg shadow-brand/20 mt-1">
-                            <span className="text-white font-black text-xs">O</span>
-                          </div>
-                         <div className="pt-1 w-full"><ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown></div>
+                  {msg.role === 'agent' && (
+                    <div className="flex max-w-[90%] lg:max-w-[75%] gap-4">
+                      {/* Agent Floating Avatar Star */}
+                      <div className="flex-shrink-0 mt-3 hidden md:block">
+                         <div className="w-10 h-10 rounded-[14px] bg-[#1A1C23] border border-white/5 flex items-center justify-center">
+                            <Sparkles size={18} className="text-neutral-400" />
+                         </div>
                       </div>
-                    )}
+                      <div className="flex flex-col gap-2 w-full">
+                        <div className="relative group/bubble px-6 py-4 rounded-2xl bg-[#1E212A] border border-white/5 text-neutral-300 w-full prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-[#12141A] prose-pre:border prose-pre:border-white/5">
+                          <button 
+                             onClick={() => handleDeleteMessage(msg.id)}
+                             className="absolute top-3 right-12 z-10 bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white p-1.5 rounded-md opacity-0 group-hover/bubble:opacity-100 transition-all"
+                          >
+                             <X size={12} />
+                          </button>
+                          <button className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-300 opacity-0 group-hover/bubble:opacity-100 transition-opacity bg-[#1A1C23] border border-white/10 p-1 rounded-md">
+                              <span className="text-[11px] font-mono px-2">Copy</span>
+                          </button>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                        </div>
+                        <div className="flex items-center gap-3 px-2 text-xs text-neutral-500 font-medium">
+                            <span className="text-neutral-400">Assistant</span>
+                            <span>{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            <span className="flex gap-2">
+                               <span className="text-neutral-600">1.2k ctx</span>
+                               <span className="bg-[#1A1C23] px-2 py-0.5 rounded-full text-brand/70 border border-white/5">
+                                  {localStorage.getItem('openzess_provider') || 'gemini'}
+                               </span>
+                            </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-                    <button 
-                      onClick={() => handleDeleteMessage(msg.id)}
-                      className={`absolute -top-3 -right-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-rose-500 hover:border-rose-500 p-1.5 rounded-full opacity-0 group-hover:opacity-100 shadow-sm transition-all hover:scale-110`}
-                      title="Permanently Delete Message"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
+                  {msg.role === 'user' && (
+                      <div className="flex items-start gap-4 max-w-[85%] lg:max-w-[70%]">
+                         <div className="flex flex-col items-end gap-1.5 w-full">
+                           {/* Dark Blue Box for User */}
+                           <div className="px-5 py-4 rounded-xl bg-[#1C2B42] text-neutral-300 whitespace-pre-wrap text-[15px] leading-relaxed w-full min-w-[200px]">
+                              {msg.content}
+                           </div>
+                           <div className="flex items-center gap-2 text-[11px] text-neutral-500 font-medium mr-1">
+                              <span>You</span>
+                              <span>{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                           </div>
+                         </div>
+                         {/* User Avatar */}
+                         <div className="flex-shrink-0 mt-2 hidden md:block">
+                           <div className="w-10 h-10 rounded-[14px] bg-[#1C2B42] border border-white/5 flex items-center justify-center">
+                              <div className="w-5 h-5 bg-blue-500/80 rounded-full" />
+                           </div>
+                         </div>
+                      </div>
+                  )}
                 </motion.div>
               ))}
               {isLoading && !pendingCalls && (
@@ -521,10 +616,28 @@ export default function Chat() {
                  </div>
               </motion.div>
           ) : (
-            <div className="w-full max-w-4xl bg-white/70 dark:bg-black/40 backdrop-blur-3xl border border-white/40 dark:border-white/10 rounded-3xl flex items-end p-2.5 px-4 transition-all focus-within:border-brand/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] relative z-20 overflow-hidden">
+            <div className="w-full max-w-4xl bg-[#1A1C23] border border-neutral-800/80 rounded-[1.5rem] flex items-end p-2 px-3 transition-all focus-within:border-brand/40 shadow-[0_8px_30px_rgb(0,0,0,0.3)] relative z-20">
+              <div className="flex gap-1.5 mb-[3px] shrink-0 pl-1">
+                  <button 
+                    onClick={toggleListen}
+                    disabled={isLoading}
+                    title="Speak Command"
+                    className={`p-2.5 rounded-xl transition-all ${isListening ? 'bg-rose-500/20 text-rose-500 animate-pulse' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
+                  >
+                    <Mic size={18} />
+                  </button>
+                  <button 
+                    onClick={handleToolToggle}
+                    disabled={isLoading}
+                    title={useTools ? "Tools: Enabled" : "Tools: Disabled"}
+                    className={`p-2.5 rounded-xl transition-all ${useTools ? 'bg-brand/10 text-brand' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
+                  >
+                    <Terminal size={18} />
+                  </button>
+              </div>
               <textarea
-                className="flex-1 bg-transparent border-none text-neutral-900 dark:text-neutral-200 text-base resize-none px-3 py-3 min-h-[50px] max-h-[200px] focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-500 leading-relaxed font-sans"
-                placeholder="Ask anything... (@scraper or @codegen via swarm)"
+                className="flex-1 bg-transparent border-none text-neutral-200 text-[15px] resize-none px-3 py-3.5 min-h-[50px] max-h-[200px] focus:outline-none placeholder:text-neutral-600 leading-relaxed font-sans"
+                placeholder="Message Agent (Enter to send)"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -536,37 +649,21 @@ export default function Chat() {
                 disabled={isLoading}
                 rows={1}
               />
-              <div className="flex gap-2 mb-1 shrink-0">
+              <div className="flex gap-2 mb-[3px] shrink-0 pr-1">
                   <button 
                     onClick={() => setUseSwarm(!useSwarm)}
                     disabled={isLoading}
-                    title={useSwarm ? "Swarm Debate Mode (ON)" : "Swarm Debate Mode (OFF)"}
-                    className={`rounded-2xl w-12 h-12 flex items-center justify-center transition-all ${useSwarm ? 'bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 shadow-[0_0_15px_rgba(217,70,239,0.3)] animate-[pulse_2s_ease-in-out_infinite]' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-fuchsia-500 hover:bg-fuchsia-500/10'}`}
+                    title="Swarm Mode"
+                    className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${useSwarm ? 'bg-fuchsia-500/10 text-fuchsia-400' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
                   >
                     <Users size={18} />
                   </button>
                   <button 
-                    onClick={handleToolToggle}
-                    disabled={isLoading}
-                    title={useTools ? "Tools Enabled (Deep Thinking Mode)" : "Tools Disabled (Lightning Fast Mode)"}
-                    className={`rounded-2xl w-12 h-12 flex items-center justify-center transition-all ${useTools ? 'bg-indigo-100 dark:bg-indigo-900/30 text-brand' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-neutral-600'}`}
-                  >
-                    <Terminal size={18} />
-                  </button>
-                  <button 
-                    onClick={toggleListen}
-                    disabled={isLoading}
-                    title="Speak Command (JARVIS Mode)"
-                    className={`rounded-2xl w-12 h-12 flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.5)] animate-pulse' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-brand hover:bg-brand/10 disabled:opacity-50'}`}
-                  >
-                    <Mic size={18} />
-                  </button>
-                  <button 
-                    className="bg-brand hover:bg-brand-hover text-white rounded-2xl w-12 h-12 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-brand/20 active:scale-95"
+                    className="bg-brand/90 hover:bg-brand text-white rounded-[10px] w-10 h-10 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ml-1 mt-1 shadow-md shadow-brand/10 active:scale-95"
                     onClick={() => handleSend()} 
                     disabled={!input.trim() || isLoading}
                   >
-                    <Send size={18} className="translate-y-[1px] translate-x-[1px]" />
+                    <Send size={16} className="translate-y-[1px] translate-x-[1px]" />
                   </button>
               </div>
             </div>
@@ -617,27 +714,34 @@ export default function Chat() {
       </AnimatePresence>
 
       {/* Dynamic Logs Sidebar for Chat (hidden if Artifact is open) */}
-      {!activeArtifact && terminalLogs.length > 0 && (
-         <div className="w-[320px] lg:w-[400px] flex flex-col bg-neutral-100/50 dark:bg-surface/50 border-l border-neutral-200 dark:border-border backdrop-blur-xl shrink-0 h-full hidden xl:flex transition-colors duration-300">
-            <div className="p-5 border-b border-neutral-200 dark:border-border flex items-center justify-between shadow-sm">
-              <div className="font-semibold flex items-center gap-2 text-sm text-neutral-800 dark:text-neutral-300">
-                <Terminal size={14} className="text-brand" /> Executed Tool Logs
+      {!activeArtifact && showLogs && (
+         <div className={`w-[320px] lg:w-[400px] flex flex-col bg-[#161922] border-l border-emerald-500/10 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] shrink-0 h-full hidden xl:flex transition-all duration-300 z-40 ${zenMode ? 'rounded-r-3xl' : ''}`}>
+            <div className="p-5 border-b border-white/5 flex items-center justify-between shadow-sm bg-[#121614]/80">
+              <div className="font-semibold flex items-center gap-2 text-sm text-emerald-400 tracking-wide">
+                <Brain size={16} /> Advanced Tool Telemetry
               </div>
+              <button onClick={() => setShowLogs(false)} className="text-neutral-500 hover:text-white">
+                 <X size={16} />
+              </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 font-mono text-xs flex flex-col gap-3">
-              {terminalLogs.map((log, i) => (
-                <motion.div 
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  key={i} 
-                  className="bg-white dark:bg-black/60 p-3 rounded-lg border border-neutral-200 dark:border-border/50 flex flex-col gap-1.5 shadow-sm dark:shadow-none"
-                >
-                  <div className="text-yellow-600 dark:text-yellow-500 font-semibold truncate hover:text-clip hover:whitespace-normal transition-all" title={JSON.stringify(log.args)}>$&gt; {log.tool}(...)</div>
-                  <div className="text-emerald-700 dark:text-emerald-500/80 leading-relaxed h-[100px] overflow-y-auto custom-scrollbar whitespace-pre-wrap">
-                    {log.output}
-                  </div>
-                </motion.div>
-              ))}
+            <div className="flex-1 overflow-y-auto p-4 font-mono text-xs flex flex-col gap-3 custom-scrollbar">
+              {terminalLogs.length === 0 ? (
+                 <div className="text-neutral-600 italic text-center mt-10">No tool telemetry recorded yet...</div>
+              ) : (
+                 terminalLogs.map((log, i) => (
+                   <motion.div 
+                     initial={{ opacity: 0, x: 10 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     key={i} 
+                     className="bg-[#0E1117] p-3 rounded-lg border border-white/5 flex flex-col gap-1.5"
+                   >
+                     <div className="text-emerald-500 font-semibold truncate hover:text-clip hover:whitespace-normal transition-all" title={JSON.stringify(log.args)}>$&gt; {log.tool}(...)</div>
+                     <div className="text-emerald-300/80 leading-relaxed max-h-[150px] overflow-y-auto custom-scrollbar whitespace-pre-wrap">
+                       {log.output}
+                     </div>
+                   </motion.div>
+                 ))
+              )}
               <div ref={terminalEndRef} />
             </div>
           </div>

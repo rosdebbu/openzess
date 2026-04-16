@@ -378,8 +378,12 @@ async def clear_all_memories():
 class MCPConnectRequest(BaseModel):
     server_id: str
     name: str = ""
-    command: str
-    args: list
+    command: str = ""
+    args: list = []
+    env: Optional[Dict[str, str]] = None
+    transport: str = "stdio"
+    url: str = ""
+    headers: Optional[Dict[str, str]] = None
 
 @app.get("/api/mcp/servers")
 async def get_mcp_servers():
@@ -388,7 +392,7 @@ async def get_mcp_servers():
 @app.post("/api/mcp/connect")
 async def connect_mcp(request: MCPConnectRequest):
     try:
-        success = mcp_registry.connect(request.server_id, request.command, request.args)
+        success = mcp_registry.connect(request.server_id, request.command, request.args, env=request.env, transport=request.transport, url=request.url, headers=request.headers)
         if success:
             display_name = request.name if request.name else request.server_id
             database.add_or_update_mcp_server(request.server_id, display_name, request.command, request.args, is_active=True)

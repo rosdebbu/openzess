@@ -10,8 +10,12 @@ interface MCPServerInfo {
   name: string;
   desc: string;
   icon: string;
-  command: string;
-  args: string[];
+  command?: string;
+  args?: string[];
+  env?: Record<string, string>;
+  transport?: string;
+  url?: string;
+  headers?: Record<string, string>;
   isCustom?: boolean;
 }
 
@@ -21,7 +25,15 @@ const DEFAULT_SERVERS: MCPServerInfo[] = [
   { id: 'everything', name: 'Test Sandbox', desc: 'Demo server with echo, long running tools and more.', icon: '🛠️', command: 'npx', args: ['-y', '@modelcontextprotocol/server-everything'] },
   { id: 'memory', name: 'Memory', desc: 'A knowledge graph built natively into MCP.', icon: '🧠', command: 'npx', args: ['-y', '@modelcontextprotocol/server-memory'] },
   { id: 'filesystem', name: 'Filesystem', desc: 'Standard local filesystem access protocol.', icon: '📁', command: 'npx', args: ['-y', '@modelcontextprotocol/server-filesystem', '.'] },
-  { id: 'stitch', name: 'Stitch AI', desc: 'Advanced AI design system and frontend generation.', icon: '✨', command: 'npx', args: ['-y', '@google/stitch-mcp', '--api-key', 'AQ.Ab8RN6JcITpR_bgh45sOECCpBQZ-p59Bw8cFAZM5blnXMocc6Q'] },
+  { 
+     id: 'stitch', 
+     name: 'Stitch AI', 
+     desc: 'Advanced AI design system and frontend generation.', 
+     icon: '✨', 
+     command: 'npx',
+     args: ['@_davideast/stitch-mcp', 'proxy'],
+     env: { 'STITCH_API_KEY': 'AQ.Ab8RN6KRzbLyIT2zc48IuWgzk9kL9KROPANPISoMsIUhmpT1pQ' } 
+  },
 ];
 
 export default function MCP() {
@@ -57,8 +69,12 @@ export default function MCP() {
            await axios.post('http://localhost:8000/api/mcp/connect', {
               server_id: server.id,
               name: server.name || server.id,
-              command: server.command,
-              args: server.args
+              command: server.command || '',
+              args: server.args || [],
+              env: server.env,
+              transport: server.transport || 'stdio',
+              url: server.url || '',
+              headers: server.headers || {}
            });
            showToast(`Connected to ${server.name}`, 'success');
         }

@@ -34,12 +34,6 @@ function AnimatedRoutes({ persona }: { persona: string }) {
   const location = useLocation();
   return (
     <div className="flex-1 flex overflow-hidden relative">
-      {persona !== 'architect' && (
-         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 bg-brand/10 border border-brand/30 text-brand px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md shadow-sm pointer-events-none flex items-center gap-2">
-            <Bot size={12} /> {PERSONAS[persona]?.name || PERSONAS['custom'].name} Active
-         </div>
-      )}
-
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Chat /></PageTransition>} />

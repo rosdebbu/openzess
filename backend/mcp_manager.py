@@ -3,6 +3,7 @@ import threading
 import concurrent.futures
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from mcp.client.sse import sse_client
 import psutil
 
 class MCPManager:
@@ -25,35 +26,46 @@ class MCPManager:
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
         return future.result(timeout=timeout)
 
-    async def _amake_connection(self, server_id: str, command: str, args: list):
+    async def _amake_connection(self, server_id: str, command: str, args: list, transport: str = "stdio", url: str = "", headers: dict = None):
         if server_id in self.servers:
             await self._adisconnect(server_id)
             
-        print(f"[{server_id}] Connecting MCP stdio via {command} {' '.join(args)}...", flush=True)
+        print(f"[{server_id}] Connecting MCP {transport}...", flush=True)
         
         import sys
         import os
         
         env = os.environ.copy()
+        if hasattr(self, 'current_env_patch') and self.current_env_patch:
+            env.update(self.current_env_patch)
         
-        if sys.platform == "win32" and command == "npx":
-            command = "npx.cmd"
+        if transport == "sse":
+            import httpx
+            # Use httpx for a robust SSE connection with optional custom headers
+            headers = headers or {}
+            headers.update({
+                "Accept": "text/event-stream"
+            })
             
-        # [CRITICAL FIX] If it's an npx command, do a dry run simple install first to prevent stdout corruption
-        # npx spits out progress bars on first run which violently breaks the MCP JSON-RPC protocol
-        if 'npx' in command:
-            import subprocess
-            print(f"[{server_id}] Pre-installing node package to prevent stream corruption...", flush=True)
-            try:
-                # We run it with --help just to force NPM to download and cache the package in the global registry
-                subprocess.run([command] + args + ["--help"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=45)
-            except Exception as e:
-                print(f"[{server_id}] Pre-install cache slip: {e}")
+            # Use strict timeout
+            sse_mgr = sse_client(url=url, headers=headers, timeout=120.0)
+            read, write = await sse_mgr.__aenter__()
+        else:
+            if sys.platform == "win32" and command == "npx":
+                command = "npx.cmd"
+                
+            if 'npx' in command:
+                import subprocess
+                print(f"[{server_id}] Pre-installing node package to prevent stream corruption...", flush=True)
+                try:
+                    subprocess.run([command] + args + ["--help"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=45)
+                except Exception as e:
+                    print(f"[{server_id}] Pre-install cache slip: {e}")
 
-        server_params = StdioServerParameters(command=command, args=args, env=env)
-        
-        stdio_mgr = stdio_client(server_params)
-        read, write = await stdio_mgr.__aenter__()
+            server_params = StdioServerParameters(command=command, args=args, env=env)
+            stdio_mgr = stdio_client(server_params)
+            read, write = await stdio_mgr.__aenter__()
+            sse_mgr = stdio_mgr  # abstract name for cleanup
         
         session_mgr = ClientSession(read, write)
         session = await session_mgr.__aenter__()
@@ -62,12 +74,16 @@ class MCPManager:
         
         tools_response = await session.list_tools()
         
+        
         self.servers[server_id] = {
-            "stdio_mgr": stdio_mgr,
+            "stdio_mgr": sse_mgr,
             "session_mgr": session_mgr,
             "session": session,
             "command": command,
-            "args": args
+            "args": args,
+            "transport": transport,
+            "url": url,
+            "headers": headers
         }
         self.server_tools[server_id] = tools_response.tools
         print(f"[{server_id}] MCP Connected natively. Loaded tools: {[t.name for t in tools_response.tools]}")
@@ -119,8 +135,9 @@ class MCPManager:
         return "\n".join([c.text for c in result.content if hasattr(c, "text")])
 
     # ---- Synchronous EXPOSED API ----
-    def connect(self, server_id: str, command: str, args: list) -> bool:
-        return self._run_async(self._amake_connection(server_id, command, args))
+    def connect(self, server_id: str, command: str, args: list, env: dict = None, transport: str = "stdio", url: str = "", headers: dict = None) -> bool:
+        self.current_env_patch = env
+        return self._run_async(self._amake_connection(server_id, command, args, transport=transport, url=url, headers=headers))
 
     def disconnect(self, server_id: str):
         self._run_async(self._adisconnect(server_id))
