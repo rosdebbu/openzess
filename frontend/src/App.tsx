@@ -22,6 +22,7 @@ import MatrixViewer from './pages/MatrixViewer';
 import WarRoom from './pages/WarRoom';
 import Welcome from './pages/Welcome';
 import KnowledgeBase from './pages/KnowledgeBase';
+import DebateArena from './pages/DebateArena';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -50,6 +51,7 @@ function AnimatedRoutes({ persona }: { persona: string }) {
           <Route path="/cron-jobs" element={<PageTransition><CronJobs /></PageTransition>} />
           <Route path="/heartbeat" element={<PageTransition><Heartbeat /></PageTransition>} />
           <Route path="/matrix" element={<PageTransition><MatrixViewer /></PageTransition>} />
+          <Route path="/debate" element={<PageTransition><DebateArena /></PageTransition>} />
           
           <Route path="/skills" element={<PageTransition><Skills /></PageTransition>} />
           <Route path="/mcp" element={<PageTransition><MCP /></PageTransition>} />

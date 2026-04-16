@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -26,6 +26,7 @@ export default function Chat() {
   const [terminalLogs, setTerminalLogs] = useState<ToolExecution[]>([]);
   const [pendingCalls, setPendingCalls] = useState<any[] | null>(null);
   const [useTools, setUseTools] = useState(() => localStorage.getItem('openzess_use_tools') !== 'false');
+  const [useSwarm, setUseSwarm] = useState(false);
   
   const [activeArtifact, setActiveArtifact] = useState<string | null>(null);
   const [lastProcessedMsgId, setLastProcessedMsgId] = useState<string | null>(null);
@@ -214,18 +215,26 @@ export default function Chat() {
     }
 
     try {
+      const requestBody = {
+        message: userMessage.content,
+        api_key: apiKey,
+        provider: localStorage.getItem('openzess_provider') || 'gemini',
+        session_id: sessionId || undefined,
+        system_instruction: systemInstruction,
+        allowed_tools: allowedTools,
+        stream: true,
+        use_swarm: useSwarm,
+        matrix_keys: {
+            deepseek2: localStorage.getItem('openzess_deepseek2_key') || '',
+            deepseek3: localStorage.getItem('openzess_deepseek3_key') || '',
+            glm: localStorage.getItem('openzess_glm_key') || '',
+        }
+      };
+
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMessage.content,
-          api_key: apiKey,
-          provider: localStorage.getItem('openzess_provider') || 'gemini',
-          session_id: sessionId || undefined,
-          system_instruction: systemInstruction,
-          allowed_tools: allowedTools,
-          stream: true
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -528,6 +537,14 @@ export default function Chat() {
                 rows={1}
               />
               <div className="flex gap-2 mb-1 shrink-0">
+                  <button 
+                    onClick={() => setUseSwarm(!useSwarm)}
+                    disabled={isLoading}
+                    title={useSwarm ? "Swarm Debate Mode (ON)" : "Swarm Debate Mode (OFF)"}
+                    className={`rounded-2xl w-12 h-12 flex items-center justify-center transition-all ${useSwarm ? 'bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 shadow-[0_0_15px_rgba(217,70,239,0.3)] animate-[pulse_2s_ease-in-out_infinite]' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-fuchsia-500 hover:bg-fuchsia-500/10'}`}
+                  >
+                    <Users size={18} />
+                  </button>
                   <button 
                     onClick={handleToolToggle}
                     disabled={isLoading}

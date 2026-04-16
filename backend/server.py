@@ -55,9 +55,92 @@ class ChatRequest(BaseModel):
     allowed_tools: Optional[List[str]] = None
     stream: bool = False
     agent_name: Optional[str] = None
+    use_swarm: Optional[bool] = False
+    matrix_keys: Optional[Dict[str, str]] = None
 
 # Store session agents locally for speed, hydrate from DB on restart
 sessions: Dict[str, OpenzessAgent] = {}
+
+def swarm_debate_stream(request: ChatRequest, session_id: str):
+    import json
+    import litellm
+    from agent import PROVIDER_MODELS, OpenzessAgent
+    
+    yield f"data: {json.dumps({'type': 'session', 'session_id': session_id})}\n\n"
+    yield f"data: {json.dumps({'type': 'content', 'content': '\n\n🚀 **[SWARM DEBATE INITIATED]**\n\n'})}\n\n"
+    
+    agents = []
+    if request.matrix_keys:
+        if request.matrix_keys.get('deepseek2'): agents.append({"role": "Strategist", "provider": "deepseek2", "key": request.matrix_keys['deepseek2']})
+        if request.matrix_keys.get('deepseek3'): agents.append({"role": "Critic", "provider": "deepseek3", "key": request.matrix_keys['deepseek3']})
+        if request.matrix_keys.get('glm'): agents.append({"role": "Optimizer", "provider": "glm", "key": request.matrix_keys['glm']})
+        
+    if not agents:
+        yield f"data: {json.dumps({'type': 'error', 'error': 'No Swarm API keys configured! Please add them in the War Room Matrix.'})}\n\n"
+        return
+        
+    transcript = f"USER PROMPT: {request.message}\n\n"
+    full_output = "\n\n🚀 **[SWARM DEBATE INITIATED]**\n\n"
+    
+    consensus_met = False
+    for turn in range(6):
+        if consensus_met: break
+        
+        for agent_def in agents:
+            yield f"data: {json.dumps({'type': 'content', 'content': f'**👤 {agent_def['role']}:** '})}\n\n"
+            full_output += f"**👤 {agent_def['role']}:** "
+            
+            system_inst = f"You are the {agent_def['role']} in a live multi-agent debate. Here is the transcript so far:\n{transcript}\n\nRespond to the discussion. If everyone has agreed perfectly on a finalized, flawless solution, and there is nothing left to add, output exactly: [CONSENSUS REACHED]. Otherwise, add new ideas, criticize the flaws, or defend your previous points."
+            model_name = PROVIDER_MODELS.get(agent_def["provider"], "openai/gpt-4o-mini")
+            
+            try:
+                response_stream = litellm.completion(
+                    model=model_name,
+                    messages=[{"role": "system", "content": system_inst}, {"role": "user", "content": request.message}],
+                    stream=True,
+                    api_key=agent_def["key"]
+                )
+                
+                agent_text = ""
+                for chunk in response_stream:
+                    if chunk.choices[0].delta.content:
+                        text = chunk.choices[0].delta.content
+                        agent_text += text
+                        full_output += text
+                        yield f"data: {json.dumps({'type': 'content', 'content': text})}\n\n"
+                        
+                yield f"data: {json.dumps({'type': 'content', 'content': '\n\n'})}\n\n"
+                full_output += "\n\n"
+                transcript += f"[{agent_def['role']}]: {agent_text}\n\n"
+                
+                if "[CONSENSUS REACHED]" in agent_text:
+                    consensus_met = True
+                    break
+                    
+            except Exception as e:
+                err_text = f"*[Connection error: {e}]*\n\n"
+                full_output += err_text
+                yield f"data: {json.dumps({'type': 'content', 'content': err_text})}\n\n"
+                
+    synth_hdr = "---\n\n🎯 **[SYNTHESIZING FINAL VERDICT]**\n\n"
+    full_output += synth_hdr
+    yield f"data: {json.dumps({'type': 'content', 'content': synth_hdr})}\n\n"
+    
+    try:
+        main_agent = OpenzessAgent(api_key=request.api_key, provider=request.provider)
+        final_prompt = f"You are the Final Judge. A swarm debate occurred regarding: '{request.message}'.\n\nTranscript:\n{transcript}\n\nSynthesize their final conclusion to solve the prompt. You MUST output the final result strictly as a Markdown Grid/Columns Table."
+        
+        reply_buffer = ""
+        for chunk in main_agent.chat_stream(final_prompt):
+            if chunk.get("type") == "content":
+                full_output += chunk["content"]
+                reply_buffer += chunk["content"]
+                yield f"data: {json.dumps(chunk)}\n\n"
+                
+        yield f"data: {json.dumps({'type': 'done', 'reply': full_output})}\n\n"
+        database.add_message(session_id, "agent:SwarmJudge", full_output)
+    except Exception as e:
+        yield f"data: {json.dumps({'type': 'error', 'error': f'Synthesis failed: {e}'})}\n\n"
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
@@ -111,6 +194,9 @@ async def chat(request: ChatRequest):
     try:
         # 1. Save user message to database
         database.add_message(session_id, "user", request.message)
+        
+        if request.use_swarm and request.stream:
+            return StreamingResponse(swarm_debate_stream(request, session_id), media_type="text/event-stream")
         
         if request.stream:
             def event_generator():
