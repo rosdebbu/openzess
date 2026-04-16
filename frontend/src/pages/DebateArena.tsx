@@ -113,6 +113,30 @@ const ALL_MODELS: ArenaModel[] = [
         glowColor: 'shadow-indigo-500/20',
         gradientFrom: 'from-indigo-500',
         gradientTo: 'to-blue-700',
+    },
+    {
+        id: 'cohere',
+        name: 'Cohere',
+        label: 'Command R+ · Scaler',
+        provider: 'cohere',
+        storageKey: 'openzess_cohere_key',
+        icon: <Layers size={22} />,
+        accentColor: 'text-gray-400',
+        glowColor: 'shadow-gray-500/20',
+        gradientFrom: 'from-gray-500',
+        gradientTo: 'to-gray-800',
+    },
+    {
+        id: 'mistral-ai',
+        name: 'Mistral AI',
+        label: 'Large 2 · Logic',
+        provider: 'mistral-ai',
+        storageKey: 'openzess_mistral_key',
+        icon: <Zap size={22} />,
+        accentColor: 'text-orange-400',
+        glowColor: 'shadow-orange-500/20',
+        gradientFrom: 'from-orange-500',
+        gradientTo: 'to-red-600',
     }
 ];
 

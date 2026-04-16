@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -36,6 +36,15 @@ export default function Chat() {
   
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files.length > 0) {
+          const file = e.target.files[0];
+          setInput(prev => prev + `\n[Attached File: ${file.name}]\n`);
+          e.target.value = ''; // trigger reset
+      }
+  };
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -618,6 +627,21 @@ export default function Chat() {
           ) : (
             <div className="w-full max-w-4xl bg-[#1A1C23] border border-neutral-800/80 rounded-[1.5rem] flex items-end p-2 px-3 transition-all focus-within:border-brand/40 shadow-[0_8px_30px_rgb(0,0,0,0.3)] relative z-20">
               <div className="flex gap-1.5 mb-[3px] shrink-0 pl-1">
+                  <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileUpload} 
+                      className="hidden" 
+                      multiple 
+                  />
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading}
+                    title="Attach File"
+                    className="p-2.5 rounded-xl transition-all text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300"
+                  >
+                    <Paperclip size={18} />
+                  </button>
                   <button 
                     onClick={toggleListen}
                     disabled={isLoading}
