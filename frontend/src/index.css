@@ -63,7 +63,7 @@
       width: 80vw;
       height: 80vh;
       border-radius: 50%;
-      background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 40%, transparent 70%);
+      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.20) 0%, rgba(236, 72, 153, 0.15) 40%, transparent 70%);
       filter: blur(100px);
       z-index: 0;
       pointer-events: none;
@@ -72,7 +72,7 @@
   }
   
   .dark .ambient-orb {
-      background: radial-gradient(circle at center, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.15) 40%, transparent 70%);
+      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.35) 0%, rgba(236, 72, 153, 0.25) 40%, transparent 70%);
       filter: blur(120px);
   }
   

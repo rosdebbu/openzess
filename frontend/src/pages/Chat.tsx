@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -29,6 +29,9 @@ export default function Chat() {
   const [activeArtifact, setActiveArtifact] = useState<string | null>(null);
   const [lastProcessedMsgId, setLastProcessedMsgId] = useState<string | null>(null);
   const isStreamingRef = useRef(false);
+  
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
@@ -86,6 +89,45 @@ export default function Chat() {
   useEffect(() => {
     terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [terminalLogs]);
+
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false; // Stops automatically when you pause speaking
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => setIsListening(true);
+      
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        setInput(prev => (prev + ' ' + transcript).trim());
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => setIsListening(false);
+
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleListen = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      if (!recognitionRef.current) {
+        alert("Speech Recognition is not supported in this browser. Please use Chrome or Edge.");
+        return;
+      }
+      try { recognitionRef.current.start(); } catch(e) {}
+    }
+  };
 
 
   const handleSend = async (suggestedText?: string) => {
@@ -442,13 +484,23 @@ export default function Chat() {
                 disabled={isLoading}
                 rows={1}
               />
-              <button 
-                className="bg-brand hover:bg-brand-hover text-white rounded-2xl w-12 h-12 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-brand/20 mb-1 active:scale-95"
-                onClick={() => handleSend()} 
-                disabled={!input.trim() || isLoading}
-              >
-                <Send size={18} className="translate-y-[1px] translate-x-[1px]" />
-              </button>
+              <div className="flex gap-2 mb-1 shrink-0">
+                  <button 
+                    onClick={toggleListen}
+                    disabled={isLoading}
+                    title="Speak Command (JARVIS Mode)"
+                    className={`rounded-2xl w-12 h-12 flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.5)] animate-pulse' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-brand hover:bg-brand/10 disabled:opacity-50'}`}
+                  >
+                    <Mic size={18} />
+                  </button>
+                  <button 
+                    className="bg-brand hover:bg-brand-hover text-white rounded-2xl w-12 h-12 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-brand/20 active:scale-95"
+                    onClick={() => handleSend()} 
+                    disabled={!input.trim() || isLoading}
+                  >
+                    <Send size={18} className="translate-y-[1px] translate-x-[1px]" />
+                  </button>
+              </div>
             </div>
           )}
 
