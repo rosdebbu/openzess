@@ -20,11 +20,13 @@ class CronManager:
         try:
             print(f"[CRON RUN] Executing job {job_id} -> {command}")
             # Use Localhost API with dummy details to let the Agent run the command
+            deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "system-cron-call")
             requests.post("http://localhost:8000/api/chat", json={
                 "message": command,
-                "api_key": os.environ.get("OPENAI_API_KEY", "system-cron-call"), # Bypass safely if native 
-                "provider": "openai",
-                "system_instruction": "You are a background CRON processor. Execute the request seamlessly."
+                "api_key": deepseek_key, 
+                "provider": "deepseek",
+                "system_instruction": "You are a background CRON processor. Execute the request seamlessly using the tools provided to you.",
+                "allowed_tools": ["run_terminal_command", "create_file", "search_the_web", "read_web_page", "read_file", "edit_code"]
             }, timeout=30)
         except Exception as e:
             print(f"[CRON ERR] {e}")
@@ -89,11 +91,13 @@ class AgentWatchdogHandler(FileSystemEventHandler):
         command = f"File {filepath} was just modified. Immediate Agent Action required: {self.action}"
         print(f"[WATCHDOG MSG] {command}")
         try:
+             deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "system-watchdog-call")
              requests.post("http://localhost:8000/api/chat", json={
                 "message": command,
-                "api_key": os.environ.get("OPENAI_API_KEY", "system-watchdog-call"),
-                "provider": "openai",
-                "system_instruction": "You are a watchdog event listener. A file change just occurred. Execute your mandated action."
+                "api_key": deepseek_key,
+                "provider": "deepseek",
+                "system_instruction": "You are a watchdog event listener. A file change just occurred. Execute your mandated action.",
+                "allowed_tools": ["run_terminal_command", "create_file", "search_the_web", "read_web_page", "read_file", "edit_code"]
              }, timeout=30)
         except Exception as e:
             pass

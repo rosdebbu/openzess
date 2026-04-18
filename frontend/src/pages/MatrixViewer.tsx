@@ -6,14 +6,20 @@ export default function MatrixViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const rfbRef = useRef<any>(null);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+  const [isSystemActive, setIsSystemActive] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
+    if (!isSystemActive) {
+       setStatus('disconnected');
+       return;
+    }
 
+    let rfb: any = null;
     try {
       setStatus('connecting');
       // Connect to the websockify proxy which hits X11VNC port 5900 natively inside WSL
-      const rfb = new RFB(containerRef.current, 'ws://localhost:6080', {
+      rfb = new RFB(containerRef.current, 'ws://localhost:6080', {
         credentials: { password: '' }
       });
 
@@ -26,6 +32,8 @@ export default function MatrixViewer() {
       rfb.addEventListener('disconnect', (e: any) => {
         console.error("VNC disconnected", e);
         setStatus('disconnected');
+        // Auto turn off if disconnected unexpectedly
+        setIsSystemActive(false);
       });
 
       // Allow the screen to resize to fit the layout flawlessly
@@ -35,14 +43,16 @@ export default function MatrixViewer() {
     } catch (err) {
       console.error(err);
       setStatus('disconnected');
+      setIsSystemActive(false);
     }
 
     return () => {
-      if (rfbRef.current) {
-        rfbRef.current.disconnect();
+      if (rfb) {
+        rfb.disconnect();
       }
+      rfbRef.current = null;
     };
-  }, []);
+  }, [isSystemActive]);
 
   return (
     <div className="flex-1 flex flex-col h-full bg-neutral-100 dark:bg-neutral-900 overflow-hidden relative">
@@ -50,7 +60,17 @@ export default function MatrixViewer() {
         <h1 className="text-xl font-semibold flex items-center gap-3">
           <Monitor size={24} className="text-brand" /> Matrix Virtual Desktop
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Power</span>
+            <button 
+              onClick={() => setIsSystemActive(!isSystemActive)}
+              className={`w-12 h-6 rounded-full p-1 transition-colors ${isSystemActive ? 'bg-brand' : 'bg-neutral-300 dark:bg-neutral-700'}`}
+            >
+              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isSystemActive ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
+          </div>
+          <div className="w-px h-6 bg-neutral-200 dark:bg-border" />
           {status === 'connected' ? (
             <div className="text-emerald-500 flex items-center gap-2 text-sm font-medium bg-emerald-500/10 px-3 py-1 rounded-full"><Wifi size={16} /> Live Access</div>
           ) : status === 'connecting' ? (
@@ -80,26 +100,34 @@ export default function MatrixViewer() {
                          </div>
                          
                          <h2 className="text-2xl font-bold tracking-widest text-white uppercase mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                             {status === 'connecting' ? 'Establishing VNC Handshake...' : 'Matrix Subsystem Offline'}
+                             {!isSystemActive ? 'Matrix Subsystem Offline' : status === 'connecting' ? 'Establishing VNC Handshake...' : 'Connection Failed'}
                          </h2>
                          
                          <p className="text-neutral-400 max-w-lg mb-8 leading-relaxed font-mono text-sm">
                              The Matrix Viewer is a real-time visual bridge that allows you to watch the AI autonomously control a sandboxed Linux GUI desktop (Xvfb) without escaping into your host Windows machine.
                          </p>
                          
-                         {status !== 'connecting' && (
+                         {!isSystemActive && (
                              <div className="bg-white/5 border border-white/10 rounded-lg p-4 font-mono text-xs text-neutral-300 text-left w-full max-w-md shadow-inner">
-                                 <div className="text-amber-500 font-bold mb-2 flex items-center gap-2"><Monitor size={14} /> DIAGNOSTIC SHUTDOWN</div>
+                                 <div className="text-brand font-bold mb-2 flex items-center gap-2"><Monitor size={14} /> SYSTEM STANDBY</div>
+                                 <div className="text-neutral-400 leading-relaxed">
+                                     The Matrix bridge is currently powered down to save resources. Toggle the Power switch in the header to activate the WebSocket streaming proxy and establish a live connection to the sandbox display.
+                                 </div>
+                             </div>
+                         )}
+                         {isSystemActive && status === 'disconnected' && (
+                             <div className="bg-white/5 border border-red-500/30 rounded-lg p-4 font-mono text-xs text-neutral-300 text-left w-full max-w-md shadow-inner">
+                                 <div className="text-amber-500 font-bold mb-2 flex items-center gap-2"><Monitor size={14} /> CONNECTION FAILED</div>
                                  <div className="flex gap-4">
                                      <span className="text-neutral-500">HOST:</span>
-                                     <span className="text-emerald-400">Windows Native Detected</span>
+                                     <span className="text-emerald-400">Environment Ready</span>
                                  </div>
                                  <div className="flex gap-4 mt-1">
-                                     <span className="text-neutral-500">DISPLAY:</span>
-                                     <span className="text-red-400">Xvfb Disabled</span>
+                                     <span className="text-neutral-500">SERVICE:</span>
+                                     <span className="text-red-400">Websockify / Xvfb Not Responding</span>
                                  </div>
                                  <div className="mt-4 pt-4 border-t border-white/10 text-brand font-bold">
-                                     {"->"} To enable, reboot Openzess via WSL (start_wsl.sh).
+                                     {"->"} Ensure backend proxy at ws://localhost:6080 is actively running.
                                  </div>
                              </div>
                          )}

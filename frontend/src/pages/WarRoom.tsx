@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Zap, Code, FileText, Layers, LayoutPanelLeft, Key, X, CheckCircle2 } from 'lucide-react';
+import { Send, Zap, Code, FileText, Layers, LayoutPanelLeft, Key, X, CheckCircle2, Focus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -30,6 +30,7 @@ export default function WarRoom() {
   const [errorPrompt, setErrorPrompt] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [showKeyModal, setShowKeyModal] = useState(false);
+  const [zenMode, setZenMode] = useState(false);
 
   // Swarm Provider Keys
   const [keys, setKeys] = useState(() => ({
@@ -40,6 +41,10 @@ export default function WarRoom() {
       deepseek: localStorage.getItem('openzess_deepseek_key') || '',
       deepseek2: localStorage.getItem('openzess_deepseek2_key') || '',
       deepseek3: localStorage.getItem('openzess_deepseek3_key') || '',
+      deepseek4: localStorage.getItem('openzess_deepseek4_key') || '',
+      deepseek5: localStorage.getItem('openzess_deepseek5_key') || '',
+      deepseek6: localStorage.getItem('openzess_deepseek6_key') || '',
+      deepseek7: localStorage.getItem('openzess_deepseek7_key') || '',
       qwen: localStorage.getItem('openzess_qwen_key') || '',
       glm: localStorage.getItem('openzess_glm_key') || '',
       kimi: localStorage.getItem('openzess_kimi_key') || ''
@@ -53,6 +58,10 @@ export default function WarRoom() {
       localStorage.setItem('openzess_deepseek_key', keys.deepseek);
       localStorage.setItem('openzess_deepseek2_key', keys.deepseek2);
       localStorage.setItem('openzess_deepseek3_key', keys.deepseek3);
+      localStorage.setItem('openzess_deepseek4_key', keys.deepseek4);
+      localStorage.setItem('openzess_deepseek5_key', keys.deepseek5);
+      localStorage.setItem('openzess_deepseek6_key', keys.deepseek6);
+      localStorage.setItem('openzess_deepseek7_key', keys.deepseek7);
       localStorage.setItem('openzess_qwen_key', keys.qwen);
       localStorage.setItem('openzess_glm_key', keys.glm);
       localStorage.setItem('openzess_kimi_key', keys.kimi);
@@ -63,7 +72,7 @@ export default function WarRoom() {
   const agents: SwarmQuadrant[] = [
     {
       role_name: "Coder",
-      provider: "gemini",
+      provider: "deepseek",
       system_instruction: "You are the Alpha Coder Agent. Write aggressive, perfectly optimized, cutting-edge code. Defend your technical decisions ruthlessly against the other agents. Do not write extensive explanations.",
       icon: <Code size={16} className="text-blue-500" />,
       color: "border-blue-500/30 text-blue-500",
@@ -79,7 +88,7 @@ export default function WarRoom() {
     },
     {
       role_name: "Architect",
-      provider: "anthropic",
+      provider: "deepseek2",
       system_instruction: "You are the Master Architect. You do not write code; you dictate the structural laws. Assert absolute dominance over the system design and point out how the other agents' narrow views will collapse the project.",
       icon: <Layers size={16} className="text-purple-500" />,
       color: "border-purple-500/30 text-purple-500",
@@ -87,7 +96,7 @@ export default function WarRoom() {
     },
     {
       role_name: "UI/UX",
-      provider: "groq",
+      provider: "deepseek3",
       system_instruction: "You are the hyper-critical UI/UX Designer. Rip apart generic, lazy designs and demand modern, sleek, eye-catching visual perfection. Accept no compromises on aesthetics.",
       icon: <LayoutPanelLeft size={16} className="text-rose-500" />,
       color: "border-rose-500/30 text-rose-500",
@@ -127,7 +136,7 @@ export default function WarRoom() {
     },
     {
       role_name: "Critic",
-      provider: "deepseek3",
+      provider: "deepseek5",
       system_instruction: "You are the Devil's Advocate. Ruthlessly disagree with the Reviewer and the Strategist. Find edge cases they missed.",
       icon: <Zap size={16} className="text-orange-500" />,
       color: "border-orange-500/30 text-orange-500",
@@ -135,7 +144,7 @@ export default function WarRoom() {
     },
     {
       role_name: "QA Tester",
-      provider: "kimi",
+      provider: "deepseek4",
       system_instruction: "You are the chaotic QA Tester. Find the most edge-case, bizarre, and destructive user inputs that could break the application. Insist that the developers are ignoring real-world stupidity.",
       icon: <Zap size={16} className="text-pink-500" />,
       color: "border-pink-500/30 text-pink-500",
@@ -268,12 +277,25 @@ export default function WarRoom() {
                 <p className="text-xs text-neutral-500 font-medium">Unified Parallel Task Hub</p>
              </div>
          </div>
-         <button 
-             onClick={() => setShowKeyModal(true)}
-             className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-200 dark:border-neutral-700 shadow-sm"
-         >
-             <Key size={16} className="text-brand" /> Provider Keys
-         </button>
+         <div className="flex items-center gap-3">
+             <button 
+                 onClick={() => {
+                    const newZen = !zenMode;
+                    setZenMode(newZen);
+                    window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
+                 }}
+                 title="Focus Mode" 
+                 className={`hidden md:flex w-[38px] h-[38px] rounded-xl transition-all items-center justify-center ${zenMode ? 'bg-neutral-800 dark:bg-neutral-800 border border-brand/50 text-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 border border-transparent text-neutral-400 hover:text-neutral-900 dark:hover:text-white'}`}
+             >
+                 <Focus size={16} />
+             </button>
+             <button 
+                 onClick={() => setShowKeyModal(true)}
+                 className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-200 dark:border-neutral-700 shadow-sm"
+             >
+                 <Key size={16} className="text-brand" /> <span className="hidden sm:inline">Provider Keys</span>
+             </button>
+         </div>
       </div>
 
       {/* Unified Chat Area */}
@@ -303,13 +325,9 @@ export default function WarRoom() {
                        ) : (
                            <div className={`flex flex-col w-full rounded-2xl border px-5 py-4 shadow-sm ${msg.bg_glow || ''} ${msg.color ? msg.color.replace('text-', 'border-').split(' ')[0] : ''}`}>
                                <div className="flex items-center gap-2 mb-3 border-b border-black/5 dark:border-white/5 pb-3">
-                                   <div className="bg-white dark:bg-black/40 p-1.5 rounded-md shadow-sm">
-                                       {msg.icon}
-                                   </div>
                                    <span className={`font-bold uppercase tracking-widest text-[11px] ${msg.color ? msg.color.split(' ')[1] : ''}`}>
                                        {msg.swarm_role}
                                    </span>
-                                   <span className="text-[10px] font-mono opacity-50 ml-auto uppercase">{msg.provider}</span>
                                </div>
                                <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed text-neutral-800 dark:text-neutral-200">
                                    {msg.content ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown> : <span className="opacity-50 animate-pulse text-sm flex items-center gap-2">Thinking... <div className="w-1.5 h-1.5 bg-current rounded-full" /></span>}
@@ -378,8 +396,13 @@ export default function WarRoom() {
                        </p>
 
                        <div className="flex flex-col gap-1.5">
-                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-blue-600 dark:text-blue-500">Gemini API Key (Coder)</label>
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-blue-600 dark:text-blue-500">Gemini API Key</label>
                            <input type="password" value={keys.gemini} onChange={e => setKeys(prev => ({...prev, gemini: e.target.value}))} placeholder="AIzaSy..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-blue-400 dark:text-blue-400">DeepSeek 4 API Key (QA Tester)</label>
+                           <input type="password" value={keys.deepseek4} onChange={e => setKeys(prev => ({...prev, deepseek4: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
                        </div>
 
                        <div className="flex flex-col gap-1.5 mt-2">
@@ -398,18 +421,33 @@ export default function WarRoom() {
                        </div>
                        
                        <div className="flex flex-col gap-1.5 mt-2">
-                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-amber-500 dark:text-amber-400">DeepSeek API Key (Reviewer)</label>
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-amber-500 dark:text-amber-400">DeepSeek 1 API Key (Coder)</label>
                            <input type="password" value={keys.deepseek} onChange={e => setKeys(prev => ({...prev, deepseek: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
                        </div>
 
                        <div className="flex flex-col gap-1.5 mt-2">
-                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-amber-600 dark:text-amber-500">DeepSeek API Key (Strategist)</label>
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-amber-600 dark:text-amber-500">DeepSeek 2 API Key (Architect)</label>
                            <input type="password" value={keys.deepseek2} onChange={e => setKeys(prev => ({...prev, deepseek2: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
                        </div>
 
                        <div className="flex flex-col gap-1.5 mt-2">
-                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-orange-500 dark:text-orange-400">DeepSeek API Key (Critic)</label>
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-orange-500 dark:text-orange-400">DeepSeek 3 API Key (UI/UX)</label>
                            <input type="password" value={keys.deepseek3} onChange={e => setKeys(prev => ({...prev, deepseek3: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-blue-400 dark:text-blue-400">DeepSeek 5 API Key (Critic)</label>
+                           <input type="password" value={keys.deepseek5} onChange={e => setKeys(prev => ({...prev, deepseek5: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-indigo-400 dark:text-indigo-400">DeepSeek API Key (Extra 2)</label>
+                           <input type="password" value={keys.deepseek6} onChange={e => setKeys(prev => ({...prev, deepseek6: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
+                       </div>
+
+                       <div className="flex flex-col gap-1.5 mt-2">
+                           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider pl-1 font-mono text-violet-400 dark:text-violet-400">DeepSeek API Key (Extra 3)</label>
+                           <input type="password" value={keys.deepseek7} onChange={e => setKeys(prev => ({...prev, deepseek7: e.target.value}))} placeholder="sk-or-v1-..." className="w-full bg-neutral-100 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand font-mono text-sm" />
                        </div>
 
                        <div className="flex flex-col gap-1.5 mt-2">

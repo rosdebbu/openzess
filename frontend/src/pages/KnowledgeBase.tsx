@@ -177,10 +177,36 @@ export default function KnowledgeBase() {
       {/* Main Editor/Viewer Pane */}
       <div className="flex-1 flex flex-col bg-white/70 dark:bg-neutral-950 relative overflow-hidden backdrop-blur-3xl">
         {(!activeNote && !isEditing) ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 opacity-60">
-            <BookOpen size={48} className="mb-4 text-neutral-300 dark:text-neutral-700" />
-            <h2 className="text-xl font-bold text-neutral-500 dark:text-neutral-500">No Canvas Selected</h2>
-            <p className="text-sm mt-2 max-w-sm text-center">Select a manifest from the sidebar or initialize a new blank canvas to begin knowledge capture.</p>
+          <div className="flex-1 flex flex-col items-center justify-center p-10 overflow-y-auto custom-scrollbar">
+            <div className="w-20 h-20 bg-brand/10 text-brand rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-brand/5 border border-brand/20">
+              <BookOpen size={40} />
+            </div>
+            <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>No Canvas Selected</h2>
+            <p className="text-neutral-500 max-w-md text-center mb-12">Select a manifest from the sidebar, initialize a new blank canvas, or start from one of the basic templates below.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
+                {[
+                    { title: "Daily Journal", category: "Personal", content: "# Daily Journal\n\n**Date:** \n\n## Goals for Today\n- [ ] \n- [ ]\n\n## Brain Dump\n" },
+                    { title: "Code Snippet", category: "Dev", content: "# Code Snippet\n\n**Language:** \n\n## Description\n\n\n## The Code\n```python\n\n```" },
+                    { title: "Project Brainstorm", category: "Planning", content: "# Project Brainstorm\n\n## The Problem\n\n## Proposed Solution\n\n## Action Items\n1. \n2. \n3. " }
+                ].map((tmpl, idx) => (
+                    <div 
+                       key={idx}
+                       onClick={() => {
+                          setActiveNote(null);
+                          setEditTitle(tmpl.title);
+                          setEditContent(tmpl.content);
+                          setEditCategory(tmpl.category);
+                          setIsEditing(true);
+                       }}
+                       className="bg-white dark:bg-[#0a0a0c] border border-neutral-200 dark:border-white/10 p-6 rounded-2xl cursor-pointer hover:border-brand/50 hover:shadow-lg transition-all group flex flex-col items-start text-left"
+                    >
+                       <div className="bg-brand/10 text-brand p-2 rounded-lg mb-4 group-hover:scale-110 transition-transform"><Plus size={20} /></div>
+                       <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">{tmpl.title}</h3>
+                       <p className="text-xs text-neutral-500 font-mono"><Tag size={12} className="inline mr-1" />{tmpl.category}</p>
+                    </div>
+                ))}
+            </div>
           </div>
         ) : (
           <>

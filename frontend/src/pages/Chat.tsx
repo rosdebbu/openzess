@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -31,6 +31,7 @@ export default function Chat() {
   const [zenMode, setZenMode] = useState(false);
   
   const [activeArtifact, setActiveArtifact] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [lastProcessedMsgId, setLastProcessedMsgId] = useState<string | null>(null);
   const isStreamingRef = useRef(false);
   
@@ -49,6 +50,21 @@ export default function Chat() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = searchParams.get('session_id');
+
+  const handleDownload = (code: string, language: string) => {
+      const ext = language || 'txt';
+      const blob = new Blob([code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `openzess_snippet.${ext}`;
+      a.click();
+      URL.revokeObjectURL(url);
+  };
+
+  const handleRun = (code: string) => {
+      setActiveArtifact(code);
+  };
 
   useEffect(() => {
     if (sessionId && !isStreamingRef.current) {
@@ -538,7 +554,52 @@ export default function Chat() {
                           <button className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-300 opacity-0 group-hover/bubble:opacity-100 transition-opacity bg-[#1A1C23] border border-white/10 p-1 rounded-md">
                               <span className="text-[11px] font-mono px-2">Copy</span>
                           </button>
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                          <ReactMarkdown 
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                  code({ node, inline, className, children, ...props }: any) {
+                                      const match = /language-(\w+)/.exec(className || '');
+                                      const language = match ? match[1] : '';
+                                      const isBlock = !inline && match;
+                                      const codeString = String(children).replace(/\n$/, '');
+
+                                      if (!isBlock) {
+                                          return <code className={`${className} bg-black/5 dark:bg-white/10 px-1 py-0.5 rounded text-[13px] font-mono`} {...props}>{children}</code>;
+                                      }
+
+                                      return (
+                                          <div className="flex flex-col w-full my-4 rounded-xl overflow-hidden border border-neutral-200/50 dark:border-white/[0.1] bg-white dark:bg-[#131317]">
+                                              <div className="flex items-center justify-between px-4 py-2 bg-neutral-100/80 dark:bg-[#1A1A1E] border-b border-neutral-200/50 dark:border-white/[0.05]">
+                                                  <div className="text-xs font-mono font-medium text-neutral-500 dark:text-neutral-400">
+                                                      {language || 'text'}
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                      <button onClick={() => { navigator.clipboard.writeText(codeString); setCopiedId(codeString); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                          {copiedId === codeString ? <CheckCircle2 size={13} className="text-emerald-500" /> : <Copy size={13} />} Copy
+                                                      </button>
+                                                      <button onClick={() => handleDownload(codeString, language)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                          <Download size={13} /> Download
+                                                      </button>
+                                                      {(language === 'html' || language === 'xml' || language === 'javascript') && (
+                                                          <>
+                                                              <div className="w-px h-3 bg-neutral-300 dark:bg-neutral-700 mx-1" />
+                                                              <button onClick={() => handleRun(codeString)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-brand hover:text-brand-hover hover:bg-brand/10 transition-colors rounded bg-brand/5 shadow-sm">
+                                                                  <Play size={13} fill="currentColor" /> Run
+                                                              </button>
+                                                          </>
+                                                      )}
+                                                  </div>
+                                              </div>
+                                              <div className="p-4 overflow-x-auto text-[13px] font-mono leading-relaxed bg-[#F8F9FA] dark:bg-[#0D0D10] text-neutral-800 dark:text-neutral-300">
+                                                  <code {...props}>{children}</code>
+                                              </div>
+                                          </div>
+                                      );
+                                  }
+                              }}
+                          >
+                              {msg.content}
+                          </ReactMarkdown>
                         </div>
                         <div className="flex items-center gap-3 px-2 text-xs text-neutral-500 font-medium">
                             <span className="text-neutral-400">Assistant</span>

@@ -112,27 +112,26 @@ export default function MemoryVault() {
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: i * 0.05 }}
                     key={memory.id}
-                    className="group bg-white dark:bg-neutral-900/60 hover:bg-neutral-50 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-800/80 hover:border-brand/40 transition-all rounded-2xl p-6 relative overflow-hidden flex flex-col shadow-sm dark:shadow-none"
+                    className="group bg-[#1e1e1e] border border-[#333] rounded-[6px] p-4 relative flex flex-col transition-all hover:border-[#444] font-sans"
                   >
-                    <div className="flex items-start justify-between mb-4">
-                       <div className="flex items-center gap-2 px-3 py-1 bg-neutral-100 dark:bg-black/40 rounded-full border border-neutral-200 dark:border-white/5">
-                          <Fingerprint size={12} className="text-brand" />
-                          <span className="text-[10px] font-mono text-neutral-500 tracking-wider truncate w-24">{memory.id.split('-')[0]}</span>
+                    <div className="flex items-center gap-2 mb-3 text-[#888] text-[0.85rem] justify-between">
+                       <div className="flex items-center gap-2">
+                           <span className="text-xl leading-none -mt-1">🧠</span>
+                           <span className="font-mono bg-[#2a2a2a] px-[6px] py-[2px] rounded-[4px]">{memory.id.split('-')[0]}</span>
                        </div>
                        
                        <button 
                          onClick={() => deleteMemory(memory.id)}
-                         className="text-neutral-400 hover:text-rose-500 dark:hover:text-rose-400 bg-transparent hover:bg-rose-50 dark:hover:bg-rose-900/20 p-2 rounded-lg transition-colors border border-transparent hover:border-rose-100 dark:hover:border-rose-900/50 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                         className="text-[#666] hover:text-[#ff5555] bg-transparent p-1 rounded transition-colors opacity-0 group-hover:opacity-100"
                          title="Delete Memory"
                        >
-                         <Trash2 size={16} />
+                         <Trash2 size={14} />
                        </button>
                     </div>
                     
-                    <div className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 font-medium leading-relaxed overflow-y-auto custom-scrollbar pr-2 pb-2 line-clamp-4">
+                    <div className="flex-1 text-[#e0e0e0] text-[0.95rem] leading-[1.5] overflow-y-auto custom-scrollbar pr-2 pb-1 line-clamp-5">
                        {memory.document}
                     </div>
-                    
                   </motion.div>
                 ))}
               </AnimatePresence>

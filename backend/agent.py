@@ -380,6 +380,13 @@ class OpenzessAgent:
 
         self.model_name = PROVIDER_MODELS.get(provider, "openai/gpt-4o-mini")
         
+        # Smart route Native DeepSeek API keys to their direct litellm endpoint
+        if "deepseek" in provider and api_key and not api_key.startswith("sk-or-"):
+            if provider == "deepseek3":
+                self.model_name = "deepseek/deepseek-reasoner"
+            else:
+                self.model_name = "deepseek/deepseek-chat"
+        
         self.messages = []
         default_inst = "You are openzess, a powerful AI coding assistant. You can help the user by writing code and executing terminal commands. Your terminal executes exclusively inside a secure Linux Debian WSL sandbox. Use standard bash commands."
         self.messages.append({"role": "system", "content": system_instruction if system_instruction else default_inst})

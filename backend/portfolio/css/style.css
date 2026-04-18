@@ -1,0 +1,39 @@
+/* Reset & Basics */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #f4f4f4;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #0077b5;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+/* Projects Grid */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        padding: 2rem 1rem;
+    }
+}

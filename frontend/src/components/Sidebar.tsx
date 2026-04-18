@@ -1,6 +1,7 @@
 import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import logoUrl from '../assets/seahorse-logo.jpg';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
@@ -63,14 +64,12 @@ export default function Sidebar() {
     <div className={`bg-white/50 dark:bg-neutral-950/50 border-r border-neutral-200 dark:border-border shrink-0 flex flex-col h-full backdrop-blur-xl transition-all duration-300 relative z-20 ${isCollapsed ? 'w-[80px]' : 'w-[280px]'}`}>
       <div className={`p-6 border-b border-neutral-200 dark:border-border pb-4 shrink-0 flex items-center justify-between ${isCollapsed ? 'justify-center px-4' : ''}`}>
         <h1 className={`text-xl font-bold flex items-center gap-3 tracking-wide overflow-hidden whitespace-nowrap transition-all ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand to-brand-hover shrink-0 flex items-center justify-center shadow-lg shadow-brand/20">
-            <span className="text-white font-black text-sm">O</span>
-          </div>
+          <img src={logoUrl} alt="Openzess Logo" className="w-9 h-9 object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(255,100,100,0.4)] shrink-0" />
           openzess
         </h1>
         {isCollapsed && (
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-8 h-8 rounded-lg bg-gradient-to-br from-brand to-brand-hover shrink-0 flex items-center justify-center shadow-lg shadow-brand/20">
-                <span className="text-white font-black text-sm">O</span>
+            <div className="absolute top-5 left-1/2 -translate-x-1/2 shrink-0 flex items-center justify-center">
+                <img src={logoUrl} alt="Openzess Logo" className="w-9 h-9 object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(255,100,100,0.4)]" />
             </div>
         )}
         <button 

@@ -28,9 +28,10 @@ export default function CronJobs() {
   const [createType, setCreateType] = useState<'cron' | 'watchdog'>('cron');
   const [cronCommand, setCronCommand] = useState('');
   const [cronInterval, setCronInterval] = useState(60);
-  const [watchDir, setWatchDir] = useState('C:/Users/');
-  const [watchAction, setWatchAction] = useState('Organize new documents into folders based on content.');
+  const [watchDir, setWatchDir] = useState('/tmp/');
+  const [watchAction, setWatchAction] = useState('Analyze new files dropped here.');
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -68,6 +69,7 @@ export default function CronJobs() {
 
   const handleCreate = async () => {
       setSubmitting(true);
+      setErrorMsg(null);
       try {
           if (createType === 'cron') {
              await axios.post('http://localhost:8000/api/cron', {
@@ -83,8 +85,9 @@ export default function CronJobs() {
           setIsCreating(false);
           setCronCommand('');
           fetchData();
-      } catch (e) {
+      } catch (e: any) {
           console.error(e);
+          setErrorMsg(e.response?.data?.detail || e.message || 'An unknown error occurred');
       } finally {
           setSubmitting(false);
       }
@@ -318,6 +321,15 @@ export default function CronJobs() {
                           </div>
                       )}
                   </div>
+
+                  {errorMsg && (
+                      <div className="px-6 pb-2">
+                          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-xl text-sm flex items-center gap-2">
+                              <ShieldAlert size={16} />
+                              <span className="font-medium">{errorMsg}</span>
+                          </div>
+                      </div>
+                  )}
 
                   <div className="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 shrink-0 flex justify-end gap-3 flex-row-reverse">
                       <button 

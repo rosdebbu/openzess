@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Key, Sparkles, Fingerprint, Activity, Zap } from 'lucide-react';
+import logoUrl from '../assets/seahorse-logo.jpg';
 
 interface WelcomeProps {
     onComplete: (provider: string, apiKey: string) => void;
@@ -102,10 +103,9 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                             <motion.div 
                                 initial={{ rotate: -90, opacity: 0 }}
                                 animate={{ rotate: 0, opacity: 1 }}
-                                transition={{ duration: 1.2, type: 'spring', bounce: 0.5, delay: 0.4 }}
-                                className="w-16 h-16 bg-gradient-to-br from-brand to-brand-hover rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(var(--brand-rgb),0.5)] mb-6 ring-1 ring-white/20"
+                                className="mb-6"
                             >
-                                <Sparkles className="text-white" size={28} />
+                                <img src={logoUrl} alt="Openzess Logo" className="w-20 h-20 object-contain mix-blend-screen drop-shadow-[0_0_20px_rgba(255,100,100,0.6)]" />
                             </motion.div>
                             <h1 className="text-4xl font-bold tracking-tight text-white mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>openzess</h1>
                             <p className="text-neutral-400 font-medium">Initialize your AI workspace</p>

@@ -2,6 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Trash2, Users, Play, Ghost, MessageSquare, Bot, PlusCircle, CheckCircle } from 'lucide-react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+const getHashColor = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    const h = Math.abs(hash) % 360;
+    return `hsl(${h}, 65%, 65%)`; // Vibrant colors suitable for names in dark mode
+};
 
 interface Persona {
   id: string;
@@ -267,36 +276,39 @@ export default function Tavern() {
                    <p className="text-sm border border-dashed border-neutral-300 dark:border-neutral-700 p-4 rounded-xl">Add imported Personas to the room from the left shelf to begin a multi-character simulation.</p>
                 </div>
              ) : (
-                <>
+                 <>
                    {messages.map((msg, i) => {
                       const isUser = msg.role === 'user';
                       const isSystem = msg.role === 'system';
-                      const agentName = msg.role.startsWith('agent:') ? msg.role.split(':')[1] : 'Agent';
+                      const agentName = msg.role.startsWith('agent:') ? msg.role.split(':')[1] : 'Unknown';
                       const pData = roomPersonas.find(p => p.name === agentName);
+                      const nameColor = isUser ? '#A3E635' : getHashColor(agentName);
                       
                       return (
                          <motion.div 
                             key={i} 
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                            className={`flex gap-4 max-w-[85%] ${isUser ? 'self-end flex-row-reverse' : isSystem ? 'self-center w-full max-w-full justify-center' : 'self-start'}`}
+                            className={`flex gap-4 w-full py-1 hover:bg-black/5 dark:hover:bg-white/[0.02] rounded-lg px-2 transition-colors ${isSystem ? 'justify-center' : ''}`}
                          >
                             {isSystem ? (
-                               <div className="text-xs font-mono text-rose-500 bg-rose-500/10 px-4 py-2 rounded-full border border-rose-500/20">{msg.content}</div>
+                               <div className="text-xs font-mono text-rose-500 bg-rose-500/10 px-4 py-2 rounded border border-rose-500/20">{msg.content}</div>
                             ) : (
                                <>
                                   <div className="mt-1 shrink-0">
                                      {isUser ? (
-                                        <div className="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/20">U</div>
+                                        <div className="w-10 h-10 rounded-xl bg-neutral-800 text-neutral-300 flex items-center justify-center text-sm font-bold shadow-sm shadow-black/20">U</div>
                                      ) : pData?.avatar_base64 ? (
-                                        <img src={pData.avatar_base64} alt={agentName} className="w-10 h-10 rounded-full object-cover shadow-sm bg-neutral-100 border border-neutral-200 dark:border-neutral-800" />
+                                        <img src={pData.avatar_base64} alt={agentName} className="w-10 h-10 rounded-xl object-cover shadow-sm bg-neutral-900 border border-neutral-200 dark:border-neutral-800" />
                                      ) : (
-                                        <div className="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm shadow-sm">{agentName.charAt(0)}</div>
+                                        <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold text-sm shadow-sm">{agentName.charAt(0)}</div>
                                      )}
                                   </div>
-                                  <div className={`flex flex-col gap-1 ${isUser ? 'items-end' : 'items-start'}`}>
-                                     <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider px-1">{isUser ? 'You' : agentName}</span>
-                                     <div className={`p-4 rounded-2xl shadow-sm text-sm whitespace-pre-wrap ${isUser ? 'bg-brand text-white rounded-tr-none' : 'bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-800 rounded-tl-none'}`}>
-                                        {msg.content}
+                                  <div className={`flex flex-col gap-0 min-w-0 flex-1`}>
+                                     <span className="text-[14px] font-bold tracking-wide" style={{ color: nameColor }}>{isUser ? 'You' : agentName}</span>
+                                     <div className={`text-[15px] leading-relaxed text-neutral-800 dark:text-neutral-300 prose prose-sm dark:prose-invert prose-p:my-1.5 prose-p:leading-[1.6] max-w-none prose-em:text-neutral-500 dark:prose-em:text-neutral-400 prose-em:italic prose-a:text-indigo-400`}>
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                           {msg.content}
+                                        </ReactMarkdown>
                                      </div>
                                   </div>
                                </>
@@ -305,9 +317,9 @@ export default function Tavern() {
                       )
                    })}
                    {isTyping && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 self-start items-center text-neutral-400">
-                         <div className="w-10 h-10 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
-                         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 px-4 py-4 rounded-2xl rounded-tl-none flex gap-1 shadow-sm">
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 self-start items-center text-neutral-400 px-2 py-2">
+                         <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
+                         <div className="flex gap-1.5 py-2">
                             <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce"></span>
                             <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></span>
                             <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></span>

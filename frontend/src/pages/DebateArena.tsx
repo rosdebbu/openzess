@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Swords, Box, Zap, Sparkles, Copy, CheckCircle2, Key, X, Layers, Trophy, RotateCcw, Crown, Cpu } from 'lucide-react';
+import { Send, Swords, Box, Zap, Sparkles, Copy, CheckCircle2, Key, X, Layers, Trophy, RotateCcw, Crown, Cpu, Focus, Download, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -20,15 +20,63 @@ interface ArenaModel {
 const ALL_MODELS: ArenaModel[] = [
     {
         id: 'deepseek',
-        name: 'DeepSeek',
+        name: 'Kimi',
         label: 'V3 · Reviewer',
         provider: 'deepseek',
         storageKey: 'openzess_deepseek_key',
+        icon: <Sparkles size={22} />,
+        accentColor: 'text-indigo-400',
+        glowColor: 'shadow-indigo-500/20',
+        gradientFrom: 'from-indigo-500',
+        gradientTo: 'to-blue-700',
+    },
+    {
+        id: 'deepseek2',
+        name: 'Gemma',
+        label: 'Coder · Logic',
+        provider: 'deepseek',
+        storageKey: 'openzess_deepseek2_key',
+        icon: <Crown size={22} />,
+        accentColor: 'text-cyan-400',
+        glowColor: 'shadow-cyan-500/20',
+        gradientFrom: 'from-cyan-500',
+        gradientTo: 'to-teal-600',
+    },
+    {
+        id: 'deepseek3',
+        name: 'DeepSeek 3',
+        label: 'Reasoner · Math',
+        provider: 'deepseek',
+        storageKey: 'openzess_deepseek3_key',
         icon: <Zap size={22} />,
         accentColor: 'text-fuchsia-400',
         glowColor: 'shadow-fuchsia-500/20',
         gradientFrom: 'from-fuchsia-600',
         gradientTo: 'to-purple-700',
+    },
+    {
+        id: 'deepseek4',
+        name: 'DeepSeek 4',
+        label: 'Refiner · Speed',
+        provider: 'deepseek',
+        storageKey: 'openzess_deepseek4_key',
+        icon: <Zap size={22} />,
+        accentColor: 'text-fuchsia-400',
+        glowColor: 'shadow-fuchsia-500/20',
+        gradientFrom: 'from-fuchsia-600',
+        gradientTo: 'to-purple-700',
+    },
+    {
+        id: 'deepseek5',
+        name: 'DeepSeek 5',
+        label: 'Critic · Quality',
+        provider: 'deepseek',
+        storageKey: 'openzess_deepseek5_key',
+        icon: <Zap size={22} />,
+        accentColor: 'text-purple-400',
+        glowColor: 'shadow-purple-500/20',
+        gradientFrom: 'from-purple-600',
+        gradientTo: 'to-indigo-700',
     },
     {
         id: 'qwen',
@@ -156,6 +204,8 @@ export default function DebateArena() {
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [showKeyModal, setShowKeyModal] = useState(false);
     const [selectedWinner, setSelectedWinner] = useState<string | null>(null);
+    const [zenMode, setZenMode] = useState(false);
+    const [previewCode, setPreviewCode] = useState<string | null>(null);
     const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
     // Warroom Provider Keys
@@ -167,6 +217,8 @@ export default function DebateArena() {
         deepseek: localStorage.getItem('openzess_deepseek_key') || '',
         deepseek2: localStorage.getItem('openzess_deepseek2_key') || '',
         deepseek3: localStorage.getItem('openzess_deepseek3_key') || '',
+        deepseek4: localStorage.getItem('openzess_deepseek4_key') || '',
+        deepseek5: localStorage.getItem('openzess_deepseek5_key') || '',
         qwen: localStorage.getItem('openzess_qwen_key') || '',
         glm: localStorage.getItem('openzess_glm_key') || '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',
         kimi: localStorage.getItem('openzess_kimi_key') || ''
@@ -186,6 +238,8 @@ export default function DebateArena() {
         localStorage.setItem('openzess_deepseek_key', keys.deepseek);
         localStorage.setItem('openzess_deepseek2_key', keys.deepseek2);
         localStorage.setItem('openzess_deepseek3_key', keys.deepseek3);
+        localStorage.setItem('openzess_deepseek4_key', keys.deepseek4);
+        localStorage.setItem('openzess_deepseek5_key', keys.deepseek5);
         localStorage.setItem('openzess_qwen_key', keys.qwen);
         localStorage.setItem('openzess_glm_key', keys.glm);
         localStorage.setItem('openzess_kimi_key', keys.kimi);
@@ -196,6 +250,21 @@ export default function DebateArena() {
         navigator.clipboard.writeText(text);
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const handleDownload = (code: string, language: string) => {
+        const ext = language || 'txt';
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `openzess_snippet.${ext}`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleRun = (code: string) => {
+        setPreviewCode(code);
     };
 
     // Auto-scroll each panel as content streams
@@ -312,13 +381,26 @@ export default function DebateArena() {
             {!hasStarted ? (
                 /* ── Initial Hero State ── */
                 <div className="h-full flex flex-col items-center justify-center p-6 relative">
-                    <button
-                        onClick={() => setShowKeyModal(true)}
-                        className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-neutral-100/80 dark:bg-white/[0.04] hover:bg-neutral-200 dark:hover:bg-white/10 border border-neutral-200/50 dark:border-white/[0.06] rounded-xl text-neutral-600 dark:text-neutral-300 transition-all text-sm font-medium z-10"
-                    >
-                        <Key size={14} />
-                        <span className="hidden md:inline">Keys</span>
-                    </button>
+                    <div className="absolute top-6 right-6 flex items-center gap-2 z-20">
+                        <button 
+                            onClick={() => {
+                               const newZen = !zenMode;
+                               setZenMode(newZen);
+                               window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
+                            }}
+                            title="Focus Mode" 
+                            className={`flex w-9 h-9 items-center justify-center rounded-full transition-all backdrop-blur-md border ${zenMode ? 'bg-neutral-800 dark:bg-neutral-800 border-brand/50 text-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'bg-white/5 dark:bg-white/[0.03] hover:bg-white/10 dark:hover:bg-white/[0.08] text-neutral-600 dark:text-neutral-300 border-neutral-200/50 dark:border-white/10'}`}
+                        >
+                            <Focus size={14} />
+                        </button>
+                        <button 
+                            onClick={() => setShowKeyModal(true)}
+                            className="flex items-center gap-2 bg-white/5 dark:bg-white/[0.03] hover:bg-white/10 dark:hover:bg-white/[0.08] text-neutral-600 dark:text-neutral-300 px-4 py-2 rounded-full text-sm font-medium transition-all backdrop-blur-md border border-neutral-200/50 dark:border-white/10"
+                        >
+                            <Key size={14} className="text-brand" />
+                            <span className="hidden md:inline">Keys</span>
+                        </button>
+                    </div>
                     
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center text-center max-w-2xl w-full z-10">
                         <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(244,63,94,0.3)] mb-6">
@@ -414,6 +496,17 @@ export default function DebateArena() {
                             <CheckCircle2 size={13} /> All Complete
                         </div>
                     )}
+                    <button 
+                        onClick={() => {
+                           const newZen = !zenMode;
+                           setZenMode(newZen);
+                           window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
+                        }}
+                        title="Focus Mode" 
+                        className={`flex w-[38px] h-[38px] items-center justify-center rounded-xl transition-all border ${zenMode ? 'bg-neutral-800 dark:bg-neutral-800 border-brand/50 text-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'bg-neutral-100/80 dark:bg-white/[0.06] hover:bg-neutral-200/80 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-300 border-neutral-200/50 dark:border-white/[0.08]'}`}
+                    >
+                        <Focus size={16} />
+                    </button>
                     <button
                         onClick={() => setShowKeyModal(true)}
                         className="flex items-center gap-2 px-3 py-2 bg-neutral-100/80 dark:bg-white/[0.06] hover:bg-neutral-200/80 dark:hover:bg-white/10 border border-neutral-200/50 dark:border-white/[0.08] rounded-xl text-neutral-600 dark:text-neutral-300 transition-all text-sm font-medium"
@@ -541,8 +634,51 @@ export default function DebateArena() {
                                     ) : (
                                         /* ── Active: Markdown content ── */
                                         <div className="px-4 py-4">
-                                            <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-p:my-2 prose-headings:my-3 prose-pre:bg-neutral-100 dark:prose-pre:bg-black/60 prose-pre:border prose-pre:border-neutral-200/50 dark:prose-pre:border-neutral-800 prose-pre:rounded-xl prose-code:text-xs">
-                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-p:my-2 prose-headings:my-3 prose-pre:bg-neutral-100 dark:prose-pre:bg-[#1A1A1E] prose-pre:border prose-pre:border-neutral-200/50 dark:prose-pre:border-white/[0.05] prose-pre:rounded-xl prose-pre:p-0 prose-code:text-xs">
+                                                <ReactMarkdown 
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        code({ node, inline, className, children, ...props }: any) {
+                                                            const match = /language-(\w+)/.exec(className || '');
+                                                            const language = match ? match[1] : '';
+                                                            const isBlock = !inline && match;
+                                                            const codeString = String(children).replace(/\n$/, '');
+
+                                                            if (!isBlock) {
+                                                                return <code className={`${className} bg-neutral-200/50 dark:bg-white/10 px-1 py-0.5 rounded text-[13px] font-mono`} {...props}>{children}</code>;
+                                                            }
+
+                                                            return (
+                                                                <div className="flex flex-col w-full my-4 rounded-xl overflow-hidden border border-neutral-200/50 dark:border-white/[0.1] bg-white dark:bg-[#131317]">
+                                                                    <div className="flex items-center justify-between px-4 py-2 bg-neutral-100/80 dark:bg-[#1A1A1E] border-b border-neutral-200/50 dark:border-white/[0.05]">
+                                                                        <div className="text-xs font-mono font-medium text-neutral-500 dark:text-neutral-400">
+                                                                            {language || 'text'}
+                                                                        </div>
+                                                                        <div className="flex items-center gap-1">
+                                                                            <button onClick={() => { navigator.clipboard.writeText(codeString); setCopiedId(codeString); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                                                {copiedId === codeString ? <CheckCircle2 size={13} className="text-emerald-500" /> : <Copy size={13} />} Copy
+                                                                            </button>
+                                                                            <button onClick={() => handleDownload(codeString, language)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                                                <Download size={13} /> Download
+                                                                            </button>
+                                                                            {(language === 'html' || language === 'xml' || language === 'javascript') && (
+                                                                                <>
+                                                                                    <div className="w-px h-3 bg-neutral-300 dark:bg-neutral-700 mx-1" />
+                                                                                    <button onClick={() => handleRun(codeString)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-brand hover:text-brand-hover hover:bg-brand/10 transition-colors rounded bg-brand/5 shadow-sm">
+                                                                                        <Play size={13} fill="currentColor" /> Run
+                                                                                    </button>
+                                                                                </>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="p-4 overflow-x-auto text-[13px] font-mono leading-relaxed bg-[#F8F9FA] dark:bg-[#0D0D10] text-neutral-800 dark:text-neutral-300">
+                                                                        <code {...props}>{children}</code>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }
+                                                    }}
+                                                >
                                                     {responses[model.id]}
                                                 </ReactMarkdown>
                                             </div>
@@ -572,6 +708,41 @@ export default function DebateArena() {
 
             {/* ── Provider Keys Modal ── */}
             <AnimatePresence>
+                {previewCode && (
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+                            className="bg-white dark:bg-[#111118] border border-neutral-200 dark:border-neutral-800 rounded-2xl w-full h-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+                        >
+                            <div className="p-4 border-b border-neutral-200/60 dark:border-white/[0.06] flex justify-between items-center bg-neutral-50 dark:bg-white/[0.02]">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center">
+                                        <Play size={16} className="text-brand ml-0.5" fill="currentColor" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-base font-bold text-neutral-900 dark:text-white leading-tight">Live Preview</h2>
+                                        <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Running securely in isolated sandbox environment</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setPreviewCode(null)} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-lg transition-colors text-sm font-medium">
+                                    <X size={15} /> Close Runtime
+                                </button>
+                            </div>
+                            <div className="flex-1 w-full bg-white relative">
+                                <iframe 
+                                    srcDoc={previewCode} 
+                                    className="w-full h-full border-none absolute inset-0"
+                                    sandbox="allow-scripts"
+                                    title="Openzess Web Preview"
+                                />
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+
                 {showKeyModal && (
                     <motion.div
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
