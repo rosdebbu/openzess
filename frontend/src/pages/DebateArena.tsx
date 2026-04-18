@@ -190,6 +190,7 @@ const ALL_MODELS: ArenaModel[] = [
 
 export default function DebateArena() {
     const [prompt, setPrompt] = useState('');
+    const [submittedPrompt, setSubmittedPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [responses, setResponses] = useState<Record<string, string>>(() => {
         const init: any = {};
@@ -342,16 +343,20 @@ export default function DebateArena() {
 
     const handleFight = async () => {
         if (!prompt.trim() || isLoading || activeModels.length === 0) return;
+        const currentPrompt = prompt.trim();
+        setSubmittedPrompt(currentPrompt);
+        setPrompt('');
         setIsLoading(true);
         setSelectedWinner(null);
 
-        await Promise.all(activeModels.map(m => fetchStream(m, prompt)));
+        await Promise.all(activeModels.map(m => fetchStream(m, currentPrompt)));
 
         setIsLoading(false);
     };
 
     const handleReset = () => {
         setPrompt('');
+        setSubmittedPrompt('');
         setResponses(prev => {
             const next = {...prev};
             ALL_MODELS.forEach(m => next[m.id] = '');
@@ -442,7 +447,7 @@ export default function DebateArena() {
                 /* ── Active Arena State ── */
                 <>
                     {/* ── Compact Top Bar ── */}
-                    <div className="shrink-0 px-5 pt-14 pb-4 flex items-center gap-4 border-b border-neutral-200/60 dark:border-white/5 bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl z-20">
+                    <div className="shrink-0 px-5 pt-14 pb-4 flex items-center justify-between border-b border-neutral-200/60 dark:border-white/5 bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl z-20">
                 {/* Left: Title */}
                 <div className="flex items-center gap-3 shrink-0">
                     <div className="w-9 h-9 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
@@ -451,41 +456,6 @@ export default function DebateArena() {
                     <div>
                         <h1 className="text-base font-bold tracking-tight text-neutral-900 dark:text-white leading-tight">Warroom Debate</h1>
                         <p className="text-[11px] text-neutral-400 dark:text-neutral-500 leading-tight">4-way parallel generation</p>
-                    </div>
-                </div>
-
-                {/* Center: Prompt Bar */}
-                <div className="flex-1 max-w-3xl mx-auto">
-                    <div className="flex items-center bg-neutral-100/80 dark:bg-white/[0.04] border border-neutral-200/50 dark:border-white/[0.06] rounded-2xl px-1 py-1 transition-all focus-within:border-brand/40 focus-within:shadow-[0_0_0_3px_rgba(var(--brand-rgb),0.08)]">
-                        <input
-                            className="flex-1 bg-transparent border-none text-sm text-neutral-900 dark:text-neutral-200 px-4 py-2.5 focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-600 font-sans"
-                            placeholder="Drop a complex problem here, and watch them race to solve it..."
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleFight();
-                                }
-                            }}
-                            disabled={isLoading}
-                        />
-                        {hasStarted && (
-                            <button
-                                onClick={handleReset}
-                                className="p-2 text-neutral-400 hover:text-neutral-700 dark:hover:text-white rounded-xl hover:bg-neutral-200/60 dark:hover:bg-white/10 transition-colors mr-1"
-                                title="Reset Arena"
-                            >
-                                <RotateCcw size={16} />
-                            </button>
-                        )}
-                        <button
-                            className="bg-brand hover:bg-brand-hover text-white rounded-xl w-10 h-10 shrink-0 flex items-center justify-center transition-all disabled:opacity-30 shadow-md shadow-brand/20 active:scale-95"
-                            onClick={handleFight}
-                            disabled={!prompt.trim() || isLoading}
-                        >
-                            <Send size={16} />
-                        </button>
                     </div>
                 </div>
 
@@ -517,10 +487,11 @@ export default function DebateArena() {
                 </div>
             </div>
 
-            {/* ── Bento Grid Arena ── */}
-            <div className="flex-1 p-3 md:p-4 overflow-hidden">
+            {/* ── Chat Feed Arena ── */}
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto custom-scrollbar flex flex-col relative behavior-smooth text-neutral-900 dark:text-neutral-200">
+                <div className="max-w-7xl mx-auto w-full flex flex-col gap-6 lg:gap-10 pb-6">
                 {activeModels.length === 0 ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-neutral-200 dark:border-white/10 rounded-3xl">
+                    <div className="w-full flex-1 flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-neutral-200 dark:border-white/10 rounded-3xl mt-12 min-h-[400px]">
                         <Key className="text-neutral-400 mb-4" size={48} />
                         <h2 className="text-lg font-bold text-neutral-800 dark:text-white mb-2">Configure Your Arena</h2>
                         <p className="text-sm text-neutral-500 max-w-sm mb-6">You must provide at least one API key in the "Keys" menu above to launch a debate grid.</p>
@@ -529,15 +500,23 @@ export default function DebateArena() {
                         </button>
                     </div>
                 ) : (
-                    <div className={`h-full grid gap-3 md:gap-4 ${
-                        activeModels.length === 1 ? 'grid-cols-1' :
-                        activeModels.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
-                        activeModels.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
-                        activeModels.length === 4 ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4' :
-                        activeModels.length === 5 ? 'grid-cols-1 md:grid-cols-3' :
-                        activeModels.length === 6 ? 'grid-cols-1 md:grid-cols-3' : 
-                        activeModels.length === 7 ? 'grid-cols-1 md:grid-cols-4' :
-                        'grid-cols-1 md:grid-cols-4'
+                    <>
+                    {/* User Prompt Bubble */}
+                    {submittedPrompt && (
+                        <div className="flex flex-col items-end w-full animate-fade-in-up mt-4 max-w-4xl self-end">
+                            <div className="bg-neutral-100 dark:bg-white/[0.04] border border-neutral-200/50 dark:border-white/[0.06] text-neutral-800 dark:text-neutral-200 px-6 py-4 rounded-[24px] rounded-tr-[4px] shadow-sm whitespace-pre-wrap leading-relaxed text-[15px]">
+                                {submittedPrompt}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* AI Responses Grid */}
+                    <div className={`w-full grid gap-4 md:gap-5 min-h-[500px] ${
+                        activeModels.length === 1 ? 'grid-cols-1 max-w-3xl mx-auto' :
+                        activeModels.length === 2 ? 'grid-cols-1 lg:grid-cols-2' :
+                        activeModels.length === 3 ? 'grid-cols-1 lg:grid-cols-3' :
+                        activeModels.length === 4 ? 'grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4' :
+                        'grid-cols-1 lg:grid-cols-3 2xl:grid-cols-4'
                     }`}>
                         {activeModels.map((model, index) => {
                             const isStarted = statuses[model.id] !== 'idle';
@@ -700,8 +679,58 @@ export default function DebateArena() {
                             </motion.div>
                         );
                     })}
-                </div>
+                    </div>
+                    </>
                 )}
+                </div>
+            </div>
+
+            {/* ── Bottom Fixed Input Console (ChatGPT Style) ── */}
+            <div className="shrink-0 px-4 pb-6 pt-2 w-full max-w-4xl mx-auto flex flex-col items-center gap-2 relative z-10">
+                <div className="w-full bg-white dark:bg-[#111118]/80 backdrop-blur-xl border border-neutral-200/80 dark:border-white/[0.08] rounded-[24px] flex flex-col shadow-xl transition-all focus-within:border-brand/50 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.1)] relative overflow-hidden">
+                    <textarea
+                        className="w-full bg-transparent border-none text-neutral-900 dark:text-neutral-200 text-base resize-none px-5 py-4 min-h-[60px] max-h-[200px] overflow-y-auto custom-scrollbar focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                        placeholder="Message the Warroom... (Shift+Enter for new line)"
+                        value={prompt}
+                        onChange={(e) => {
+                            setPrompt(e.target.value);
+                            e.target.style.height = 'auto';
+                            e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleFight();
+                            }
+                        }}
+                        disabled={isLoading}
+                    />
+                    <div className="absolute right-3 bottom-3 flex items-center gap-1.5">
+                        {hasStarted && (
+                            <button
+                                onClick={handleReset}
+                                className="p-2 text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300 rounded-full hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                                title="Reset Discussion"
+                            >
+                                <RotateCcw size={18} />
+                            </button>
+                        )}
+                        <button
+                            className={`rounded-full w-9 h-9 shrink-0 flex items-center justify-center transition-all ${
+                                prompt.trim() && !isLoading 
+                                    ? 'bg-brand text-white shadow-md shadow-brand/20 hover:bg-brand-hover active:scale-95' 
+                                    : 'bg-neutral-100 dark:bg-white/5 text-neutral-400 dark:text-neutral-600 cursor-not-allowed'
+                            }`}
+                            onClick={handleFight}
+                            disabled={!prompt.trim() || isLoading}
+                        >
+                            <Send size={15} className="translate-x-[1px]" />
+                        </button>
+                    </div>
+                </div>
+                <div className="text-[10px] text-neutral-400 dark:text-neutral-600 font-medium">
+                    Models can make mistakes. Always review the Warroom's conclusions.
+                </div>
             </div>
             </>
             )}

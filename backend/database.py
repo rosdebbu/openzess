@@ -3,11 +3,13 @@ import uuid
 from datetime import datetime
 import json
 from dotenv import load_dotenv
+import os
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from fastapi import HTTPException
 
-load_dotenv()
+# Enforce override to bust the cache when restarting WSL
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"), override=True)
 
 # Use Postgres connection string from ENV
 # Fallback to sqlite if postgres is not provided (for local testing without docker)

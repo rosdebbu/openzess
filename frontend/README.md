@@ -122,6 +122,7 @@ To truly make this a next-generation robotics platform, here are our planned imp
 
 ### Phase 2: Agent Autonomy & AI UX
 - [ ] **Agentic Console Window:** A dedicated split-pane view (refer to the mockup above) where users can issue natural language commands directly to the `agent.py` backend (e.g., *"Pick up the red cube and place it softly"*).
+- [ ] **J.A.R.V.I.S Voice Integration:** Implement the Web Speech API (or OpenAI Whisper) on the frontend so you can dictact voice commands directly from your phone's microphone to open files, close apps, and control the system hands-free!
 - [ ] **Auto-Generated Action Logs:** Real-time logging of the AI agent's internal "thought process," parsed cleanly using markdown formatting.
 
 ### Phase 3: Hardware Tuning & Extensibility
