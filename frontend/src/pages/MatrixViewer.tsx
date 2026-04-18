@@ -7,6 +7,7 @@ export default function MatrixViewer() {
   const rfbRef = useRef<any>(null);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
   const [isSystemActive, setIsSystemActive] = useState(false);
+  const [vncPassword, setVncPassword] = useState('openzess');
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -20,7 +21,7 @@ export default function MatrixViewer() {
       setStatus('connecting');
       // Connect to the websockify proxy which hits X11VNC port 5900 natively inside WSL
       rfb = new RFB(containerRef.current, 'ws://localhost:6080', {
-        credentials: { password: '' }
+        credentials: { password: vncPassword }
       });
 
       rfbRef.current = rfb;
@@ -62,7 +63,15 @@ export default function MatrixViewer() {
         </h1>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Power</span>
+            <input 
+              type="password"
+              placeholder="Matrix Passcode"
+              className="bg-neutral-200 dark:bg-neutral-800 text-sm text-brand outline-none w-32 px-3 py-1 rounded-md placeholder:text-neutral-500 focus:ring-1 ring-brand/50 transition-shadow"
+              value={vncPassword}
+              onChange={(e) => setVncPassword(e.target.value)}
+              disabled={isSystemActive}
+            />
+            <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400 ml-2">Power</span>
             <button 
               onClick={() => setIsSystemActive(!isSystemActive)}
               className={`w-12 h-6 rounded-full p-1 transition-colors ${isSystemActive ? 'bg-brand' : 'bg-neutral-300 dark:bg-neutral-700'}`}

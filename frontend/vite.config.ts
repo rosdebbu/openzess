@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    electron({
+    /* electron({
       main: {
         entry: 'electron/main.ts',
       },
@@ -15,6 +15,6 @@ export default defineConfig({
         input: 'electron/preload.ts',
       },
       renderer: {},
-    }),
+    }), */
   ],
 })

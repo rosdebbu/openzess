@@ -32,8 +32,7 @@ export default function Sidebar() {
         { name: 'Channels', icon: <Radio size={18} />, path: '/channels' },
         { name: 'Sessions', icon: <Users size={18} />, path: '/sessions' },
         { name: 'Task Center', icon: <CalendarClock size={18} />, path: '/cron-jobs' },
-        { name: 'Matrix Viewer', icon: <Monitor size={18} />, path: '/matrix' },
-        { name: 'Heartbeat', icon: <Activity size={18} />, path: '/heartbeat' },
+        { name: 'Matrix Viewer', icon: <Monitor size={18} />, path: '/matrix' }
       ]
     },
     {

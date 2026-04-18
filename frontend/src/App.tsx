@@ -12,7 +12,6 @@ import MemoryVault from './pages/Memory';
 import Skills from './pages/Skills';
 import Channels from './pages/Channels';
 import CronJobs from './pages/CronJobs';
-import Heartbeat from './pages/Heartbeat';
 import MCP from './pages/MCP';
 import Changelog from './pages/Changelog';
 import Companion from './pages/Companion';
@@ -43,7 +42,6 @@ function AnimatedRoutes({ persona }: { persona: string }) {
           
           <Route path="/channels" element={<PageTransition><Channels /></PageTransition>} />
           <Route path="/cron-jobs" element={<PageTransition><CronJobs /></PageTransition>} />
-          <Route path="/heartbeat" element={<PageTransition><Heartbeat /></PageTransition>} />
           <Route path="/matrix" element={<PageTransition><MatrixViewer /></PageTransition>} />
           <Route path="/debate" element={<PageTransition><DebateArena /></PageTransition>} />
           

@@ -92,6 +92,26 @@ The server will start on `http://localhost:5173` (by default) with fast HMR enab
 
 ---
 
+## ☁️ Cloud Deployment Strategies
+
+It is absolutely possible to make the Matrix View accessible online from anywhere in the world! Since you are exposing a raw desktop connection and robotics hardware, Openzess provides two supported methods to go online securely:
+
+### 1. The Quick Way: Cloud Tunnels (Ngrok / Cloudflare)
+If you just want to access your local machine's Matrix from your phone or a laptop at a coffee shop, you can use a secure tunnel.
+
+* **How it works:** You run a free tool like Ngrok on Windows, which generates a public URL (e.g., `https://my-robot.ngrok-free.app`). 
+* Because the Matrix relies on WebSockets on port `6080`, you would simply tell Ngrok to forward that port: `ngrok http 6080`.
+* You then update your React Frontend to connect to `ws://my-robot.ngrok-free.app` instead of `ws://localhost:6080`!
+
+### 2. The Production Way: Cloud Virtual Machines (AWS / DigitalOcean)
+If you want the Openzess system running 24/7 independently of your local computer:
+
+* You rent an Ubuntu server (Droplet/EC2) in the cloud.
+* You drop the entire Openzess folder onto the server and just run the exact same `start_wsl.sh` script! (Since Cloud servers *are* natively Linux, the script works perfectly).
+* You would then access the server's public IP address via your local browser.
+
+---
+
 ## 💡 Ideas for Implementation (Next Steps)
 
 To truly make this a next-generation robotics platform, here are our planned implementation ideas and roadmap milestones for the frontend:
