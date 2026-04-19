@@ -4,6 +4,14 @@ echo "    Starting Openzess WSL Sandbox Matrix     "
 echo "=============================================="
 
 # 1. Start Xvfb: The Invisible Linux Monitor
+echo "[Sys] Cleaning up any previous ghost displays..."
+pkill -9 -f Xvfb > /dev/null 2>&1 || true
+pkill -9 -f fluxbox > /dev/null 2>&1 || true
+pkill -9 -f x11vnc > /dev/null 2>&1 || true
+pkill -9 -f websockify > /dev/null 2>&1 || true
+rm -f /tmp/.X99-lock /tmp/.X11-unix/X99 > /dev/null 2>&1 || true
+sleep 1
+
 export DISPLAY=:99
 Xvfb :99 -screen 0 1280x800x24 -ac -nolisten tcp &
 XVFB_PID=$!
@@ -17,11 +25,7 @@ fluxbox -display :99 > /dev/null 2>&1 &
 FLUX_PID=$!
 echo "[Sys] Window Manager (fluxbox) active (PID: $FLUX_PID)"
 
-# 4. Start X11VNC to allow the user to spy on the matrix visually!
-x11vnc -display :99 -forever -shared -bg -usepw -rfbauth ~/.vnc/passwd -quiet
-echo "[Sys] VNC Server active on internal WSL port 5900 (SECURED VIA PASSWORD). You can connect via Windows!"
 
-# (Websockify moved down after Python env activation)
 
 echo "[Sys] Booting Python Ecosystem..."
 # Construct VENV natively in Linux home directory (/home/user/) to bypass brutal /mnt/c/ IO speed bottlenecks
@@ -37,14 +41,6 @@ pip install fastapi uvicorn litellm chromadb duckduckgo-search beautifulsoup4 mc
 
 # Removed CRLF fix that caused massive file I/O bottleneck
 
-# Boot Websockify (now inside venv so it works!)
-if [ ! -d ~/.novnc ]; then
-    echo "[Sys] Fetching noVNC client for browser viewer..."
-    git clone https://github.com/novnc/noVNC.git ~/.novnc
-fi
-websockify --web ~/.novnc 6080 localhost:5900 &
-WEBSOCKIFY_PID=$!
-echo "[Sys] Websockify Proxy active on ws://localhost:6080"
 
 # Boot Backend
 cd backend
@@ -70,6 +66,6 @@ echo "   Connect to Web UI from Windows host. "
 echo "=============================================="
 
 # Keep alive and catch Ctrl+C to clean everything up
-trap "echo 'Shutting down sandbox...'; kill $XVFB_PID $FLUX_PID $WEBSOCKIFY_PID $BACKEND_PID $FRONTEND_PID; pkill x11vnc; exit" SIGINT SIGTERM
+trap "echo 'Shutting down sandbox...'; kill $XVFB_PID $FLUX_PID $BACKEND_PID $FRONTEND_PID; exit" SIGINT SIGTERM
 
 wait

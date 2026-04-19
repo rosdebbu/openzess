@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +18,10 @@ import uuid
 import shutil
 import tavern_parser
 from swarm_manager import swarm_manager
+import mss
+import pyautogui
+from PIL import Image
+import asyncio
 
 app = FastAPI()
 
@@ -797,6 +801,92 @@ async def upload_note_image(file: UploadFile = File(...)):
         return {"url": f"http://localhost:8000/uploads/{unique_filename}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ================================
+# NATIVE MATRIX STREAM (Replaces VNC)
+# ================================
+@app.websocket("/api/matrix/stream")
+async def matrix_stream(websocket: WebSocket):
+    await websocket.accept()
+    
+    # We will run the screen capture in a loop at ~15fps
+    fps = 15
+    frame_delay = 1.0 / fps
+    sct = mss.mss()
+    
+    try:
+        # Since Xvfb uses a fixed virtual monitor, we grab monitor 0 or 1
+        # Usually monitor 1 is the main display in mss if it exists
+        monitor = sct.monitors[0]
+        
+        async def send_frames():
+            while True:
+                # Grab a raw screenshot from the Xvfb sandbox display
+                sct_img = sct.grab(monitor)
+                # Convert raw pixels to a PIL Image (RGB format)
+                img = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
+                
+                # Compress into a fast JPEG byte buffer
+                buffer = io.BytesIO()
+                # Use medium quality and optimization for faster websocket speeds
+                img.save(buffer, format="JPEG", quality=65, optimize=True)
+                
+                # Send binary data directly over websocket
+                await websocket.send_bytes(buffer.getvalue())
+                await asyncio.sleep(frame_delay)
+                
+        async def receive_Input():
+            while True:
+                data = await websocket.receive_text()
+                try:
+                    payload = json.loads(data)
+                    action = payload.get("action")
+                    if action == "click":
+                        # The frontend will send relative percentages (0.0 to 1.0) because 
+                        # the UI image will scale responsively. We multiply by native screen size.
+                        x_pct = payload.get("x", 0.5)
+                        y_pct = payload.get("y", 0.5)
+                        
+                        native_x = int(x_pct * monitor["width"])
+                        native_y = int(y_pct * monitor["height"])
+                        
+                        # Use PyAutoGUI to click directly inside the invisible sandbox!
+                        pyautogui.click(x=native_x, y=native_y)
+                        
+                    elif action == "type":
+                        text = payload.get("text", "")
+                        if text:
+                            # Use tiny intervals to be safe on Xvfb
+                            pyautogui.write(text, interval=0.01)
+                            
+                    elif action == "key":
+                        key = payload.get("key", "")
+                        # E.g., 'enter', 'backspace'
+                        if key:
+                            pyautogui.press(key)
+                            
+                except Exception as e:
+                    print(f"[Matrix] Error processing input: {e}")
+                    
+        # Run both tasks concurrently
+        stream_task = asyncio.create_task(send_frames())
+        input_task = asyncio.create_task(receive_Input())
+        
+        # Wait until either one crashes/disconnects
+        done, pending = await asyncio.wait(
+            [stream_task, input_task],
+            return_when=asyncio.FIRST_COMPLETED
+        )
+        
+        for task in pending:
+            task.cancel()
+            
+    except WebSocketDisconnect:
+        print("[Matrix] Viewer disconnected.")
+    except Exception as e:
+        print(f"[Matrix] Stream Error: {e}")
+    finally:
+        pass
 
 if __name__ == "__main__":
     import uvicorn

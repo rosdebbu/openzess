@@ -11,7 +11,7 @@ genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 # Create a basic model instance (using gemini-2.5-flash which is great for fast text and code)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-def start():
+def start():r
     print("Welcome to openzess - Step 0 (Gemini Version)!")
     user_input = input("Say hello to your AI: ")
     

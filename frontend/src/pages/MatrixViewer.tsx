@@ -1,59 +1,83 @@
-import React, { useEffect, useRef, useState } from 'react';
-import RFB from '@novnc/novnc';
+import React, { useEffect, useRef, useState, MouseEvent } from 'react';
 import { Monitor, Wifi, WifiOff } from 'lucide-react';
 
 export default function MatrixViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const rfbRef = useRef<any>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
   const [isSystemActive, setIsSystemActive] = useState(false);
-  const [vncPassword, setVncPassword] = useState('openzess');
+  const [imgSrc, setImgSrc] = useState<string>('');
+  
+  // Clean up object URLs to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (imgSrc) URL.revokeObjectURL(imgSrc);
+    };
+  }, [imgSrc]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
     if (!isSystemActive) {
        setStatus('disconnected');
        return;
     }
 
-    let rfb: any = null;
-    try {
-      setStatus('connecting');
-      // Connect to the websockify proxy which hits X11VNC port 5900 natively inside WSL
-      rfb = new RFB(containerRef.current, 'ws://localhost:6080', {
-        credentials: { password: vncPassword }
+    setStatus('connecting');
+    const wsUrl = `ws://${window.location.hostname}:8000/api/matrix/stream`;
+    const ws = new WebSocket(wsUrl);
+    ws.binaryType = 'blob'; // Receive fast binary data
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      setStatus('connected');
+    };
+
+    ws.onmessage = (event) => {
+      // Create an ultra-fast temporary URL for the JPEG stream
+      const url = URL.createObjectURL(event.data);
+      setImgSrc(prevSrc => {
+        if (prevSrc) URL.revokeObjectURL(prevSrc); // Clean old frame
+        return url;
       });
+    };
 
-      rfbRef.current = rfb;
-      
-      rfb.addEventListener('connect', () => {
-        setStatus('connected');
-      });
-
-      rfb.addEventListener('disconnect', (e: any) => {
-        console.error("VNC disconnected", e);
-        setStatus('disconnected');
-        // Auto turn off if disconnected unexpectedly
-        setIsSystemActive(false);
-      });
-
-      // Allow the screen to resize to fit the layout flawlessly
-      rfb.scaleViewport = true;
-      rfb.resizeSession = true;
-
-    } catch (err) {
-      console.error(err);
+    ws.onclose = () => {
       setStatus('disconnected');
       setIsSystemActive(false);
-    }
+    };
+
+    ws.onerror = (error) => {
+      console.error("Matrix WS Error: ", error);
+      setStatus('disconnected');
+      setIsSystemActive(false);
+    };
 
     return () => {
-      if (rfb) {
-        rfb.disconnect();
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+        ws.close();
       }
-      rfbRef.current = null;
+      wsRef.current = null;
     };
   }, [isSystemActive]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+    if (!imgRef.current) return;
+    
+    // Calculate precise relative percentages for responsive scaling
+    const rect = imgRef.current.getBoundingClientRect();
+    const xPct = (e.clientX - rect.left) / rect.width;
+    const yPct = (e.clientY - rect.top) / rect.height;
+    
+    // Bounds check to ensure we only click inside the screen
+    if (xPct >= 0 && xPct <= 1 && yPct >= 0 && yPct <= 1) {
+      wsRef.current.send(JSON.stringify({
+        action: 'click',
+        x: xPct,
+        y: yPct
+      }));
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full bg-neutral-100 dark:bg-neutral-900 overflow-hidden relative">
@@ -63,15 +87,7 @@ export default function MatrixViewer() {
         </h1>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <input 
-              type="password"
-              placeholder="Matrix Passcode"
-              className="bg-neutral-200 dark:bg-neutral-800 text-sm text-brand outline-none w-32 px-3 py-1 rounded-md placeholder:text-neutral-500 focus:ring-1 ring-brand/50 transition-shadow"
-              value={vncPassword}
-              onChange={(e) => setVncPassword(e.target.value)}
-              disabled={isSystemActive}
-            />
-            <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400 ml-2">Power</span>
+            <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400 ml-2">Stream Power</span>
             <button 
               onClick={() => setIsSystemActive(!isSystemActive)}
               className={`w-12 h-6 rounded-full p-1 transition-colors ${isSystemActive ? 'bg-brand' : 'bg-neutral-300 dark:bg-neutral-700'}`}
@@ -136,7 +152,7 @@ export default function MatrixViewer() {
                                      <span className="text-red-400">Websockify / Xvfb Not Responding</span>
                                  </div>
                                  <div className="mt-4 pt-4 border-t border-white/10 text-brand font-bold">
-                                     {"->"} Ensure backend proxy at ws://localhost:6080 is actively running.
+                                     {"->"} Ensure the Python Ecosystem is actively running in your sandbox!
                                  </div>
                              </div>
                          )}
@@ -144,8 +160,17 @@ export default function MatrixViewer() {
                  </div>
              )}
 
-             {/* The raw canvas injector */}
-             <div ref={containerRef} className="w-full h-full" style={{ outline: 'none' }} />
+             {/* The native custom JPEG WebSocket projector */}
+             {status === 'connected' && imgSrc && (
+                 <img
+                   ref={imgRef}
+                   src={imgSrc}
+                   className="w-full h-full object-contain cursor-crosshair active:scale-[99%] transition-transform duration-75"
+                   onPointerDown={handlePointerDown}
+                   alt="Matrix Stream"
+                   draggable={false}
+                 />
+             )}
         </div>
       </div>
     </div>
