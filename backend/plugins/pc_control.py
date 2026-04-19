@@ -78,50 +78,7 @@ def keyboard_type(text: str, press_enter: bool = False):
 def keyboard_press(key: str):
     try:
         pyautogui.press(key)
+        # You can also use pyautogui.hotkey('ctrl', 'c') etc dynamically if we expose hotkey arrays
         return f"Pressed key: {key}"
     except Exception as e:
         return str(e)
-
-@plugin_registry.register(
-    name="keyboard_hotkey",
-    description="Presses a combination of keys simultaneously (e.g., ['ctrl', 't'] to open a new tab, ['ctrl', 'c'] to copy).",
-    schema_params={
-        "properties": {
-            "keys": {
-                "type": "array",
-                "items": {"type": "string"}
-            }
-        }, 
-        "required": ["keys"]
-    }
-)
-def keyboard_hotkey(keys: list):
-    try:
-        pyautogui.hotkey(*keys)
-        return f"Executed hotkey: {' + '.join(keys)}"
-    except Exception as e:
-        return str(e)
-
-@plugin_registry.register(
-    name="launch_application",
-    description="Launches an application or opens a URL in the default browser. e.g. path='chrome', path='https://google.com'",
-    schema_params={
-        "properties": {
-            "path_or_url": {"type": "string", "description": "The command, app name, or URL to open."}
-        }, 
-        "required": ["path_or_url"]
-    }
-)
-def launch_application(path_or_url: str):
-    import webbrowser
-    import subprocess
-    try:
-        if path_or_url.startswith('http://') or path_or_url.startswith('https://'):
-            webbrowser.open(path_or_url)
-            return f"Opened URL in browser: {path_or_url}"
-        else:
-            # Simple fallback for OS commands like 'chrome' or 'notepad'
-            subprocess.Popen(path_or_url, shell=True)
-            return f"Launched application: {path_or_url}"
-    except Exception as e:
-        return f"Failed to launch: {str(e)}"

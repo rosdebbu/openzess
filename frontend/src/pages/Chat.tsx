@@ -36,8 +36,6 @@ export default function Chat() {
   const isStreamingRef = useRef(false);
   
   const [isListening, setIsListening] = useState(false);
-  const isListeningRef = useRef(false);
-  const autoSubmitRef = useRef(false);
   const recognitionRef = useRef<any>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,61 +140,38 @@ export default function Chat() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
-      recognition.continuous = true; // Stay alive while button is held
+      recognition.continuous = false; // Stops automatically when you pause speaking
       recognition.interimResults = false;
       recognition.lang = 'en-US';
 
-      recognition.onstart = () => { setIsListening(true); isListeningRef.current = true; };
+      recognition.onstart = () => setIsListening(true);
       
       recognition.onresult = (event: any) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
-        }
+        const transcript = event.results[event.results.length - 1][0].transcript;
         setInput(prev => (prev + ' ' + transcript).trim());
       };
 
       recognition.onerror = (event: any) => {
         console.error('Speech recognition error', event.error);
         setIsListening(false);
-        isListeningRef.current = false;
       };
 
-      recognition.onend = () => {
-        setIsListening(false);
-        isListeningRef.current = false;
-        
-        // J.A.R.V.I.S Auto-Submit logic
-        if (autoSubmitRef.current) {
-            autoSubmitRef.current = false;
-            // Delay to allow input state to finalize
-            setTimeout(() => {
-                const submitBtn = document.getElementById('auto-submit-btn');
-                if (submitBtn) submitBtn.click();
-            }, 300);
-        }
-      };
+      recognition.onend = () => setIsListening(false);
 
       recognitionRef.current = recognition;
     }
   }, []);
 
-  const startListen = (e: any) => {
-    e.preventDefault();
-    if (!recognitionRef.current) {
+  const toggleListen = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      if (!recognitionRef.current) {
         alert("Speech Recognition is not supported in this browser. Please use Chrome or Edge.");
         return;
-    }
-    if (!isListeningRef.current) {
-        try { recognitionRef.current.start(); } catch(e) {}
-    }
-  };
-
-  const stopListen = (e: any) => {
-    e.preventDefault();
-    if (isListeningRef.current) {
-        autoSubmitRef.current = true;
-        recognitionRef.current.stop();
+      }
+      try { recognitionRef.current.start(); } catch(e) {}
     }
   };
 
@@ -259,21 +234,12 @@ export default function Chat() {
        if (t.edit_code) allowedTools.push('edit_code');
     } else {
        // Standard Load
-       const p = localStorage.getItem('openzess_provider') || 'gemini';
        if (localStorage.getItem('openzess_tool_term') !== 'false') allowedTools.push('run_terminal_command');
        if (localStorage.getItem('openzess_tool_web') !== 'false') allowedTools.push('search_the_web');
        if (localStorage.getItem('openzess_tool_read') !== 'false') allowedTools.push('read_web_page');
        if (localStorage.getItem('openzess_tool_create') !== 'false') allowedTools.push('create_file');
        if (localStorage.getItem('openzess_tool_readf') !== 'false') allowedTools.push('read_file');
        if (localStorage.getItem('openzess_tool_edit') !== 'false') allowedTools.push('edit_code');
-       
-       // Force PC Control tools into standard agents if they exist in the registry 
-       // to allow JARVIS Chrome control. (Backend plugin_registry automatically exports them if present)
-       allowedTools.push('launch_application');
-       allowedTools.push('keyboard_hotkey');
-       allowedTools.push('keyboard_press');
-       allowedTools.push('keyboard_type');
-       allowedTools.push('mouse_click');
     }
 
     try {
@@ -357,15 +323,9 @@ export default function Chat() {
         }
       }
 
-      // Phase 3 trigger: Electron TTS or Web TTS
-      if (streamedResponse) {
-          if ((window as any).electronAPI) {
-              (window as any).electronAPI.companionSpeak(streamedResponse);
-          } else if ('speechSynthesis' in window) {
-              // Web native Jarvis playback natively strips markdown
-              const utterThis = new SpeechSynthesisUtterance(streamedResponse.replace(/[*_#]/g, ''));
-              window.speechSynthesis.speak(utterThis);
-          }
+      // Phase 3 trigger
+      if (streamedResponse && (window as any).electronAPI) {
+          (window as any).electronAPI.companionSpeak(streamedResponse);
       }
     } catch (error: any) {
       console.error(error);
@@ -744,12 +704,10 @@ export default function Chat() {
                     <Paperclip size={18} />
                   </button>
                   <button 
-                    onPointerDown={startListen}
-                    onPointerUp={stopListen}
-                    onPointerLeave={stopListen}
+                    onClick={toggleListen}
                     disabled={isLoading}
-                    title="Hold to Speak (J.A.R.V.I.S Mode)"
-                    className={`p-2.5 rounded-xl transition-all select-none ${isListening ? 'bg-emerald-500/20 text-emerald-500 animate-pulse scale-110 shadow-lg shadow-emerald-500/20' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
+                    title="Speak Command"
+                    className={`p-2.5 rounded-xl transition-all ${isListening ? 'bg-rose-500/20 text-rose-500 animate-pulse' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
                   >
                     <Mic size={18} />
                   </button>
@@ -786,7 +744,6 @@ export default function Chat() {
                     <Users size={18} />
                   </button>
                   <button 
-                    id="auto-submit-btn"
                     className="bg-brand/90 hover:bg-brand text-white rounded-[10px] w-10 h-10 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ml-1 mt-1 shadow-md shadow-brand/10 active:scale-95"
                     onClick={() => handleSend()} 
                     disabled={!input.trim() || isLoading}
