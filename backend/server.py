@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
@@ -19,6 +20,10 @@ import tavern_parser
 from swarm_manager import swarm_manager
 
 app = FastAPI()
+
+# Ensure uploads directory exists
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,
@@ -776,6 +781,20 @@ async def delete_note(note_id: str):
         if not success:
             raise HTTPException(status_code=404, detail="Note not found")
         return {"status": "deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/notes/upload")
+async def upload_note_image(file: UploadFile = File(...)):
+    try:
+        file_extension = os.path.splitext(file.filename)[1] if file.filename else ".png"
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = os.path.join("uploads", unique_filename)
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        return {"url": f"http://localhost:8000/uploads/{unique_filename}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
