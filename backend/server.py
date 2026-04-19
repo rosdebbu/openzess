@@ -1,6 +1,7 @@
 import os
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Form
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
@@ -19,6 +20,10 @@ import tavern_parser
 from swarm_manager import swarm_manager
 
 app = FastAPI()
+
+# Mount uploads directory for static files
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,
@@ -778,6 +783,66 @@ async def delete_note(note_id: str):
         return {"status": "deleted"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/notes/upload")
+async def upload_note_file(file: UploadFile = File(...)):
+    try:
+        os.makedirs("uploads", exist_ok=True)
+        file_ext = os.path.splitext(file.filename)[1].lower() if file.filename else ""
+        new_filename = f"{uuid.uuid4()}{file_ext}"
+        file_path = os.path.join("uploads", new_filename)
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        file_type = "image" if file_ext in [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"] else "file"
+        
+        return {
+            "url": f"http://localhost:8000/uploads/{new_filename}",
+            "type": file_type,
+            "name": file.filename
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/link-preview")
+async def get_link_preview(url: str):
+    import requests
+    from bs4 import BeautifulSoup
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        response = requests.get(url, headers=headers, timeout=5)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        title = soup.find("meta", property="og:title")
+        title = title["content"] if title else soup.title.string if soup.title else url
+        
+        description = soup.find("meta", property="og:description")
+        description = description["content"] if description else ""
+        if not description:
+            desc_tag = soup.find("meta", attrs={"name": "description"})
+            description = desc_tag["content"] if desc_tag else ""
+            
+        image = soup.find("meta", property="og:image")
+        image = image["content"] if image else ""
+        # Handle relative image URLs
+        if image and image.startswith('/'):
+            from urllib.parse import urljoin
+            image = urljoin(url, image)
+            
+        site_name = soup.find("meta", property="og:site_name")
+        site_name = site_name["content"] if site_name else ""
+            
+        return {
+            "title": title,
+            "description": description[:150] + "..." if len(description) > 150 else description,
+            "image": image,
+            "url": url,
+            "siteName": site_name
+        }
+    except Exception as e:
+        # Fallback to returning just the URL data if fetch fails
+        return {"url": url, "title": url, "description": "", "image": "", "siteName": ""}
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Plus, Save, Trash2, Edit3, Eye, Calendar, Tag, ChevronRight, Hash } from 'lucide-react';
+import { BookOpen, Plus, Save, Trash2, Edit3, Eye, Calendar, Tag, ChevronRight, Hash, Paperclip } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useToast } from '../contexts/ToastContext';
@@ -14,6 +14,40 @@ interface Note {
   updated_at: string;
 }
 
+const LinkPreview = ({ href, children }: any) => {
+  const [data, setData] = useState<any>(null);
+  
+  useEffect(() => {
+    if (href && href.startsWith('http')) {
+      fetch(`http://localhost:8000/api/link-preview?url=${encodeURIComponent(href)}`)
+        .then(res => res.json())
+        .then(setData)
+        .catch(() => {});
+    }
+  }, [href]);
+
+  if (data && data.title && data.title !== href && children && children[0] === href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="block my-6 no-underline">
+        <div className="flex bg-white dark:bg-[#0a0a0c] border border-neutral-200 dark:border-white/10 rounded-2xl overflow-hidden hover:border-brand/40 dark:hover:border-brand/40 transition-colors shadow-lg max-w-2xl group">
+          {data.image && (
+            <div className="w-32 sm:w-48 shrink-0 bg-neutral-100 dark:bg-black/50 border-r border-neutral-200 dark:border-white/5 overflow-hidden">
+              <img src={data.image} alt={data.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+          )}
+          <div className="p-5 flex flex-col justify-center">
+            <div className="text-xs text-brand font-bold mb-1 uppercase tracking-wider">{data.siteName || new URL(href).hostname}</div>
+            <div className="font-bold text-neutral-900 dark:text-neutral-100 line-clamp-1 mb-2 text-lg" style={{ fontFamily: "'Outfit', sans-serif" }}>{data.title}</div>
+            <div className="text-sm text-neutral-500 line-clamp-2 leading-relaxed">{data.description}</div>
+          </div>
+        </div>
+      </a>
+    );
+  }
+
+  return <a href={href} target="_blank" rel="noopener noreferrer" className="text-brand hover:text-brand-hover underline">{children}</a>;
+};
+
 export default function KnowledgeBase() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [activeNote, setActiveNote] = useState<Note | null>(null);
@@ -23,6 +57,47 @@ export default function KnowledgeBase() {
   const [editCategory, setEditCategory] = useState('General');
   const [searchTerm, setSearchTerm] = useState('');
   const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      showToast("Uploading attachment...", "info");
+      const res = await fetch('http://localhost:8000/api/notes/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      
+      const markdownSnip = data.type === 'image' 
+        ? `\n![${data.name}](${data.url})\n`
+        : `\n[📥 Download ${data.name}](${data.url})\n`;
+        
+      setEditContent(prev => prev + markdownSnip);
+      showToast("Attachment processed successfully", "success");
+    } catch (err) {
+      showToast("Failed to upload attachment", "error");
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!isEditing) return;
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    if (!isEditing) return;
+    if (e.clipboardData.files && e.clipboardData.files.length > 0) {
+      e.preventDefault();
+      handleFileUpload(e.clipboardData.files[0]);
+    }
+  };
 
   const fetchNotes = async () => {
     try {
@@ -229,6 +304,14 @@ export default function KnowledgeBase() {
               <div className="flex items-center gap-2">
                 {isEditing && (
                   <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-white/5 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 px-4 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 border border-neutral-200 dark:border-white/10 shadow-sm"
+                  >
+                    <Paperclip size={16} /> Attach Media
+                  </button>
+                )}
+                {isEditing && (
+                  <button 
                     onClick={handleSave}
                     className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
                   >
@@ -261,17 +344,31 @@ export default function KnowledgeBase() {
                         className="bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 focus:border-brand px-3 py-1.5 rounded-lg text-sm font-mono focus:outline-none text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400 w-64 transition-colors"
                       />
                     </div>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden" 
+                      onChange={(e) => e.target.files && e.target.files.length > 0 && handleFileUpload(e.target.files[0])} 
+                    />
                     <textarea 
-                      placeholder="Initiate brain dump process...\n\nMarkdown supported (Use ``` for code blocks, ## for headers)..."
+                      placeholder="Initiate brain dump process...\n\nMarkdown supported (Use ``` for code blocks, ## for headers). Drag and drop files or images here, or use the Attach Media button..."
                       value={editContent}
                       onChange={e => setEditContent(e.target.value)}
-                      className="w-full flex-1 min-h-[500px] bg-transparent border-none focus:outline-none text-neutral-800 dark:text-neutral-200 resize-none text-base leading-loose placeholder:text-neutral-300 dark:placeholder:text-neutral-800 font-mono mt-4"
+                      onDrop={handleDrop}
+                      onDragOver={e => e.preventDefault()}
+                      onPaste={handlePaste}
+                      className="w-full flex-1 min-h-[500px] bg-transparent border-none focus:outline-none text-neutral-800 dark:text-neutral-200 resize-none text-base leading-loose placeholder:text-neutral-300 dark:placeholder:text-neutral-800 font-mono mt-4 custom-scrollbar p-2 rounded-xl transition-colors ring-0 focus-visible:ring-0"
                     />
                   </motion.div>
                 ) : (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="prose dark:prose-invert prose-lg max-w-none prose-headings:font-bold prose-a:text-brand prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-neutral-800 prose-pre:shadow-xl prose-pre:rounded-2xl pb-32">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="prose dark:prose-invert prose-lg max-w-none prose-headings:font-bold prose-headings:font-outfit prose-a:text-brand prose-pre:bg-[#0a0a0c] prose-pre:border prose-pre:border-neutral-800 prose-pre:shadow-xl prose-pre:rounded-2xl prose-img:rounded-2xl border-none prose-img:shadow-lg prose-img:border prose-img:border-neutral-200 dark:prose-img:border-neutral-800 pb-32">
                     <h1 style={{ fontFamily: "'Outfit', sans-serif" }} className="text-5xl mb-8 pb-8 border-b border-neutral-200 dark:border-white/10">{activeNote?.title}</h1>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        a: LinkPreview
+                      }}
+                    >
                       {activeNote?.content || '*Empty canvas.*'}
                     </ReactMarkdown>
                   </motion.div>
