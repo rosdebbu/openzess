@@ -137,19 +137,10 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
       <BrowserRouter>
-        <div 
-          className="h-screen w-screen relative overflow-hidden flex items-center justify-center transition-colors duration-500"
-          style={{ 
-            backgroundImage: "url('https://images.unsplash.com/photo-1542273917363-3b1817f69a56?q=80&w=2670&auto=format&fit=crop')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundColor: "#e0e5ec", 
-            backgroundBlendMode: "overlay" 
-          }}
-        >
+        <div className="w-full h-full relative overflow-hidden flex flex-col bg-white dark:bg-neutral-900 transition-colors duration-500">
           
           {/* Main Floating Application Container */}
-          <div className="relative z-10 w-[96vw] h-[94vh] max-w-[1600px] flex flex-col bg-white dark:bg-neutral-900 shadow-[0_8px_40px_rgba(0,0,0,0.12)] rounded-[20px] border border-white/50 dark:border-white/10 overflow-hidden">
+          <div className="relative z-10 w-full h-full flex flex-col bg-white dark:bg-neutral-900 overflow-hidden">
             
             {/* Global Header */}
             <header className="h-[64px] shrink-0 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between px-6 bg-white dark:bg-neutral-900">
@@ -164,7 +155,7 @@ function App() {
                 <a href="/changelog" className="hover:text-brand transition-colors">Changelog</a>
                 <a href="#" className="hover:text-brand transition-colors">Doc</a>
                 <a href="#" className="hover:text-brand transition-colors">FAQ</a>
-                <a href="#" className="hover:text-brand transition-colors">GitHub</a>
+                <a href="https://github.com/rosdebbu/openzess" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">GitHub</a>
                 <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-2"></div>
                 <button className="hover:text-brand flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded text-xs">
                   En

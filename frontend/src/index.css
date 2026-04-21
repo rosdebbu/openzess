@@ -29,9 +29,13 @@
 
 @layer base {
   body {
-    @apply antialiased font-sans h-screen flex justify-center items-center overflow-hidden transition-colors duration-500 text-neutral-900 dark:text-neutral-100;
+    @apply antialiased font-sans h-screen w-screen m-0 p-0 overflow-hidden transition-colors duration-500 text-neutral-900 dark:text-neutral-100;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  
+  #root {
+    @apply w-full h-full m-0 p-0;
   }
   
   h1, h2, h3, h4, h5, h6 {

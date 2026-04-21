@@ -32,7 +32,7 @@ const DEFAULT_SERVERS: MCPServerInfo[] = [
      icon: '✨', 
      command: 'npx',
      args: ['@_davideast/stitch-mcp', 'proxy'],
-     env: { 'STITCH_API_KEY': 'AQ.Ab8RN6KRzbLyIT2zc48IuWgzk9kL9KROPANPISoMsIUhmpT1pQ' } 
+     env: { 'STITCH_API_KEY': import.meta.env?.VITE_STITCH_API_KEY || '' } 
   },
 ];
 
