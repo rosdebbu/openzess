@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play, FileText } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play, FileText, Plus, Image } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -29,6 +29,7 @@ export default function Chat() {
   const [useSwarm, setUseSwarm] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [zenMode, setZenMode] = useState(false);
+  const [isPlusMenuOpen, setIsPlusMenuOpen] = useState(false);
   
   const [activeArtifact, setActiveArtifact] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -39,6 +40,20 @@ export default function Chat() {
   const recognitionRef = useRef<any>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const plusMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (plusMenuRef.current && !plusMenuRef.current.contains(event.target as Node)) {
+        setIsPlusMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
           const file = e.target.files[0];
@@ -188,7 +203,13 @@ export default function Chat() {
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: textToSend };
     setMessages(prev => [...prev, userMessage]);
-    if (!suggestedText) setInput('');
+    if (!suggestedText) {
+       setInput('');
+       setTimeout(() => {
+           const tas = document.querySelectorAll('textarea');
+           tas.forEach(ta => ta.style.height = 'auto');
+       }, 10);
+    }
     setIsLoading(true);
     isStreamingRef.current = true;
     setPendingCalls(null);
@@ -645,17 +666,15 @@ export default function Chat() {
                 </motion.div>
               ))}
               {isLoading && !pendingCalls && (
-                <div className="flex max-w-[85%] self-start pl-4">
-                   <div className="flex gap-4">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand to-brand-hover shrink-0 flex items-center justify-center shadow-lg shadow-brand/20 mt-1">
-                        <span className="text-white font-black text-xs">O</span>
+                <div className="flex max-w-full lg:max-w-[90%] gap-4 w-full">
+                   <div className="flex-shrink-0 mt-1 hidden md:block">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+                         <Sparkles size={14} className="animate-spin" style={{ animationDuration: '3s' }} />
                       </div>
-                      <div className="p-4 rounded-2xl bg-transparent">
-                          <div className="flex gap-1.5 px-2">
-                            <div className="w-1.5 h-1.5 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '-0.32s' }}></div>
-                            <div className="w-1.5 h-1.5 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '-0.16s' }}></div>
-                            <div className="w-1.5 h-1.5 bg-neutral-500 rounded-full animate-bounce"></div>
-                          </div>
+                   </div>
+                   <div className="flex flex-col gap-1 w-full min-w-0 pr-10">
+                      <div className="relative group/bubble pt-1 pb-2 text-neutral-800 dark:text-neutral-100 w-full prose dark:prose-invert max-w-none">
+                         <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} className="w-24 h-4 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-[4px] my-2"></motion.div>
                       </div>
                    </div>
                 </div>
@@ -694,7 +713,7 @@ export default function Chat() {
               </motion.div>
           ) : (
             <div className="w-full max-w-4xl bg-[#f0f4f9] dark:bg-[#1e1f20] border border-transparent rounded-[2rem] flex items-end p-2 md:p-3 transition-all focus-within:bg-white dark:focus-within:bg-[#2a2b2e] focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.05)] dark:focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.3)] focus-within:border-neutral-200 dark:focus-within:border-neutral-700/50 relative z-20">
-              <div className="flex gap-1.5 mb-[3px] shrink-0 pl-1 mr-2">
+              <div ref={plusMenuRef} className="relative flex gap-1.5 mb-[3px] shrink-0 pl-1 mr-2">
                   <input 
                       type="file" 
                       ref={fileInputRef} 
@@ -703,19 +722,61 @@ export default function Chat() {
                       multiple 
                   />
                   <button 
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => setIsPlusMenuOpen(!isPlusMenuOpen)}
                     disabled={isLoading}
-                    title="Attach File"
-                    className="p-2.5 rounded-full transition-colors text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200"
+                    title="Add features"
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isPlusMenuOpen ? 'bg-neutral-200 dark:bg-[#2a2b2e] text-neutral-800 dark:text-neutral-100' : 'bg-transparent text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200'}`}
                   >
-                    <Paperclip size={18} />
+                    <Plus size={20} className={`transition-transform duration-300 ${isPlusMenuOpen ? 'rotate-45' : 'rotate-0'}`} />
                   </button>
+
+                  <AnimatePresence>
+                     {isPlusMenuOpen && (
+                       <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute bottom-12 left-0 w-48 bg-[#f0f4f9] dark:bg-[#1e1f20] rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-700/50 py-2 z-50 overflow-hidden"
+                       >
+                          <button 
+                             onClick={() => { fileInputRef.current?.click(); setIsPlusMenuOpen(false); }}
+                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-200/60 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-200 text-[14px] font-medium transition-colors"
+                          >
+                             <Paperclip size={18} className="text-neutral-500 dark:text-neutral-400" />
+                             <span>Upload files</span>
+                          </button>
+                          
+                          <button 
+                             onClick={() => setIsPlusMenuOpen(false)}
+                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-200/60 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-200 text-[14px] font-medium transition-colors"
+                          >
+                             <Image size={18} className="text-neutral-500 dark:text-neutral-400" />
+                             <span>Photos</span>
+                          </button>
+                          
+                          <button 
+                             onClick={() => {
+                                setInput(prev => prev + '\n```\n// Paste your code here\n```\n');
+                                setIsPlusMenuOpen(false);
+                             }}
+                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-200/60 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-200 text-[14px] font-medium transition-colors"
+                          >
+                             <Code size={18} className="text-neutral-500 dark:text-neutral-400" />
+                             <span>Import code</span>
+                          </button>
+                       </motion.div>
+                     )}
+                  </AnimatePresence>
               </div>
               <textarea
                 className="flex-1 bg-transparent border-none text-neutral-800 dark:text-neutral-200 text-[15px] resize-none py-3 min-h-[48px] max-h-[200px] focus:outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400 leading-relaxed font-sans"
                 placeholder="Ask whatever you'd like..."
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  e.target.style.height = 'auto';
+                  e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
