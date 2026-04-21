@@ -137,9 +137,52 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
       <BrowserRouter>
-        <div className="flex h-screen w-screen bg-neutral-50 dark:bg-neutral-950 font-sans relative overflow-hidden transition-colors duration-500">
-          <div className="ambient-orb"></div>
+        <div 
+          className="h-screen w-screen relative overflow-hidden flex items-center justify-center transition-colors duration-500"
+          style={{ 
+            backgroundImage: "url('https://images.unsplash.com/photo-1542273917363-3b1817f69a56?q=80&w=2670&auto=format&fit=crop')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundColor: "#e0e5ec", 
+            backgroundBlendMode: "overlay" 
+          }}
+        >
           
+          {/* Main Floating Application Container */}
+          <div className="relative z-10 w-[96vw] h-[94vh] max-w-[1600px] flex flex-col bg-white dark:bg-neutral-900 shadow-[0_8px_40px_rgba(0,0,0,0.12)] rounded-[20px] border border-white/50 dark:border-white/10 overflow-hidden">
+            
+            {/* Global Header */}
+            <header className="h-[64px] shrink-0 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between px-6 bg-white dark:bg-neutral-900">
+              <div className="flex items-center gap-3">
+                <div className="font-bold text-xl tracking-tight text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
+                  OpenZess
+                  <span className="text-[10px] text-brand/80 font-medium tracking-normal mt-1">v1.1.0</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-orange-400 ml-1 mt-1"></div>
+                </div>
+              </div>
+              <div className="flex items-center gap-6 text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                <a href="/changelog" className="hover:text-brand transition-colors">Changelog</a>
+                <a href="#" className="hover:text-brand transition-colors">Doc</a>
+                <a href="#" className="hover:text-brand transition-colors">FAQ</a>
+                <a href="#" className="hover:text-brand transition-colors">GitHub</a>
+                <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-2"></div>
+                <button className="hover:text-brand flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded text-xs">
+                  En
+                </button>
+                <button onClick={() => window.dispatchEvent(new Event('toggle-theme-global'))} className="hover:text-brand transition-colors">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                </button>
+              </div>
+            </header>
+
+            {/* Main Split */}
+            <div className="flex flex-1 overflow-hidden relative text-neutral-900 dark:text-neutral-200 bg-[#fbfbfb] dark:bg-neutral-950">
+              <Sidebar />
+              <AnimatedRoutes persona={persona} />
+            </div>
+
+          </div>
+
           {/* Persistent General Settings Modal */}
           <AnimatePresence>
             {showSettings && (
@@ -147,12 +190,12 @@ function App() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 px-4"
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"
               >
                 <motion.div 
                   initial={{ y: 30, opacity: 0, scale: 0.95 }}
                   animate={{ y: 0, opacity: 1, scale: 1 }}
-                  className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-3xl border border-neutral-200 dark:border-white/10 rounded-3xl w-full max-w-4xl premium-shadow flex flex-col overflow-hidden max-h-[90vh]"
+                  className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
                 >
                 <div className="flex border-b border-neutral-200 dark:border-border shrink-0">
                   <button 
@@ -240,7 +283,7 @@ function App() {
                            <label className="block text-sm font-medium mb-3 text-neutral-800 dark:text-neutral-200">Allowed Arsenal (Tools)</label>
                            <div className="grid grid-cols-1 gap-3 shrink-0">
                               
-                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-surface/50 hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
+                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
                                  <div className="flex items-center gap-3">
                                     <TerminalSquare size={18} className={tools.run_terminal_command ? "text-brand" : "text-neutral-400"} />
                                     <div>
@@ -251,7 +294,7 @@ function App() {
                                  <input type="checkbox" checked={tools.run_terminal_command} onChange={(e) => handleToolChange('run_terminal_command', e.target.checked)} className="w-5 h-5 accent-brand" />
                               </label>
 
-                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-surface/50 hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
+                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
                                  <div className="flex items-center gap-3">
                                     <FilePlus size={18} className={tools.create_file ? "text-blue-500" : "text-neutral-400"} />
                                     <div>
@@ -262,7 +305,7 @@ function App() {
                                  <input type="checkbox" checked={tools.create_file} onChange={(e) => handleToolChange('create_file', e.target.checked)} className="w-5 h-5 accent-brand" />
                               </label>
 
-                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-surface/50 hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
+                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
                                  <div className="flex items-center gap-3">
                                     <FileCode2 size={18} className={tools.edit_code ? "text-indigo-500" : "text-neutral-400"} />
                                     <div>
@@ -273,7 +316,7 @@ function App() {
                                  <input type="checkbox" checked={tools.edit_code} onChange={(e) => handleToolChange('edit_code', e.target.checked)} className="w-5 h-5 accent-brand" />
                               </label>
 
-                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-surface/50 hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
+                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
                                  <div className="flex items-center gap-3">
                                     <FileText size={18} className={tools.read_file ? "text-teal-500" : "text-neutral-400"} />
                                     <div>
@@ -284,7 +327,7 @@ function App() {
                                  <input type="checkbox" checked={tools.read_file} onChange={(e) => handleToolChange('read_file', e.target.checked)} className="w-5 h-5 accent-brand" />
                               </label>
                               
-                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-surface/50 hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
+                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
                                  <div className="flex items-center gap-3">
                                     <Globe size={18} className={tools.search_the_web ? "text-emerald-500" : "text-neutral-400"} />
                                     <div>
@@ -295,7 +338,7 @@ function App() {
                                  <input type="checkbox" checked={tools.search_the_web} onChange={(e) => handleToolChange('search_the_web', e.target.checked)} className="w-5 h-5 accent-brand" />
                               </label>
 
-                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-surface/50 hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
+                              <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl border border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface hover:bg-neutral-100 dark:hover:bg-surface transition-colors">
                                  <div className="flex items-center gap-3">
                                     <BookOpen size={18} className={tools.read_web_page ? "text-amber-500" : "text-neutral-400"} />
                                     <div>
@@ -314,9 +357,9 @@ function App() {
                   )}
                 </div>
                 
-                <div className="p-6 border-t border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-surface/30 shrink-0">
+                <div className="p-6 border-t border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface shrink-0">
                   <button 
-                    className="w-full py-3.5 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition-all shadow-lg shadow-brand/20 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.98]"
+                    className="w-full py-3.5 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.98]"
                     onClick={saveConfig}
                     disabled={!apiKey && provider !== 'ollama'}
                   >
@@ -325,13 +368,9 @@ function App() {
                 </div>
               </motion.div>
             </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
 
-          <div className="flex flex-1 relative z-10 w-full h-full text-neutral-900 dark:text-neutral-200 bg-transparent">
-             <Sidebar />
-             <AnimatedRoutes persona={persona} />
-          </div>
         </div>
       </BrowserRouter>
       </ToastProvider>

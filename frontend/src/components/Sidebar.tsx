@@ -1,7 +1,6 @@
-import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import logoUrl from '../assets/seahorse-logo.jpg';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
@@ -14,73 +13,70 @@ export default function Sidebar() {
       setIsCollapsed(e.detail);
     };
     window.addEventListener('toggle-zen-mode', handleZenMode);
-    return () => window.removeEventListener('toggle-zen-mode', handleZenMode);
-  }, []);
+    
+    // Listen for global theme toggle from App header
+    const handleGlobalThemeToggle = () => toggleTheme();
+    window.addEventListener('toggle-theme-global', handleGlobalThemeToggle);
+    
+    return () => {
+        window.removeEventListener('toggle-zen-mode', handleZenMode);
+        window.removeEventListener('toggle-theme-global', handleGlobalThemeToggle);
+    };
+  }, [toggleTheme]);
   
   const navSections = [
-    {
-      title: 'General',
-      items: [
-        { name: 'Active Chat', icon: <MessageSquare size={18} />, path: '/' },
-        { name: 'Warroom Debate', icon: <Swords size={18} />, path: '/debate' },
-        { name: 'CollaborationRoom', icon: <Zap size={18} />, path: '/swarm' }
-      ]
-    },
     {
       title: 'Control',
       items: [
         { name: 'Channels', icon: <Radio size={18} />, path: '/channels' },
         { name: 'Sessions', icon: <Users size={18} />, path: '/sessions' },
-        { name: 'Task Center', icon: <CalendarClock size={18} />, path: '/cron-jobs' },
+        { name: 'Cron Jobs', icon: <CalendarClock size={18} />, path: '/cron-jobs' },
         { name: 'Matrix Viewer', icon: <Monitor size={18} />, path: '/matrix' }
       ]
     },
     {
       title: 'Workspace',
       items: [
-        { name: 'Personal Canvas', icon: <BookOpen size={18} />, path: '/canvas' },
-        { name: 'Memory Vault', icon: <Database size={18} />, path: '/memory' },
         { name: 'Files', icon: <Folder size={18} />, path: '/files' },
         { name: 'Skills', icon: <Wand2 size={18} />, path: '/skills' },
-        { name: 'Ecosystem', icon: <Layers size={18} />, path: '/marketplace' },
         { name: 'Tools', icon: <Wrench size={18} />, path: '/tools' },
         { name: 'MCP', icon: <Zap size={18} />, path: '/mcp' },
-        { name: 'Tavern', icon: <Users size={18} />, path: '/tavern' },
-        { name: 'Companion', icon: <Smile size={18} />, path: '/companion' },
         { name: 'Configuration', icon: <SlidersHorizontal size={18} />, action: () => window.dispatchEvent(new Event('open-settings')) },
       ]
     },
     {
       title: 'Settings',
       items: [
-        { name: 'Agent Memory', icon: <Database size={18} />, path: '/memory' },
-        { name: 'Changelog', icon: <FileText size={18} />, path: '/changelog' },
+        { name: 'Settings & Models', icon: <Database size={18} />, path: '/memory' },
       ]
     }
   ];
 
   return (
-    <div className={`bg-white/50 dark:bg-neutral-950/50 border-r border-neutral-200 dark:border-border shrink-0 flex flex-col h-full backdrop-blur-xl transition-all duration-300 relative z-20 ${isCollapsed ? 'w-[80px]' : 'w-[280px]'}`}>
-      <div className={`p-6 border-b border-neutral-200 dark:border-border pb-4 shrink-0 flex items-center justify-between ${isCollapsed ? 'justify-center px-4' : ''}`}>
-        <h1 className={`text-xl font-bold flex items-center gap-3 tracking-wide overflow-hidden whitespace-nowrap transition-all ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
-          <img src={logoUrl} alt="Openzess Logo" className="w-9 h-9 object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(255,100,100,0.4)] shrink-0" />
-          openzess
-        </h1>
-        {isCollapsed && (
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 shrink-0 flex items-center justify-center">
-                <img src={logoUrl} alt="Openzess Logo" className="w-9 h-9 object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(255,100,100,0.4)]" />
-            </div>
-        )}
-        <button 
-           onClick={() => setIsCollapsed(!isCollapsed)}
-           className="p-1.5 text-neutral-400 hover:text-neutral-900 dark:hover:text-white rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors z-10 hidden sm:block"
-        >
-           {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
+    <div className={`bg-[#fdfdfd] dark:bg-neutral-900 border-r border-neutral-100 dark:border-neutral-800 shrink-0 flex flex-col h-full transition-all duration-300 relative z-20 ${isCollapsed ? 'w-[80px]' : 'w-[260px]'}`}>
+      
+      {/* Current Agent Dropdown Area Inspired by QwenPaw */}
+      <div className={`p-4 border-b border-transparent shrink-0 flex flex-col justify-center ${isCollapsed ? 'items-center px-2' : ''}`}>
+         {!isCollapsed ? (
+             <div className="flex flex-col gap-1 w-full mt-2">
+                 <span className="text-[11px] text-neutral-400 font-medium tracking-wide uppercase px-1 mb-1">Current Agent (2)</span>
+                 <button className="flex items-center justify-between w-full p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors text-sm font-medium text-neutral-800 dark:text-neutral-200">
+                     <div className="flex items-center gap-2">
+                         <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-xs"><Smile size={12}/></div>
+                         Default Agent
+                     </div>
+                     <ChevronDown size={14} className="text-neutral-400" />
+                 </button>
+             </div>
+         ) : (
+             <button className="w-10 h-10 mt-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-xl flex items-center justify-center transition-colors">
+                 <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-500"><Smile size={14}/></div>
+             </button>
+         )}
       </div>
       
       <motion.div 
-        className="flex-1 py-4 px-3 flex flex-col gap-6 overflow-y-auto"
+        className="flex-1 py-2 px-3 flex flex-col gap-6 overflow-y-auto custom-scrollbar"
         initial="hidden"
         animate="visible"
         variants={{
@@ -91,16 +87,29 @@ export default function Sidebar() {
            }
         }}
       >
+        <div className="flex flex-col mb-2">
+           <NavLink 
+                to="/"
+                className={({ isActive }) => `
+                    flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent
+                    ${isActive ? 'bg-[#f0f0f0] dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50'}
+                `}
+            >
+                <span className="shrink-0"><MessageSquare size={16} /></span>
+                {!isCollapsed && <span className="truncate">Chat</span>}
+            </NavLink>
+        </div>
+
         {navSections.map((section) => (
-          <div key={section.title} className="flex flex-col gap-1">
-            <p className={`text-[10px] text-neutral-400 dark:text-neutral-500 mb-2 font-mono uppercase tracking-widest transition-all ${isCollapsed ? 'text-center pl-0' : 'pl-3'}`}>
+          <div key={section.title} className="flex flex-col gap-1.5">
+            <p className={`text-[11px] text-neutral-400 dark:text-neutral-500 mb-1 font-medium tracking-wide ${isCollapsed ? 'text-center pl-0' : 'pl-3'}`}>
                 {isCollapsed ? '—' : section.title}
             </p>
             {section.items.map((item) => (
               <motion.div 
                  key={item.name}
                  variants={{
-                    hidden: { opacity: 0, x: -20 },
+                    hidden: { opacity: 0, x: -10 },
                     visible: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
                  }}
                  title={item.name}
@@ -109,8 +118,8 @@ export default function Sidebar() {
                   <NavLink 
                     to={item.path}
                     className={({ isActive }) => `
-                      flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-xl transition-all duration-300 ease-out font-medium text-sm border-l-2
-                      ${isActive ? 'bg-brand/10 text-brand font-bold border-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.1)]' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100/80 dark:hover:bg-white/5 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'}
+                      flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent
+                      ${isActive ? 'bg-[#f0f0f0] dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-[#fafafa] dark:hover:bg-neutral-800/80'}
                     `}
                   >
                     <span className="shrink-0">{item.icon}</span>
@@ -119,7 +128,7 @@ export default function Sidebar() {
                 ) : (
                   <button 
                     onClick={item.action}
-                    className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-xl transition-all duration-300 ease-out font-medium text-sm border-l-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100/80 dark:hover:bg-white/5 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700`}
+                    className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-[#fafafa] dark:hover:bg-neutral-800/80`}
                   >
                     <span className="shrink-0">{item.icon}</span>
                     {!isCollapsed && <span className="truncate">{item.name}</span>}
@@ -131,23 +140,16 @@ export default function Sidebar() {
         ))}
       </motion.div>
       
-      <div className="p-4 border-t border-neutral-200 dark:border-border flex flex-col gap-2 shrink-0">
-        <button 
-          className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'justify-between px-3'} text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-surface transition-colors py-2.5 w-full text-left rounded-lg text-sm font-medium`}
-          onClick={toggleTheme}
-          title="Toggle Theme"
-        >
-          <span className={`flex items-center ${isCollapsed ? 'gap-0' : 'gap-3'}`}>
-            {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
-            {!isCollapsed && <span>Theme Toggle</span>}
-          </span>
-          {!isCollapsed && (
-              <div className="w-8 h-4 bg-neutral-200 dark:bg-neutral-800 rounded-full relative transition-colors shadow-inner shrink-0">
-                 <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-all duration-300 ${theme === 'dark' ? 'left-[18px] bg-brand' : 'left-[2px]'}`}></div>
-              </div>
-          )}
-        </button>
+      {/* Collapse Bottom Action */}
+      <div className="p-3 border-t border-transparent flex justify-end shrink-0">
+         <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-white rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10 hidden sm:flex items-center justify-center"
+         >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+         </button>
       </div>
+
     </div>
   );
 }
