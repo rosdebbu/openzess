@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +22,8 @@ import WarRoom from './pages/WarRoom';
 import Welcome from './pages/Welcome';
 import KnowledgeBase from './pages/KnowledgeBase';
 import DebateArena from './pages/DebateArena';
+import Doc from './pages/Doc';
+import FAQ from './pages/FAQ';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -54,6 +56,8 @@ function AnimatedRoutes({ persona }: { persona: string }) {
           <Route path="/companion" element={<PageTransition><Companion /></PageTransition>} />
           <Route path="/changelog" element={<PageTransition><Changelog /></PageTransition>} />
           <Route path="/swarm" element={<PageTransition><WarRoom /></PageTransition>} />
+          <Route path="/doc" element={<PageTransition><Doc /></PageTransition>} />
+          <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
         </Routes>
       </AnimatePresence>
     </div>
@@ -152,12 +156,12 @@ function App() {
                 </div>
               </div>
               <div className="flex items-center gap-6 text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                <a href="/changelog" className="hover:text-brand transition-colors">Changelog</a>
-                <a href="#" className="hover:text-brand transition-colors">Doc</a>
-                <a href="#" className="hover:text-brand transition-colors">FAQ</a>
+                <Link to="/changelog" className="hover:text-brand transition-colors">Changelog</Link>
+                <Link to="/doc" className="hover:text-brand transition-colors">Doc</Link>
+                <Link to="/faq" className="hover:text-brand transition-colors">FAQ</Link>
                 <a href="https://github.com/rosdebbu/openzess" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">GitHub</a>
                 <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-2"></div>
-                <button className="hover:text-brand flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded text-xs">
+                <button onClick={() => alert('Language Options (En, Es, Fr, etc.) will be automatically supported in the next module release!')} className="hover:text-brand flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded text-xs">
                   En
                 </button>
                 <button onClick={() => window.dispatchEvent(new Event('toggle-theme-global'))} className="hover:text-brand transition-colors">
