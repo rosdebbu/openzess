@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -439,43 +439,37 @@ export default function Chat() {
   };
 
   return (
-    <div className={`flex flex-1 h-full w-full bg-[#0E1117] transition-all overflow-hidden relative ${zenMode ? 'p-6' : 'p-0'}`}>
-      <div className={`flex flex-col relative h-full transition-all duration-500 ease-in-out shrink-0 ${activeArtifact ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'} ${zenMode ? 'rounded-3xl border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.05)] bg-[#121614]/50 overflow-hidden backdrop-blur-sm scale-[0.98]' : ''}`}>
+    <div className={`flex flex-1 h-full w-full bg-white dark:bg-[#131314] transition-colors duration-500 overflow-hidden relative ${zenMode ? 'p-2 md:p-6' : 'p-0'}`}>
+      <div className={`flex flex-col relative h-full transition-all duration-500 ease-in-out shrink-0 ${activeArtifact ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'} ${zenMode ? 'rounded-2xl border border-neutral-200 dark:border-white/10 shadow-2xl bg-white/50 dark:bg-black/20 overflow-hidden backdrop-blur-xl scale-[0.98]' : ''}`}>
         
-        {/* Top Control Bar (OpenClaw Style) */}
-        <div className={`w-full px-10 pt-6 pb-2 z-30 flex items-center justify-between shrink-0 transition-all ${zenMode ? 'px-12 pt-8' : ''}`}>
+        {/* Modern Clean Header */}
+        <div className={`w-full px-5 pt-5 pb-2 z-30 flex items-center justify-between shrink-0 transition-all ${zenMode ? 'px-8 pt-8' : ''}`}>
             {/* Left Header - Dropdowns */}
-            <div className="flex items-center gap-3">
-               <div className="relative">
-                  <select className="appearance-none bg-[#1A1C23] border border-transparent hover:bg-[#252830] text-neutral-300 text-[13px] font-medium py-2.5 pl-4 pr-10 rounded-[12px] transition-all cursor-pointer focus:outline-none focus:ring-0 min-w-[220px]">
-                     <option>main</option>
+            <div className="flex items-center gap-1">
+               <div className="relative group">
+                  <select className="appearance-none bg-transparent hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-600 dark:text-neutral-300 text-[14px] font-medium py-2 pl-3 pr-8 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-0 min-w-[90px]">
+                     <option>Main</option>
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-200" />
                </div>
+               <div className="w-[1px] h-4 bg-neutral-200 dark:bg-neutral-700/50 mx-1"></div>
                <div className="relative group/select">
-                  <div className="absolute inset-0 bg-transparent border-2 border-emerald-500/50 rounded-[14px] pointer-events-none -m-[1px]" />
                   <select 
-                     className="appearance-none bg-transparent hover:bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.05)] text-neutral-200 text-[13px] font-medium py-2.5 pl-4 pr-10 rounded-[12px] transition-all cursor-pointer focus:outline-none focus:ring-0 min-w-[300px] outline-none"
+                     className="appearance-none bg-transparent hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-600 dark:text-neutral-300 text-[14px] font-medium py-2 pl-3 pr-8 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-0 max-w-[200px] outline-none"
                      defaultValue="gemini-3.1-flash-lite-preview-google"
                   >
-                     <option className="bg-[#0E1117]" value="gemini-3.1-flash-lite-preview-google">gemini-3.1-flash-lite-preview · google</option>
-                     <option className="bg-[#0E1117]" value="gemini-2.5-flash">gemini 2.5 flash</option>
-                     <option className="bg-[#0E1117]" value="openai">openai</option>
-                     <option className="bg-[#0E1117]" value="deepseek">deepseek</option>
-                     <option className="bg-[#0E1117]" value="mistral-ai">mistral AI</option>
-                     <option className="bg-[#0E1117]" value="groq">groq</option>
-                     <option className="bg-[#0E1117]" value="cohere">cohere</option>
-                     <option className="bg-[#0E1117]" value="glm">glm</option>
-                     <option className="bg-[#0E1117]" value="gemma">gemma</option>
-                     <option className="bg-[#0E1117]" value="qwen">qwen</option>
-                     <option className="bg-[#0E1117]" value="kimi">kimi</option>
+                     <option className="bg-white dark:bg-[#131314]" value="gemini-3.1-flash-lite-preview-google">Gemini 3.1 Flash</option>
+                     <option className="bg-white dark:bg-[#131314]" value="gemini-2.5-flash">Gemini 2.5</option>
+                     <option className="bg-white dark:bg-[#131314]" value="openai">OpenAI GPT-4o</option>
+                     <option className="bg-white dark:bg-[#131314]" value="deepseek">DeepSeek</option>
+                     <option className="bg-white dark:bg-[#131314]" value="qwen">Qwen</option>
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none group-hover/select:text-emerald-400 transition-colors" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none group-hover/select:text-neutral-600 dark:group-hover:text-neutral-200 transition-colors" />
                </div>
             </div>
 
             {/* Right Header - Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
                 <button 
                   onClick={() => {
                      setMessages([]);
@@ -485,17 +479,17 @@ export default function Chat() {
                      setSearchParams({ new: 'true' }, { replace: true });
                   }}
                   title="New Chat / Refresh" 
-                  className="w-[42px] h-[42px] rounded-[14px] bg-[#1A1C23] border border-transparent flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#252830] transition-all"
+                  className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
                 >
-                    <RotateCcw size={18} />
+                    <RotateCcw size={16} />
                 </button>
-                <div className="w-[1px] h-6 bg-neutral-800 mx-1"></div>
+                <div className="w-[1px] h-4 bg-neutral-200 dark:bg-neutral-800 mx-1"></div>
                 <button 
                   onClick={() => setShowLogs(!showLogs)}
                   title="Memory Vault / Tool Output" 
-                  className={`w-[42px] h-[42px] rounded-[14px] transition-all group flex items-center justify-center ${showLogs ? 'bg-[#121614] border-2 border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.3)] text-emerald-400' : 'bg-[#121614] border-2 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.1)] text-emerald-500 hover:bg-emerald-500/10'}`}
+                  className={`w-[36px] h-[36px] rounded-full transition-colors group flex items-center justify-center ${showLogs ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10'}`}
                 >
-                    <Brain size={18} className="transition-transform group-hover:scale-110" />
+                    <Brain size={16} />
                 </button>
                 <button 
                   onClick={() => {
@@ -503,26 +497,53 @@ export default function Chat() {
                      setZenMode(newZen);
                      window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
                   }}
-                  title="Focus Mode (Zoom Out)" 
-                  className={`w-[42px] h-[42px] rounded-[14px] transition-all flex items-center justify-center ${zenMode ? 'bg-[#121614] border border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-[#1A1C23] border border-transparent text-neutral-400 hover:text-white hover:bg-[#252830]'}`}
+                  title="Focus Mode" 
+                  className={`w-[36px] h-[36px] rounded-full transition-colors flex items-center justify-center ${zenMode ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10'}`}
                 >
-                    <Focus size={18} />
+                    <Focus size={16} />
                 </button>
                 <button 
                   onClick={() => navigate('/sessions')}
-                  title="View Details / History" 
-                  className="w-[42px] h-[42px] rounded-[14px] bg-[#121614] border-2 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.1)] flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 transition-all group"
+                  title="History" 
+                  className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
                 >
-                    <Clock size={18} className="group-hover:scale-110 transition-transform" />
+                    <Clock size={16} />
                 </button>
             </div>
         </div>
 
         {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-10 relative overflow-hidden pointer-events-none select-none">
-             {/* Emptied state per user request */}
-             <div className="w-16 h-16 bg-neutral-900/50 rounded-full flex items-center justify-center opacity-30 shadow-inner">
-                <Sparkles size={24} className="text-neutral-500" />
+          <div className="flex-1 flex flex-col justify-center p-6 md:p-10 relative overflow-y-auto max-w-4xl mx-auto w-full custom-scrollbar">
+             <div className="mt-auto pb-8 pt-20">
+                <h1 className="text-[44px] md:text-[52px] font-semibold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent pb-2 tracking-tight leading-tight">Hello, {localStorage.getItem('openzess_persona') || 'Developer'}</h1>
+                <p className="text-[32px] md:text-[38px] font-medium text-neutral-400 dark:text-neutral-500 tracking-tight mt-1 leading-tight">How can I help you today?</p>
+             </div>
+             
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full mt-auto">
+                <button onClick={() => setInput("Link and explore this Github repository: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Explore a<br/>GitHub Repository</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                       <Globe size={18} className="text-blue-500" />
+                    </div>
+                </button>
+                <button onClick={() => setInput("Let's brainstorm ideas and analysis for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Brainstorm ideas<br/>& workflow logic</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                       <Brain size={18} className="text-purple-500" />
+                    </div>
+                </button>
+                <button onClick={() => setInput("Analyze the attached PDF report: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Analyze a<br/>PDF report</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                       <FileText size={18} className="text-emerald-500" />
+                    </div>
+                </button>
+                <button onClick={() => setInput("Make a roadmap and workflow for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Make a roadmap<br/>& project workflow</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                       <Code size={18} className="text-orange-500" />
+                    </div>
+                </button>
              </div>
           </div>
         ) : (
@@ -536,23 +557,20 @@ export default function Chat() {
                   className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start ml-2 lg:ml-12'} mb-4`}
                 >
                   {msg.role === 'agent' && (
-                    <div className="flex max-w-[90%] lg:max-w-[75%] gap-4">
-                      {/* Agent Floating Avatar Star */}
-                      <div className="flex-shrink-0 mt-3 hidden md:block">
-                         <div className="w-10 h-10 rounded-[14px] bg-[#1A1C23] border border-white/5 flex items-center justify-center">
-                            <Sparkles size={18} className="text-neutral-400" />
+                    <div className="flex max-w-full lg:max-w-[90%] gap-4 w-full">
+                      {/* Agent Avatar */}
+                      <div className="flex-shrink-0 mt-1 hidden md:block">
+                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+                            <Sparkles size={14} />
                          </div>
                       </div>
-                      <div className="flex flex-col gap-2 w-full">
-                        <div className="relative group/bubble px-6 py-4 rounded-2xl bg-[#1E212A] border border-white/5 text-neutral-300 w-full prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-[#12141A] prose-pre:border prose-pre:border-white/5">
+                      <div className="flex flex-col gap-1 w-full min-w-0 pr-10">
+                        <div className="relative group/bubble pt-1 pb-2 text-neutral-800 dark:text-neutral-100 w-full prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-neutral-50 dark:prose-pre:bg-[#1A1A1E] prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-white/5">
                           <button 
                              onClick={() => handleDeleteMessage(msg.id)}
-                             className="absolute top-3 right-12 z-10 bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white p-1.5 rounded-md opacity-0 group-hover/bubble:opacity-100 transition-all"
+                             className="absolute top-0 -right-10 z-10 text-neutral-400 hover:text-rose-500 p-1.5 rounded-full opacity-0 group-hover/bubble:opacity-100 transition-all bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm"
                           >
                              <X size={12} />
-                          </button>
-                          <button className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-300 opacity-0 group-hover/bubble:opacity-100 transition-opacity bg-[#1A1C23] border border-white/10 p-1 rounded-md">
-                              <span className="text-[11px] font-mono px-2">Copy</span>
                           </button>
                           <ReactMarkdown 
                               remarkPlugins={[remarkGfm]}
@@ -601,14 +619,14 @@ export default function Chat() {
                               {msg.content}
                           </ReactMarkdown>
                         </div>
-                        <div className="flex items-center gap-3 px-2 text-xs text-neutral-500 font-medium">
-                            <span className="text-neutral-400">Assistant</span>
-                            <span>{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                            <span className="flex gap-2">
-                               <span className="text-neutral-600">1.2k ctx</span>
-                               <span className="bg-[#1A1C23] px-2 py-0.5 rounded-full text-brand/70 border border-white/5">
-                                  {localStorage.getItem('openzess_provider') || 'gemini'}
-                               </span>
+                        <div className="flex items-center gap-2 text-[11px] text-neutral-400 font-medium">
+                            <button onClick={() => { navigator.clipboard.writeText(msg.content); setCopiedId(msg.id); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
+                               {copiedId === msg.id ? <CheckCircle2 size={13} className="text-emerald-500" /> : <Copy size={13} />}
+                               {copiedId === msg.id ? 'Copied' : 'Copy'}
+                            </button>
+                            <span className="px-1.5 text-neutral-300 dark:text-neutral-700">•</span>
+                            <span className="bg-neutral-100 dark:bg-white/5 px-1.5 py-0.5 rounded text-neutral-500">
+                               {localStorage.getItem('openzess_provider') || 'Gemini'}
                             </span>
                         </div>
                       </div>
@@ -616,21 +634,10 @@ export default function Chat() {
                   )}
 
                   {msg.role === 'user' && (
-                      <div className="flex items-start gap-4 max-w-[85%] lg:max-w-[70%]">
-                         <div className="flex flex-col items-end gap-1.5 w-full">
-                           {/* Dark Blue Box for User */}
-                           <div className="px-5 py-4 rounded-xl bg-[#1C2B42] text-neutral-300 whitespace-pre-wrap text-[15px] leading-relaxed w-full min-w-[200px]">
+                      <div className="flex items-start gap-3 max-w-[85%] lg:max-w-[65%] ml-auto">
+                         <div className="flex flex-col items-end gap-1 w-full">
+                           <div className="px-5 py-3.5 rounded-[1.5rem] bg-[#f0f4f9] dark:bg-[#1e1f20] text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap text-[15px] leading-relaxed w-full inline-block">
                               {msg.content}
-                           </div>
-                           <div className="flex items-center gap-2 text-[11px] text-neutral-500 font-medium mr-1">
-                              <span>You</span>
-                              <span>{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                           </div>
-                         </div>
-                         {/* User Avatar */}
-                         <div className="flex-shrink-0 mt-2 hidden md:block">
-                           <div className="w-10 h-10 rounded-[14px] bg-[#1C2B42] border border-white/5 flex items-center justify-center">
-                              <div className="w-5 h-5 bg-blue-500/80 rounded-full" />
                            </div>
                          </div>
                       </div>
@@ -658,7 +665,7 @@ export default function Chat() {
           </div>
         )}
 
-        <div className="px-10 pb-8 flex justify-center sticky bottom-0 bg-gradient-to-t from-neutral-50 via-neutral-50 dark:from-neutral-950 dark:via-neutral-950 to-transparent pt-10 shrink-0">
+        <div className="px-4 md:px-10 pb-6 md:pb-8 flex justify-center sticky bottom-0 bg-gradient-to-t from-white via-white dark:from-[#131314] dark:via-[#131314] to-transparent pt-10 shrink-0">
           
           {pendingCalls ? (
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-full max-w-4xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex flex-col p-5 shadow-xl z-20">
@@ -686,8 +693,8 @@ export default function Chat() {
                  </div>
               </motion.div>
           ) : (
-            <div className="w-full max-w-4xl bg-[#1A1C23] border border-neutral-800/80 rounded-[1.5rem] flex items-end p-2 px-3 transition-all focus-within:border-brand/40 shadow-[0_8px_30px_rgb(0,0,0,0.3)] relative z-20">
-              <div className="flex gap-1.5 mb-[3px] shrink-0 pl-1">
+            <div className="w-full max-w-4xl bg-[#f0f4f9] dark:bg-[#1e1f20] border border-transparent rounded-[2rem] flex items-end p-2 md:p-3 transition-all focus-within:bg-white dark:focus-within:bg-[#2a2b2e] focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.05)] dark:focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.3)] focus-within:border-neutral-200 dark:focus-within:border-neutral-700/50 relative z-20">
+              <div className="flex gap-1.5 mb-[3px] shrink-0 pl-1 mr-2">
                   <input 
                       type="file" 
                       ref={fileInputRef} 
@@ -699,30 +706,14 @@ export default function Chat() {
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
                     title="Attach File"
-                    className="p-2.5 rounded-xl transition-all text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300"
+                    className="p-2.5 rounded-full transition-colors text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200"
                   >
                     <Paperclip size={18} />
                   </button>
-                  <button 
-                    onClick={toggleListen}
-                    disabled={isLoading}
-                    title="Speak Command"
-                    className={`p-2.5 rounded-xl transition-all ${isListening ? 'bg-rose-500/20 text-rose-500 animate-pulse' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
-                  >
-                    <Mic size={18} />
-                  </button>
-                  <button 
-                    onClick={handleToolToggle}
-                    disabled={isLoading}
-                    title={useTools ? "Tools: Enabled" : "Tools: Disabled"}
-                    className={`p-2.5 rounded-xl transition-all ${useTools ? 'bg-brand/10 text-brand' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
-                  >
-                    <Terminal size={18} />
-                  </button>
               </div>
               <textarea
-                className="flex-1 bg-transparent border-none text-neutral-200 text-[15px] resize-none px-3 py-3.5 min-h-[50px] max-h-[200px] focus:outline-none placeholder:text-neutral-600 leading-relaxed font-sans"
-                placeholder="Message Agent (Enter to send)"
+                className="flex-1 bg-transparent border-none text-neutral-800 dark:text-neutral-200 text-[15px] resize-none py-3 min-h-[48px] max-h-[200px] focus:outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400 leading-relaxed font-sans"
+                placeholder="Ask whatever you'd like..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -734,17 +725,25 @@ export default function Chat() {
                 disabled={isLoading}
                 rows={1}
               />
-              <div className="flex gap-2 mb-[3px] shrink-0 pr-1">
+              <div className="flex gap-1.5 mb-[3px] shrink-0 pr-1 ml-2">
                   <button 
-                    onClick={() => setUseSwarm(!useSwarm)}
+                    onClick={handleToolToggle}
                     disabled={isLoading}
-                    title="Swarm Mode"
-                    className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${useSwarm ? 'bg-fuchsia-500/10 text-fuchsia-400' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
+                    title={useTools ? "Tools: Enabled" : "Tools: Disabled"}
+                    className={`p-2.5 rounded-full transition-colors ${useTools ? 'text-brand bg-brand/10 dark:text-brand dark:bg-brand/20' : 'text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200'}`}
                   >
-                    <Users size={18} />
+                    <Terminal size={18} />
                   </button>
                   <button 
-                    className="bg-brand/90 hover:bg-brand text-white rounded-[10px] w-10 h-10 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ml-1 mt-1 shadow-md shadow-brand/10 active:scale-95"
+                    onClick={toggleListen}
+                    disabled={isLoading}
+                    title="Speak Command"
+                    className={`p-2.5 rounded-full transition-colors ${isListening ? 'bg-rose-500/20 text-rose-500 animate-pulse' : 'text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200'}`}
+                  >
+                    <Mic size={18} />
+                  </button>
+                  <button 
+                    className="bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ml-1 active:scale-95 shadow-sm"
                     onClick={() => handleSend()} 
                     disabled={!input.trim() || isLoading}
                   >
