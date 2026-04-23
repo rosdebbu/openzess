@@ -35,6 +35,8 @@ export default function Chat() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [lastProcessedMsgId, setLastProcessedMsgId] = useState<string | null>(null);
   const isStreamingRef = useRef(false);
+  const [currentPersonaKey, setCurrentPersonaKey] = useState(() => localStorage.getItem('openzess_persona') || 'architect');
+
   
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -48,9 +50,16 @@ export default function Chat() {
         setIsPlusMenuOpen(false);
       }
     }
+    const handlePersonaChanged = () => {
+      setCurrentPersonaKey(localStorage.getItem('openzess_persona') || 'architect');
+    };
+    
     document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("persona-changed", handlePersonaChanged);
+    
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("persona-changed", handlePersonaChanged);
     };
   }, []);
 
@@ -467,11 +476,11 @@ export default function Chat() {
         <div className={`w-full px-5 pt-5 pb-2 z-30 flex items-center justify-between shrink-0 transition-all ${zenMode ? 'px-8 pt-8' : ''}`}>
             {/* Left Header - Dropdowns */}
             <div className="flex items-center gap-1">
-               <div className="relative group">
-                  <select className="appearance-none bg-transparent hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-600 dark:text-neutral-300 text-[14px] font-medium py-2 pl-3 pr-8 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-0 min-w-[90px]">
-                     <option>Main</option>
-                  </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-200" />
+               <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 dark:bg-white/5 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-[13px] font-medium text-neutral-600 dark:text-neutral-300">
+                     {PERSONAS[currentPersonaKey]?.name || 'Developer'}
+                  </span>
                </div>
                <div className="w-[1px] h-4 bg-neutral-200 dark:bg-neutral-700/50 mx-1"></div>
                <div className="relative group/select">
@@ -536,7 +545,7 @@ export default function Chat() {
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col justify-center p-6 md:p-10 relative overflow-y-auto max-w-4xl mx-auto w-full custom-scrollbar">
              <div className="mt-auto pb-8 pt-20">
-                <h1 className="text-[44px] md:text-[52px] font-semibold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent pb-2 tracking-tight leading-tight">Hello, {localStorage.getItem('openzess_persona') || 'Developer'}</h1>
+                <h1 className="text-[44px] md:text-[52px] font-semibold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent pb-2 tracking-tight leading-tight">Hello, {PERSONAS[currentPersonaKey]?.name || 'Developer'}</h1>
                 <p className="text-[32px] md:text-[38px] font-medium text-neutral-400 dark:text-neutral-500 tracking-tight mt-1 leading-tight">How can I help you today?</p>
              </div>
              
@@ -770,7 +779,7 @@ export default function Chat() {
               </div>
               <textarea
                 className="flex-1 bg-transparent border-none text-neutral-800 dark:text-neutral-200 text-[15px] resize-none py-3 min-h-[48px] max-h-[200px] focus:outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400 leading-relaxed font-sans"
-                placeholder="Ask whatever you'd like..."
+                placeholder={`Ask ${PERSONAS[currentPersonaKey]?.name || "Developer"}...`}
                 value={input}
                 onChange={(e) => {
                   setInput(e.target.value);

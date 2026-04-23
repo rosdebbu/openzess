@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../contexts/ToastContext';
 import { PERSONAS } from '../utils/personas';
 
 export default function Sidebar() {
   const { theme, toggleTheme } = useTheme();
+  const { showToast } = useToast();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ 'Tools': true });
 
@@ -65,12 +67,15 @@ export default function Sidebar() {
   ];
 
   const [showAgentMenu, setShowAgentMenu] = useState(false);
-  const [activeAgentName, setActiveAgentName] = useState(() => localStorage.getItem('openzess_persona') || 'Architect');
+  const [activeAgentName, setActiveAgentName] = useState(() => {
+      const savedKey = localStorage.getItem('openzess_persona') || 'architect';
+      return PERSONAS[savedKey]?.name || PERSONAS['architect'].name;
+  });
 
   const handleAgentSelect = (personaKey: string) => {
       const p = PERSONAS[personaKey];
       if (p) {
-          localStorage.setItem('openzess_persona', p.name);
+          localStorage.setItem('openzess_persona', personaKey);
           localStorage.setItem('openzess_sys_inst', p.instruction);
           localStorage.setItem('openzess_tool_term', p.tools.run_terminal_command.toString());
           localStorage.setItem('openzess_tool_web', p.tools.search_the_web.toString());
@@ -79,6 +84,7 @@ export default function Sidebar() {
           localStorage.setItem('openzess_tool_readf', p.tools.read_file.toString());
           localStorage.setItem('openzess_tool_edit', p.tools.edit_code.toString());
           setActiveAgentName(p.name);
+          showToast(`Switched to ${p.name}`, 'success');
           // Optional: refresh the UI or notify Chat that persona changed
           window.dispatchEvent(new Event('persona-changed'));
       }

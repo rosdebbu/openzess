@@ -88,8 +88,25 @@ function App() {
 
   useEffect(() => {
     const handleOpenSettings = () => setShowSettings(true);
+    const handlePersonaChanged = () => {
+      const p = localStorage.getItem('openzess_persona') || 'architect';
+      setPersona(p);
+      setSystemInstruction(localStorage.getItem('openzess_sys_inst') || PERSONAS['architect'].instruction);
+      setTools({
+        run_terminal_command: localStorage.getItem('openzess_tool_term') === 'true',
+        search_the_web: localStorage.getItem('openzess_tool_web') === 'true',
+        read_web_page: localStorage.getItem('openzess_tool_read') === 'true',
+        create_file: localStorage.getItem('openzess_tool_create') === 'true',
+        read_file: localStorage.getItem('openzess_tool_readf') === 'true',
+        edit_code: localStorage.getItem('openzess_tool_edit') === 'true',
+      });
+    };
     window.addEventListener('open-settings', handleOpenSettings);
-    return () => window.removeEventListener('open-settings', handleOpenSettings);
+    window.addEventListener('persona-changed', handlePersonaChanged);
+    return () => {
+      window.removeEventListener('open-settings', handleOpenSettings);
+      window.removeEventListener('persona-changed', handlePersonaChanged);
+    };
   }, []);
 
   const handlePersonaChange = (p: string) => {
