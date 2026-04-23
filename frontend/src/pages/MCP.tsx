@@ -30,9 +30,9 @@ const DEFAULT_SERVERS: MCPServerInfo[] = [
      name: 'Stitch AI', 
      desc: 'Advanced AI design system and frontend generation via Remote MCP.', 
      icon: '✨', 
-     transport: 'sse',
-     url: 'https://stitch.googleapis.com/mcp',
-     headers: { 'X-Goog-Api-Key': import.meta.env?.VITE_STITCH_API_KEY || '' } 
+     transport: 'stdio',
+     command: 'npx',
+     args: ['-y', 'mcp-remote', 'https://stitch.googleapis.com/mcp', '--header', `X-Goog-Api-Key: ${import.meta.env?.VITE_STITCH_API_KEY || ''}`]
   },
 ];
 

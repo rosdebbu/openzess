@@ -19,7 +19,11 @@ import shutil
 import tavern_parser
 from swarm_manager import swarm_manager
 import mss
-import pyautogui
+try:
+    import pyautogui
+except Exception:
+    pyautogui = None
+    print("Warning: pyautogui unavailable (no X display). Matrix/PC control disabled.", flush=True)
 from PIL import Image
 import asyncio
 

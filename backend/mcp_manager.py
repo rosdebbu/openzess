@@ -39,17 +39,23 @@ class MCPManager:
         if hasattr(self, 'current_env_patch') and self.current_env_patch:
             env.update(self.current_env_patch)
         
-        if transport == "sse":
-            import httpx
-            # Use httpx for a robust SSE connection with optional custom headers
+        if transport == "sse" or transport == "streamablehttp":
+            # Stitch and other remote MCP servers use streamable HTTP or SSE
             headers = headers or {}
-            headers.update({
-                "Accept": "text/event-stream"
-            })
             
-            # Use strict timeout
-            sse_mgr = sse_client(url=url, headers=headers, timeout=120.0)
-            read, write = await sse_mgr.__aenter__()
+            # Try streamable HTTP first (required by Stitch), fall back to SSE
+            try:
+                from mcp.client.streamable_http import streamablehttp_client
+                print(f"[{server_id}] Using Streamable HTTP transport...", flush=True)
+                http_mgr = streamablehttp_client(url=url, headers=headers)
+                read, write = await http_mgr.__aenter__()
+                sse_mgr = http_mgr
+            except (ImportError, Exception) as e:
+                print(f"[{server_id}] Streamable HTTP unavailable ({e}), falling back to SSE...", flush=True)
+                import httpx
+                headers.update({"Accept": "text/event-stream"})
+                sse_mgr = sse_client(url=url, headers=headers, timeout=120.0)
+                read, write = await sse_mgr.__aenter__()
         else:
             if sys.platform == "win32" and command == "npx":
                 command = "npx.cmd"
