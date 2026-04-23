@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 from dotenv import load_dotenv
 import os
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, event
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from fastapi import HTTPException
 
@@ -18,11 +18,26 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./chat_history.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+kwargs = {}
+if "sqlite" not in DATABASE_URL:
+    kwargs["pool_size"] = 10
+    kwargs["max_overflow"] = 20
+
 engine = create_engine(
     DATABASE_URL, 
-    # Check_same_thread is only needed for sqlite
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+    connect_args=connect_args,
+    **kwargs
 )
+
+@event.listens_for(engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    if "sqlite" in DATABASE_URL:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA cache_size=-64000")
+        cursor.close()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -31,16 +46,16 @@ class Session(Base):
     __tablename__ = "sessions"
     id = Column(String, primary_key=True, index=True)
     title = Column(String, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
     messages = relationship("Message", back_populates="session", cascade="all, delete-orphan")
 
 class Message(Base):
     __tablename__ = "messages"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    session_id = Column(String, ForeignKey("sessions.id"))
+    session_id = Column(String, ForeignKey("sessions.id"), index=True)
     role = Column(String) # 'user' or 'agent'
     content = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
     
     session = relationship("Session", back_populates="messages")
 
@@ -70,8 +85,8 @@ class Note(Base):
     title = Column(String, index=True)
     content = Column(String)
     category = Column(String, default="General")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
 
 def init_db():
     Base.metadata.create_all(bind=engine)
