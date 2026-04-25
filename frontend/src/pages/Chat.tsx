@@ -160,19 +160,55 @@ export default function Chat() {
     terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [terminalLogs]);
 
+  const handleSendRef = useRef(handleSend);
+  useEffect(() => {
+    handleSendRef.current = handleSend;
+  }, [handleSend]);
+
+  const inputRef = useRef(input);
+  useEffect(() => {
+    inputRef.current = input;
+  }, [input]);
+
+  const finalTranscriptRef = useRef<string>('');
+  const silenceTimerRef = useRef<any>(null);
+
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
-      recognition.continuous = false; // Stops automatically when you pause speaking
-      recognition.interimResults = false;
+      recognition.continuous = true; 
+      recognition.interimResults = true;
       recognition.lang = 'en-US';
 
-      recognition.onstart = () => setIsListening(true);
+      recognition.onstart = () => {
+        setIsListening(true);
+        finalTranscriptRef.current = inputRef.current ? inputRef.current + ' ' : '';
+      };
       
       recognition.onresult = (event: any) => {
-        const transcript = event.results[event.results.length - 1][0].transcript;
-        setInput(prev => (prev + ' ' + transcript).trim());
+        let interimTranscript = '';
+        let sessionFinal = '';
+
+        for (let i = 0; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            sessionFinal += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        
+        const currentText = (finalTranscriptRef.current + sessionFinal + interimTranscript).trim();
+        setInput(currentText);
+
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+        
+        if (sessionFinal.trim().length > 0 && interimTranscript.trim().length === 0) {
+            silenceTimerRef.current = setTimeout(() => {
+                handleSendRef.current(currentText);
+                recognition.stop();
+            }, 2500);
+        }
       };
 
       recognition.onerror = (event: any) => {
@@ -180,7 +216,10 @@ export default function Chat() {
         setIsListening(false);
       };
 
-      recognition.onend = () => setIsListening(false);
+      recognition.onend = () => {
+         setIsListening(false);
+         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      };
 
       recognitionRef.current = recognition;
     }
