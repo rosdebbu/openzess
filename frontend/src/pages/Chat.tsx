@@ -160,7 +160,7 @@ export default function Chat() {
     terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [terminalLogs]);
 
-  const handleSendRef = useRef(handleSend);
+  const handleSendRef = useRef<any>(null);
   useEffect(() => {
     handleSendRef.current = handleSend;
   }, [handleSend]);

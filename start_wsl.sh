@@ -36,7 +36,7 @@ source ~/openzess_venv/bin/activate
 
 if ! python3 -c "import fastapi" &> /dev/null; then
     echo "Installing Python dependencies natively into WSL..."
-    pip install fastapi uvicorn litellm chromadb duckduckgo-search beautifulsoup4 mcp psutil pyautogui mss pillow requests pydantic httpx apscheduler watchdog sqlalchemy gtts python-dotenv python-multipart websockify pyTelegramBotAPI telebot discord.py
+    pip install psycopg2-binary fastapi uvicorn litellm chromadb duckduckgo-search beautifulsoup4 mcp psutil pyautogui mss pillow requests pydantic httpx apscheduler watchdog sqlalchemy gtts python-dotenv python-multipart websockify pyTelegramBotAPI telebot discord.py
 else
     echo "[Sys] Python dependencies already installed. Skipping pip."
 fi
