@@ -2,8 +2,8 @@ import os
 import uuid
 from datetime import datetime
 import json
+from contextlib import contextmanager
 from dotenv import load_dotenv
-import os
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, event
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from fastapi import HTTPException
@@ -18,11 +18,15 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./chat_history.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+IS_POSTGRES = "sqlite" not in DATABASE_URL
+connect_args = {} if IS_POSTGRES else {"check_same_thread": False}
 kwargs = {}
-if "sqlite" not in DATABASE_URL:
+if IS_POSTGRES:
     kwargs["pool_size"] = 10
     kwargs["max_overflow"] = 20
+    kwargs["pool_pre_ping"] = True       # Auto-reconnect on stale Neon connections
+    kwargs["pool_recycle"] = 300          # Recycle connections every 5 min (Neon drops idle)
+    kwargs["pool_timeout"] = 30           # Wait up to 30s for a connection from pool
 
 engine = create_engine(
     DATABASE_URL, 
@@ -98,49 +102,55 @@ def get_db():
     finally:
         db.close()
 
-def create_session(title: str = "New Chat") -> str:
+@contextmanager
+def _session():
+    """Context manager for safe DB sessions with auto-rollback on errors."""
     db = SessionLocal()
     try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+def create_session(title: str = "New Chat") -> str:
+    with _session() as db:
         session_id = str(uuid.uuid4())
         new_session = Session(id=session_id, title=title)
         db.add(new_session)
-        db.commit()
         return session_id
-    finally:
-        db.close()
 
 def add_message(session_id: str, role: str, content: str):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         new_msg = Message(session_id=session_id, role=role, content=content)
         db.add(new_msg)
-        db.commit()
-    finally:
-        db.close()
 
 def get_all_sessions():
-    db = SessionLocal()
-    try:
+    with _session() as db:
         results = db.query(Session).order_by(Session.created_at.desc()).limit(20).all()
         return [{"id": s.id, "title": s.title, "created_at": s.created_at.isoformat()} for s in results]
-    finally:
-        db.close()
+
+def update_session_title(session_id: str, title: str) -> bool:
+    """Rename a chat session."""
+    with _session() as db:
+        session = db.query(Session).filter(Session.id == session_id).first()
+        if session:
+            session.title = title
+            return True
+        return False
 
 def delete_session(session_id: str):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         session = db.query(Session).filter(Session.id == session_id).first()
         if session:
             db.delete(session)
-            db.commit()
             return True
         return False
-    finally:
-        db.close()
 
 def get_session_messages(session_id: str):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         # Check if session exists
         session = db.query(Session).filter(Session.id == session_id).first()
         if not session:
@@ -148,35 +158,38 @@ def get_session_messages(session_id: str):
             
         results = db.query(Message).filter(Message.session_id == session_id).order_by(Message.created_at.asc()).all()
         return [{"id": m.id, "role": m.role, "content": m.content, "created_at": m.created_at.isoformat()} for m in results]
-    finally:
-        db.close()
 
 def add_or_update_mcp_server(server_id: str, name: str, command: str, args: list, is_active: bool = True):
-    db = SessionLocal()
-    try:
-        server = db.query(MCPServer).filter(MCPServer.server_id == server_id).first()
-        args_str = json.dumps(args)
-        if server:
-            server.name = name
-            server.command = command
-            server.args_json = args_str
-            server.is_active = 1 if is_active else 0
-        else:
-            new_server = MCPServer(
-                server_id=server_id, 
-                name=name, 
-                command=command, 
-                args_json=args_str, 
-                is_active=1 if is_active else 0
+    args_str = json.dumps(args)
+    if IS_POSTGRES:
+        # Native atomic upsert — no race conditions on Neon
+        from sqlalchemy.dialects.postgresql import insert as pg_insert
+        with _session() as db:
+            stmt = pg_insert(MCPServer).values(
+                server_id=server_id, name=name, command=command,
+                args_json=args_str, is_active=1 if is_active else 0
+            ).on_conflict_do_update(
+                index_elements=["server_id"],
+                set_={"name": name, "command": command, "args_json": args_str, "is_active": 1 if is_active else 0}
             )
-            db.add(new_server)
-        db.commit()
-    finally:
-        db.close()
+            db.execute(stmt)
+    else:
+        # SQLite fallback — ORM pattern
+        with _session() as db:
+            server = db.query(MCPServer).filter(MCPServer.server_id == server_id).first()
+            if server:
+                server.name = name
+                server.command = command
+                server.args_json = args_str
+                server.is_active = 1 if is_active else 0
+            else:
+                db.add(MCPServer(
+                    server_id=server_id, name=name, command=command,
+                    args_json=args_str, is_active=1 if is_active else 0
+                ))
 
 def get_all_mcp_servers():
-    db = SessionLocal()
-    try:
+    with _session() as db:
         results = db.query(MCPServer).all()
         return [{
             "id": s.server_id, 
@@ -185,51 +198,64 @@ def get_all_mcp_servers():
             "args": json.loads(s.args_json) if s.args_json else [],
             "is_active": bool(s.is_active)
         } for s in results]
-    finally:
-        db.close()
 
 def remove_mcp_server(server_id: str):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         server = db.query(MCPServer).filter(MCPServer.server_id == server_id).first()
         if server:
             db.delete(server)
-            db.commit()
-    finally:
-        db.close()
 
 def add_or_update_persona(persona_id: str, data: dict):
-    db = SessionLocal()
-    try:
-        persona = db.query(Persona).filter(Persona.id == persona_id).first()
-        if persona:
-            persona.name = data.get("name", persona.name)
-            persona.description = data.get("description", persona.description)
-            persona.personality = data.get("personality", persona.personality)
-            persona.scenario = data.get("scenario", persona.scenario)
-            persona.first_mes = data.get("first_mes", persona.first_mes)
-            persona.mes_example = data.get("mes_example", persona.mes_example)
-            if data.get("avatar_base64"):
-                persona.avatar_base64 = data["avatar_base64"]
-        else:
-            new_persona = Persona(
-                id=persona_id,
-                name=data.get("name", "Unknown"),
-                description=data.get("description", ""),
-                personality=data.get("personality", ""),
-                scenario=data.get("scenario", ""),
-                first_mes=data.get("first_mes", ""),
-                mes_example=data.get("mes_example", ""),
-                avatar_base64=data.get("avatar_base64", "")
+    if IS_POSTGRES:
+        # Native atomic upsert for Postgres/Neon
+        from sqlalchemy.dialects.postgresql import insert as pg_insert
+        with _session() as db:
+            values = {
+                "id": persona_id,
+                "name": data.get("name", "Unknown"),
+                "description": data.get("description", ""),
+                "personality": data.get("personality", ""),
+                "scenario": data.get("scenario", ""),
+                "first_mes": data.get("first_mes", ""),
+                "mes_example": data.get("mes_example", ""),
+                "avatar_base64": data.get("avatar_base64", ""),
+            }
+            update_fields = {k: v for k, v in values.items() if k != "id"}
+            # Only update avatar if a new one was provided
+            if not data.get("avatar_base64"):
+                update_fields.pop("avatar_base64", None)
+            stmt = pg_insert(Persona).values(**values).on_conflict_do_update(
+                index_elements=["id"],
+                set_=update_fields
             )
-            db.add(new_persona)
-        db.commit()
-    finally:
-        db.close()
+            db.execute(stmt)
+    else:
+        # SQLite fallback
+        with _session() as db:
+            persona = db.query(Persona).filter(Persona.id == persona_id).first()
+            if persona:
+                persona.name = data.get("name", persona.name)
+                persona.description = data.get("description", persona.description)
+                persona.personality = data.get("personality", persona.personality)
+                persona.scenario = data.get("scenario", persona.scenario)
+                persona.first_mes = data.get("first_mes", persona.first_mes)
+                persona.mes_example = data.get("mes_example", persona.mes_example)
+                if data.get("avatar_base64"):
+                    persona.avatar_base64 = data["avatar_base64"]
+            else:
+                db.add(Persona(
+                    id=persona_id,
+                    name=data.get("name", "Unknown"),
+                    description=data.get("description", ""),
+                    personality=data.get("personality", ""),
+                    scenario=data.get("scenario", ""),
+                    first_mes=data.get("first_mes", ""),
+                    mes_example=data.get("mes_example", ""),
+                    avatar_base64=data.get("avatar_base64", "")
+                ))
 
 def get_all_personas():
-    db = SessionLocal()
-    try:
+    with _session() as db:
         results = db.query(Persona).all()
         return [{
             "id": p.id,
@@ -241,23 +267,16 @@ def get_all_personas():
             "mes_example": p.mes_example,
             "avatar_base64": p.avatar_base64
         } for p in results]
-    finally:
-        db.close()
 
 def delete_persona(persona_id: str):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         p = db.query(Persona).filter(Persona.id == persona_id).first()
         if p:
             db.delete(p)
-            db.commit()
-    finally:
-        db.close()
 
 # --- NOTES (Personal Canvas) ---
 def create_note(title: str, content: str, category: str = "General") -> str:
-    db = SessionLocal()
-    try:
+    with _session() as db:
         note_id = str(uuid.uuid4())
         new_note = Note(
             id=note_id,
@@ -266,14 +285,10 @@ def create_note(title: str, content: str, category: str = "General") -> str:
             category=category
         )
         db.add(new_note)
-        db.commit()
         return note_id
-    finally:
-        db.close()
 
 def get_all_notes():
-    db = SessionLocal()
-    try:
+    with _session() as db:
         results = db.query(Note).order_by(Note.updated_at.desc()).all()
         return [{
             "id": n.id,
@@ -283,44 +298,30 @@ def get_all_notes():
             "created_at": n.created_at.isoformat() if n.created_at else None,
             "updated_at": n.updated_at.isoformat() if n.updated_at else None
         } for n in results]
-    finally:
-        db.close()
 
 def update_note(note_id: str, title: str, content: str, category: str):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             note.title = title
             note.content = content
             note.category = category
             # updated_at handles itself via onupdate hook in SQLAlchemy
-            db.commit()
             return True
         return False
-    finally:
-        db.close()
 
 def delete_note(note_id: str):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             db.delete(note)
-            db.commit()
             return True
         return False
-    finally:
-        db.close()
 
 def delete_message(message_id: int):
-    db = SessionLocal()
-    try:
+    with _session() as db:
         msg = db.query(Message).filter(Message.id == message_id).first()
         if msg:
             db.delete(msg)
-            db.commit()
             return True
         return False
-    finally:
-        db.close()

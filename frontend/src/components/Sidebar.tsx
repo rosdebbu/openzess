@@ -1,4 +1,4 @@
-import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight, ChevronDown, ExternalLink } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,6 +62,7 @@ export default function Sidebar() {
       title: 'Settings',
       items: [
         { name: 'Settings & Models', icon: <Database size={18} />, path: '/memory' },
+        { name: 'Docs', icon: <BookOpen size={18} />, action: () => window.open('https://openzess-docs.vercel.app/', '_blank'), external: true },
       ]
     }
   ];
@@ -235,6 +236,7 @@ export default function Sidebar() {
                   >
                     <span className="shrink-0">{item.icon}</span>
                     {!isCollapsed && <span className="truncate">{item.name}</span>}
+                    {!isCollapsed && item.external && <ExternalLink size={12} className="ml-auto text-neutral-400 shrink-0" />}
                   </button>
                 )}
               </motion.div>
