@@ -161,9 +161,6 @@ export default function Chat() {
   }, [terminalLogs]);
 
   const handleSendRef = useRef<any>(null);
-  useEffect(() => {
-    handleSendRef.current = handleSend;
-  }, [handleSend]);
 
   const inputRef = useRef(input);
   useEffect(() => {
@@ -408,6 +405,8 @@ export default function Chat() {
       isStreamingRef.current = false;
     }
   };
+  
+  handleSendRef.current = handleSend;
 
   const handleApproval = async (approved: boolean) => {
       setIsLoading(true);

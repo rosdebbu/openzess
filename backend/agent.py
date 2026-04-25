@@ -4,7 +4,7 @@ import platform
 # Ensure DISPLAY is set natively for Xvfb in the Linux/WSL sandbox before any GUI library loads.
 # We do NOT set this on Windows, as PyAutoGUI uses the native Win32 API there.
 if platform.system() == "Linux":
-    os.environ["DISPLAY"] = ":99"
+    os.environ["DISPLAY"] = ":100"
 import subprocess
 import requests
 import uuid
