@@ -176,7 +176,7 @@ function App() {
               </div>
               <div className="flex items-center gap-6 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 <Link to="/changelog" className="hover:text-brand transition-colors">Changelog</Link>
-                <Link to="/doc" className="hover:text-brand transition-colors">Doc</Link>
+                <a href="https://openzess-docs.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">Doc</a>
                 <Link to="/faq" className="hover:text-brand transition-colors">FAQ</Link>
                 <a href="https://github.com/rosdebbu/openzess" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">GitHub</a>
                 <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-2"></div>

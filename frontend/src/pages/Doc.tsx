@@ -15,17 +15,17 @@ export default function Doc() {
            </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-white dark:bg-surface border border-neutral-200 dark:border-border rounded-2xl shadow-sm hover:border-brand transition-colors cursor-pointer group" onClick={() => window.open('http://localhost:5175/getting-started', '_blank')}>
+           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-white dark:bg-surface border border-neutral-200 dark:border-border rounded-2xl shadow-sm hover:border-brand transition-colors cursor-pointer group" onClick={() => window.open('https://openzess-docs.vercel.app/getting-started', '_blank')}>
              <FileText className="text-brand mb-4 group-hover:scale-110 transition-transform" size={32} />
              <h3 className="text-xl font-bold mb-2 dark:text-white">Getting Started</h3>
              <p className="text-neutral-500 mb-4 text-sm leading-relaxed">Learn how to install, configure, and boot up the system environments correctly via the shell scripts.</p>
-             <a href="http://localhost:5175/getting-started" target="_blank" rel="noopener noreferrer" className="text-brand text-sm font-semibold hover:underline">Read Guide &rarr;</a>
+             <a href="https://openzess-docs.vercel.app/getting-started" target="_blank" rel="noopener noreferrer" className="text-brand text-sm font-semibold hover:underline">Read Guide &rarr;</a>
            </motion.div>
-           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-6 bg-white dark:bg-surface border border-neutral-200 dark:border-border rounded-2xl shadow-sm hover:border-brand transition-colors cursor-pointer group" onClick={() => window.open('http://localhost:5175/matrix-viewer', '_blank')}>
+           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-6 bg-white dark:bg-surface border border-neutral-200 dark:border-border rounded-2xl shadow-sm hover:border-brand transition-colors cursor-pointer group" onClick={() => window.open('https://openzess-docs.vercel.app/matrix-viewer', '_blank')}>
              <Code className="text-brand mb-4 group-hover:scale-110 transition-transform" size={32} />
              <h3 className="text-xl font-bold mb-2 dark:text-white">Developer API</h3>
              <p className="text-neutral-500 mb-4 text-sm leading-relaxed">Integrate external MCP services and invoke the native Python WebSocket streamers programmatically.</p>
-             <a href="http://localhost:5175/matrix-viewer" target="_blank" rel="noopener noreferrer" className="text-brand text-sm font-semibold hover:underline">View Matrix Guide &rarr;</a>
+             <a href="https://openzess-docs.vercel.app/matrix-viewer" target="_blank" rel="noopener noreferrer" className="text-brand text-sm font-semibold hover:underline">View Matrix Guide &rarr;</a>
            </motion.div>
         </div>
       </div>
