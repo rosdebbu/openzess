@@ -1,0 +1,13 @@
+:root {
+  --vp-c-brand-1: #f97316;
+  --vp-c-brand-2: #ea580c;
+  --vp-c-brand-3: #c2410c;
+  --vp-c-brand-soft: rgba(249, 115, 22, 0.14);
+  --vp-button-brand-bg: #f97316;
+  --vp-button-brand-hover-bg: #ea580c;
+  --vp-button-brand-active-bg: #c2410c;
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%);
+  --vp-home-hero-image-background-image: linear-gradient(135deg, rgba(249,115,22,0.3) 0%, rgba(236,72,153,0.3) 50%, rgba(139,92,246,0.3) 100%);
+  --vp-home-hero-image-filter: blur(56px);
+}
