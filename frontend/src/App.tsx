@@ -24,6 +24,7 @@ import KnowledgeBase from './pages/KnowledgeBase';
 import DebateArena from './pages/DebateArena';
 import Doc from './pages/Doc';
 import FAQ from './pages/FAQ';
+import Graphify from './pages/Graphify';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -58,6 +59,7 @@ function AnimatedRoutes({ persona }: { persona: string }) {
           <Route path="/swarm" element={<PageTransition><WarRoom /></PageTransition>} />
           <Route path="/doc" element={<PageTransition><Doc /></PageTransition>} />
           <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
+          <Route path="/graphify" element={<PageTransition><Graphify /></PageTransition>} />
         </Routes>
       </AnimatePresence>
     </div>
