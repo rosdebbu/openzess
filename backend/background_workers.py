@@ -15,19 +15,35 @@ class CronManager:
         self.jobs = {}
 
     def _execute_job(self, job_id: str, command: str):
-        # We simulate firing the execution by calling the agent via the internal API or directly.
-        # Calling localhost /api/chat seamlessly.
+        """Fire the agent via the internal /api/chat endpoint."""
         try:
             print(f"[CRON RUN] Executing job {job_id} -> {command}")
-            # Use Localhost API with dummy details to let the Agent run the command
-            deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "system-cron-call")
+            
+            # Auto-detect which API key + provider is available
+            api_key = None
+            provider = None
+            for env_key, prov in [
+                ("GEMINI_API_KEY", "gemini"),
+                ("DEEPSEEK_API_KEY", "deepseek"),
+                ("OPENAI_API_KEY", "openai"),
+            ]:
+                val = os.environ.get(env_key)
+                if val:
+                    api_key = val
+                    provider = prov
+                    break
+            
+            if not api_key:
+                print("[CRON ERR] No API key found in env (GEMINI_API_KEY / DEEPSEEK_API_KEY / OPENAI_API_KEY). Cron job skipped.")
+                return
+            
             requests.post("http://localhost:8000/api/chat", json={
                 "message": command,
-                "api_key": deepseek_key, 
-                "provider": "deepseek",
-                "system_instruction": "You are a background CRON processor. Execute the request seamlessly using the tools provided to you.",
-                "allowed_tools": ["run_terminal_command", "create_file", "search_the_web", "read_web_page", "read_file", "edit_code"]
-            }, timeout=30)
+                "api_key": api_key, 
+                "provider": provider,
+                "system_instruction": "You are a background CRON processor. Execute the request seamlessly using the tools provided to you. When asked to email, always use the send_email tool.",
+                "allowed_tools": ["run_terminal_command", "create_file", "search_the_web", "read_web_page", "read_file", "edit_code", "send_email"]
+            }, timeout=120)
         except Exception as e:
             print(f"[CRON ERR] {e}")
 

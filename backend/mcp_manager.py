@@ -21,10 +21,15 @@ class MCPManager:
         asyncio.set_event_loop(self._loop)
         self._loop.run_forever()
 
-    def _run_async(self, coro, timeout=120):
+    def _run_async(self, coro, timeout=15):
         """Helper to run coroutines in the background loop from sync functions"""
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
-        return future.result(timeout=timeout)
+        try:
+            return future.result(timeout=timeout)
+        except Exception as e:
+            # Prevent background task from hanging forever if we timeout
+            future.cancel()
+            raise e
 
     async def _amake_connection(self, server_id: str, command: str, args: list, transport: str = "stdio", url: str = "", headers: dict = None):
         if server_id in self.servers:

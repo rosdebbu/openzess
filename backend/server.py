@@ -50,6 +50,8 @@ app.add_middleware(
 import asyncio
 database.init_db()
 
+import threading
+
 # Auto-reconnect active MCP servers
 def init_active_mcps():
     servers = database.get_all_mcp_servers()
@@ -61,8 +63,8 @@ def init_active_mcps():
             except Exception as e:
                 print(f"Failed to auto-connect MCP {s['name']}: {e}")
 
-# Run the initialization
-init_active_mcps()
+# Run the initialization in the background so it doesn't block server startup
+threading.Thread(target=init_active_mcps, daemon=True).start()
 
 class ChatRequest(BaseModel):
     message: str
@@ -269,14 +271,14 @@ async def chat_approve(request: ApprovalRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/sessions")
-async def list_sessions():
+def list_sessions():
     try:
         return {"sessions": database.get_all_sessions()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/sessions/{session_id}/messages")
-async def get_messages(session_id: str):
+def get_messages(session_id: str):
     try:
         messages = database.get_session_messages(session_id)
         # Presentation speed optimization implies we can also limit frontend load to 40
@@ -285,7 +287,7 @@ async def get_messages(session_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/messages/{message_id}")
-async def delete_message_endpoint(message_id: int):
+def delete_message_endpoint(message_id: int):
     try:
         session_id = database.delete_message(message_id)
         if hasattr(session_id, 'status_code') or not session_id:
@@ -314,7 +316,7 @@ async def delete_message_endpoint(message_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/sessions/{session_id}")
-async def delete_session_endpoint(session_id: str):
+def delete_session_endpoint(session_id: str):
     try:
         success = database.delete_session(session_id)
         if session_id in sessions:
@@ -326,7 +328,7 @@ async def delete_session_endpoint(session_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/files")
-async def list_files():
+def list_files():
     try:
         current_dir = os.getcwd()
         items = os.listdir(current_dir)
@@ -336,7 +338,7 @@ async def list_files():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/tools")
-async def list_tools():
+def list_tools():
     return {
         "tools": [
             {"name": "run_terminal_command", "description": "Execute local shell commands."},
@@ -349,7 +351,7 @@ async def list_tools():
     }
 
 @app.get("/api/memory")
-async def get_memories():
+def get_memories():
     try:
         if memory_collection is None:
             return {"memories": []}
@@ -368,7 +370,7 @@ async def get_memories():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/memory/{memory_id}")
-async def delete_memory(memory_id: str):
+def delete_memory(memory_id: str):
     try:
         if memory_collection is None:
             raise HTTPException(status_code=400, detail="Memory vault is disabled.")
@@ -379,7 +381,7 @@ async def delete_memory(memory_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/memory")
-async def clear_all_memories():
+def clear_all_memories():
     try:
         if memory_collection is None:
             raise HTTPException(status_code=400, detail="Memory vault is disabled.")
@@ -404,11 +406,11 @@ class MCPConnectRequest(BaseModel):
     headers: Optional[Dict[str, str]] = None
 
 @app.get("/api/mcp/servers")
-async def get_mcp_servers():
+def get_mcp_servers():
     return {"servers": mcp_registry.get_status(), "saved_servers": database.get_all_mcp_servers()}
 
 @app.post("/api/mcp/connect")
-async def connect_mcp(request: MCPConnectRequest):
+def connect_mcp(request: MCPConnectRequest):
     try:
         success = mcp_registry.connect(request.server_id, request.command, request.args, env=request.env, transport=request.transport, url=request.url, headers=request.headers)
         if success:
@@ -419,7 +421,7 @@ async def connect_mcp(request: MCPConnectRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/mcp/disconnect/{server_id}")
-async def disconnect_mcp(server_id: str):
+def disconnect_mcp(server_id: str):
     mcp_registry.disconnect(server_id)
     saved = database.get_all_mcp_servers()
     for s in saved:
@@ -429,7 +431,7 @@ async def disconnect_mcp(server_id: str):
     return {"status": "disconnected"}
 
 @app.delete("/api/mcp/saved/{server_id}")
-async def remove_saved_mcp(server_id: str):
+def remove_saved_mcp(server_id: str):
     mcp_registry.disconnect(server_id)
     database.remove_mcp_server(server_id)
     return {"status": "deleted"}
@@ -441,7 +443,7 @@ class CronCreateRequest(BaseModel):
     cron_time: Optional[str] = None
 
 @app.post("/api/cron")
-async def create_cron_job(request: CronCreateRequest):
+def create_cron_job(request: CronCreateRequest):
     try:
         job_id = background_workers.cron_manager.add_job(
             command=request.command, 
@@ -454,11 +456,11 @@ async def create_cron_job(request: CronCreateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/cron")
-async def get_cron_jobs():
+def get_cron_jobs():
     return {"jobs": background_workers.cron_manager.get_jobs()}
 
 @app.delete("/api/cron/{job_id}")
-async def delete_cron_job(job_id: str):
+def delete_cron_job(job_id: str):
     background_workers.cron_manager.remove_job(job_id)
     return {"status": "deleted"}
 
@@ -467,7 +469,7 @@ class WatchdogCreateRequest(BaseModel):
     action: str
 
 @app.post("/api/watchdog")
-async def create_watchdog(request: WatchdogCreateRequest):
+def create_watchdog(request: WatchdogCreateRequest):
     try:
         watch_id = background_workers.watch_manager.add_watchdog(request.directory, request.action)
         return {"status": "created", "watch_id": watch_id}
@@ -475,11 +477,11 @@ async def create_watchdog(request: WatchdogCreateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/watchdog")
-async def get_watchdogs():
+def get_watchdogs():
     return {"watchdogs": background_workers.watch_manager.get_watchdogs()}
 
 @app.delete("/api/watchdog/{watch_id}")
-async def delete_watchdog(watch_id: str):
+def delete_watchdog(watch_id: str):
     background_workers.watch_manager.remove_watchdog(watch_id)
     return {"status": "deleted"}
 
@@ -487,7 +489,7 @@ async def delete_watchdog(watch_id: str):
 # PERSONA / TAVERN
 # ================================
 @app.post("/api/personas/import")
-async def import_persona(file: UploadFile = File(...)):
+def import_persona(file: UploadFile = File(...)):
     file_path = f"temp_{uuid.uuid4()}_{file.filename}"
     try:
         with open(file_path, "wb") as buffer:
@@ -510,14 +512,14 @@ async def import_persona(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/personas")
-async def get_personas():
+def get_personas():
     try:
         return {"personas": database.get_all_personas()}
     except Exception as e:
          raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/personas/{persona_id}")
-async def delete_persona(persona_id: str):
+def delete_persona(persona_id: str):
     database.delete_persona(persona_id)
     return {"status": "deleted"}
 
@@ -568,7 +570,7 @@ class OpenAIChatRequest(BaseModel):
     stream: bool = False
 
 @app.get("/v1/models")
-async def get_openai_models():
+def get_openai_models():
     return {
         "object": "list",
         "data": [{ "id": "openzess", "object": "model", "created": 1686935002, "owned_by": "openzess" }]
@@ -581,7 +583,7 @@ def guess_provider(key: str) -> str:
     return "gemini"
 
 @app.post("/v1/chat/completions")
-async def openai_chat_completions(request: OpenAIChatRequest, api_req: Request):
+def openai_chat_completions(request: OpenAIChatRequest, api_req: Request):
     auth_header = api_req.headers.get("Authorization") or api_req.headers.get("x-api-key")
     api_key = auth_header.replace("Bearer ", "").strip() if auth_header else ""
     provider = guess_provider(api_key)
@@ -626,7 +628,7 @@ class AnthropicChatRequest(BaseModel):
     stream: bool = False
 
 @app.post("/v1/messages")
-async def anthropic_messages(request: AnthropicChatRequest, api_req: Request):
+def anthropic_messages(request: AnthropicChatRequest, api_req: Request):
     auth_header = api_req.headers.get("x-api-key") or api_req.headers.get("Authorization")
     api_key = auth_header.replace("Bearer ", "").strip() if auth_header else ""
     provider = guess_provider(api_key)
@@ -667,7 +669,7 @@ class TelegramStartRequest(BaseModel):
     api_key: str
 
 @app.post("/api/channels/telegram/start")
-async def start_telegram(request: TelegramStartRequest):
+def start_telegram(request: TelegramStartRequest):
     try:
         success = telegram_worker.start_telegram_listener(request.bot_token, request.provider, request.api_key)
         return {"status": "started" if success else "failed"}
@@ -675,7 +677,7 @@ async def start_telegram(request: TelegramStartRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/channels/telegram/stop")
-async def stop_telegram():
+def stop_telegram():
     try:
         telegram_worker.stop_telegram_listener()
         return {"status": "stopped"}
@@ -683,7 +685,7 @@ async def stop_telegram():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/channels/telegram/status")
-async def get_telegram_status():
+def get_telegram_status():
     return {"is_running": telegram_worker.get_status()}
 
 # ================================
@@ -695,7 +697,7 @@ class DiscordStartRequest(BaseModel):
     api_key: str
 
 @app.post("/api/channels/discord/start")
-async def start_discord(request: DiscordStartRequest):
+def start_discord(request: DiscordStartRequest):
     try:
         success = discord_worker.start_discord_listener(request.bot_token, request.provider, request.api_key)
         return {"status": "started" if success else "failed"}
@@ -703,7 +705,7 @@ async def start_discord(request: DiscordStartRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/channels/discord/stop")
-async def stop_discord():
+def stop_discord():
     try:
         discord_worker.stop_discord_listener()
         return {"status": "stopped"}
@@ -711,7 +713,7 @@ async def stop_discord():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/channels/discord/status")
-async def get_discord_status():
+def get_discord_status():
     return {"is_running": discord_worker.get_status()}
 
 # ================================
@@ -721,7 +723,7 @@ class TTSRequest(BaseModel):
     text: str
 
 @app.post("/api/tts")
-async def generate_tts(request: TTSRequest):
+def generate_tts(request: TTSRequest):
     try:
         if not request.text or len(request.text.strip()) == 0:
              raise HTTPException(status_code=400, detail="Text cannot be empty.")
@@ -770,7 +772,7 @@ class NoteUpdateRequest(BaseModel):
     category: str
 
 @app.post("/api/notes")
-async def create_note(request: NoteCreateRequest):
+def create_note(request: NoteCreateRequest):
     try:
         note_id = database.create_note(request.title, request.content, request.category)
         return {"status": "created", "note_id": note_id}
@@ -778,14 +780,14 @@ async def create_note(request: NoteCreateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/notes")
-async def get_notes():
+def get_notes():
     try:
         return {"notes": database.get_all_notes()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/api/notes/{note_id}")
-async def update_note(note_id: str, request: NoteUpdateRequest):
+def update_note(note_id: str, request: NoteUpdateRequest):
     try:
         success = database.update_note(note_id, request.title, request.content, request.category)
         if not success:
@@ -795,7 +797,7 @@ async def update_note(note_id: str, request: NoteUpdateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/notes/{note_id}")
-async def delete_note(note_id: str):
+def delete_note(note_id: str):
     try:
         success = database.delete_note(note_id)
         if not success:
@@ -805,7 +807,7 @@ async def delete_note(note_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/notes/upload")
-async def upload_note_image(file: UploadFile = File(...)):
+def upload_note_image(file: UploadFile = File(...)):
     try:
         file_extension = os.path.splitext(file.filename)[1] if file.filename else ".png"
         unique_filename = f"{uuid.uuid4()}{file_extension}"
