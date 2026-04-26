@@ -42,6 +42,7 @@ export default function Graphify() {
   const [showPanel, setShowPanel] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'gods' | 'gaps'>('overview');
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [graphKey, setGraphKey] = useState(0);
 
   useEffect(() => {
     // Fetch live report from the backend
@@ -71,7 +72,7 @@ export default function Graphify() {
   const graphUrl = `${BASE_URL}/graphify/graph.html`;
 
   return (
-    <div className="flex flex-col h-full bg-[#0f0f1a] overflow-hidden relative">
+    <div className="flex flex-col bg-[#0f0f1a] overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
       
       {/* Top Bar */}
       <div className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-white/10 bg-[#0f0f1a]/90 backdrop-blur-sm z-10">
@@ -90,7 +91,7 @@ export default function Graphify() {
             Live
           </span>
           <button
-            onClick={() => iframeRef.current?.contentWindow?.location.reload()}
+            onClick={() => setGraphKey(k => k + 1)}
             className="p-1.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             title="Reload Graph"
           >
@@ -116,16 +117,17 @@ export default function Graphify() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex overflow-hidden" style={{ flex: '1 1 0', minHeight: 0 }}>
         
         {/* Graph iframe */}
-        <div className="flex-1 relative">
+        <div className="relative" style={{ flex: '1 1 0', minWidth: 0, minHeight: 0 }}>
           <iframe
+            key={graphKey}
             ref={iframeRef}
             src={graphUrl}
             title="Codebase Graph"
-            className="w-full h-full border-none"
-            style={{ background: '#0f0f1a' }}
+            className="border-none"
+            style={{ width: '100%', height: '100%', display: 'block', background: '#0f0f1a' }}
           />
           
           {/* Gradient overlay at bottom of iframe for aesthetics */}
