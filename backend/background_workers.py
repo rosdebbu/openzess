@@ -31,22 +31,39 @@ class CronManager:
         except Exception as e:
             print(f"[CRON ERR] {e}")
 
-    def add_job(self, command: str, interval_minutes: int) -> str:
+    def add_job(self, command: str, schedule_type: str = "interval", interval_minutes: int = 60, cron_time: str = None) -> str:
         job_id = str(uuid.uuid4())
         
         # Schedule the APScheduler Job
-        job = self.scheduler.add_job(
-            self._execute_job, 
-            'interval', 
-            minutes=interval_minutes, 
-            args=[job_id, command],
-            id=job_id
-        )
+        if schedule_type == "time" and cron_time:
+            try:
+                hour, minute = map(int, cron_time.split(':'))
+            except:
+                hour, minute = 10, 0
+            job = self.scheduler.add_job(
+                self._execute_job, 
+                'cron', 
+                hour=hour,
+                minute=minute,
+                args=[job_id, command],
+                id=job_id
+            )
+        else:
+            schedule_type = "interval"
+            job = self.scheduler.add_job(
+                self._execute_job, 
+                'interval', 
+                minutes=interval_minutes, 
+                args=[job_id, command],
+                id=job_id
+            )
         
         self.jobs[job_id] = {
             "id": job_id,
             "command": command,
+            "schedule_type": schedule_type,
             "interval_minutes": interval_minutes,
+            "cron_time": cron_time,
             "created_at": time.time(),
             "next_run_time": job.next_run_time.isoformat() if job.next_run_time else None,
             "status": "active"

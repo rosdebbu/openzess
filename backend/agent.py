@@ -14,6 +14,8 @@ from mcp_manager import mcp_registry
 import json
 import litellm
 import background_workers
+import smtplib
+from email.mime.text import MIMEText
 
 pyautogui = None
 try:
@@ -170,6 +172,31 @@ def computer_press_key(key: str) -> str:
     except Exception as e:
         return f"Failed to press key: {e}"
 
+def send_email(to_email: str, subject: str, body: str) -> str:
+    try:
+        smtp_server = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
+        smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+        smtp_user = os.environ.get("SMTP_USERNAME")
+        smtp_pass = os.environ.get("SMTP_PASSWORD")
+        smtp_from = os.environ.get("SMTP_FROM", smtp_user)
+
+        if not smtp_user or not smtp_pass:
+            return "Error: SMTP_USERNAME or SMTP_PASSWORD environment variables are not set in .env."
+
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = smtp_from if smtp_from else "openzess@agent.local"
+        msg['To'] = to_email
+
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_pass)
+        server.send_message(msg)
+        server.quit()
+        return f"Successfully sent email to {to_email}"
+    except Exception as e:
+        return f"Failed to send email: {e}"
+
 native_tool_funcs = {
     "run_terminal_command": run_terminal_command,
     "search_the_web": search_the_web,
@@ -183,7 +210,8 @@ native_tool_funcs = {
     "computer_mouse_move": computer_mouse_move,
     "computer_mouse_click": computer_mouse_click,
     "computer_type_text": computer_type_text,
-    "computer_press_key": computer_press_key
+    "computer_press_key": computer_press_key,
+    "send_email": send_email
 }
 
 # Dynamically merge hot-loaded python plugins into the core native ecosystem!
@@ -345,6 +373,22 @@ NATIVE_TOOL_SCHEMAS = [
                 "required": ["key"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "send_email",
+            "description": "Sends an email using the configured SMTP server (default Gmail). Requires SMTP_USERNAME and SMTP_PASSWORD in the .env file. Useful for sending task reports or notifications to the user.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "to_email": {"type": "string"},
+                    "subject": {"type": "string"},
+                    "body": {"type": "string"}
+                },
+                "required": ["to_email", "subject", "body"]
+            }
+        }
     }
 ]
 
@@ -445,7 +489,7 @@ class OpenzessAgent:
             if not message.tool_calls:
                 return {"reply": message.content, "tools": tool_outputs, "auth_required": False}
                 
-            dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key"]
+            dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key", "send_email"]
             
             pending_calls = []
             for tc in message.tool_calls:
@@ -602,7 +646,7 @@ class OpenzessAgent:
                     yield {"type": "done", "auth_required": False, "reply": collected_content}
                     return
                     
-                dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key"]
+                dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key", "send_email"]
                 
                 pending_calls = []
                 for tc in tool_calls:

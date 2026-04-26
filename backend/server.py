@@ -436,12 +436,19 @@ async def remove_saved_mcp(server_id: str):
 
 class CronCreateRequest(BaseModel):
     command: str
-    interval_minutes: int
+    schedule_type: str = "interval"
+    interval_minutes: Optional[int] = 60
+    cron_time: Optional[str] = None
 
 @app.post("/api/cron")
 async def create_cron_job(request: CronCreateRequest):
     try:
-        job_id = background_workers.cron_manager.add_job(request.command, request.interval_minutes)
+        job_id = background_workers.cron_manager.add_job(
+            command=request.command, 
+            schedule_type=request.schedule_type,
+            interval_minutes=request.interval_minutes,
+            cron_time=request.cron_time
+        )
         return {"status": "created", "job_id": job_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

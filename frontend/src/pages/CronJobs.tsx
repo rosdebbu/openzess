@@ -6,7 +6,9 @@ import axios from 'axios';
 interface LiveJob {
   id: string;
   command: string;
+  schedule_type?: string;
   interval_minutes: number;
+  cron_time?: string;
   created_at: number;
   next_run_time: string | null;
   status: string;
@@ -26,8 +28,10 @@ export default function CronJobs() {
 
   const [isCreating, setIsCreating] = useState(false);
   const [createType, setCreateType] = useState<'cron' | 'watchdog'>('cron');
+  const [scheduleType, setScheduleType] = useState<'interval' | 'time'>('interval');
   const [cronCommand, setCronCommand] = useState('');
   const [cronInterval, setCronInterval] = useState(60);
+  const [cronTime, setCronTime] = useState('10:00');
   const [watchDir, setWatchDir] = useState('/tmp/');
   const [watchAction, setWatchAction] = useState('Analyze new files dropped here.');
   const [submitting, setSubmitting] = useState(false);
@@ -74,7 +78,9 @@ export default function CronJobs() {
           if (createType === 'cron') {
              await axios.post('http://localhost:8000/api/cron', {
                  command: cronCommand,
-                 interval_minutes: cronInterval
+                 schedule_type: scheduleType,
+                 interval_minutes: cronInterval,
+                 cron_time: cronTime
              });
           } else {
              await axios.post('http://localhost:8000/api/watchdog', {
@@ -154,10 +160,13 @@ export default function CronJobs() {
                                        {job.status}
                                     </span>
                                  </h3>
-                                 <div className="flex items-center gap-4 text-xs text-neutral-500 font-mono">
-                                    <span className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-900 px-2 py-1 rounded-md border border-neutral-200 dark:border-border"><Clock size={12} /> Every {job.interval_minutes}m</span>
-                                    {job.next_run_time && <span className="text-brand flex items-center gap-1"><Play size={10} className="fill-brand"/> Next: {new Date(job.next_run_time).toLocaleTimeString()}</span>}
-                                 </div>
+                                  <div className="flex items-center gap-4 text-xs text-neutral-500 font-mono">
+                                     <span className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-900 px-2 py-1 rounded-md border border-neutral-200 dark:border-border">
+                                        <Clock size={12} /> 
+                                        {job.schedule_type === 'time' ? `Daily at ${job.cron_time}` : `Every ${job.interval_minutes}m`}
+                                     </span>
+                                     {job.next_run_time && <span className="text-brand flex items-center gap-1"><Play size={10} className="fill-brand"/> Next: {new Date(job.next_run_time).toLocaleTimeString()}</span>}
+                                  </div>
                               </div>
                             </div>
 
@@ -276,23 +285,54 @@ export default function CronJobs() {
                                 <textarea 
                                    value={cronCommand}
                                    onChange={(e) => setCronCommand(e.target.value)}
-                                   placeholder="e.g. Scrape the top news stories from HackerNews and save them to a markdown file on my desktop."
+                                   placeholder="e.g. Email me a summary of tasks scheduled for today."
                                    className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-border rounded-xl p-4 text-sm focus:outline-none focus:border-brand/50 dark:focus:border-brand/50 min-h-[120px] resize-none"
                                 />
                              </div>
-                             <div>
-                                <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2">Execution Interval (Minutes)</label>
-                                <div className="flex items-center gap-4 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-border rounded-xl p-3">
-                                   <Clock size={16} className="text-neutral-400" />
-                                   <input 
-                                      type="number" 
-                                      min={1}
-                                      value={cronInterval}
-                                      onChange={(e) => setCronInterval(Number(e.target.value))}
-                                      className="bg-transparent border-none focus:outline-none flex-1 text-sm font-mono text-neutral-800 dark:text-neutral-200"
-                                   />
-                                </div>
+                             
+                             <div className="flex gap-2 p-1 bg-neutral-100 dark:bg-neutral-900 rounded-lg w-fit">
+                               <button 
+                                  onClick={() => setScheduleType('interval')}
+                                  className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all ${scheduleType === 'interval' ? 'bg-white dark:bg-neutral-800 text-brand shadow-sm' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}`}
+                               >
+                                  Interval
+                               </button>
+                               <button 
+                                  onClick={() => setScheduleType('time')}
+                                  className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all ${scheduleType === 'time' ? 'bg-white dark:bg-neutral-800 text-brand shadow-sm' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}`}
+                               >
+                                  Specific Time
+                               </button>
                              </div>
+
+                             {scheduleType === 'interval' ? (
+                               <div>
+                                  <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2">Execution Interval (Minutes)</label>
+                                  <div className="flex items-center gap-4 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-border rounded-xl p-3">
+                                     <Clock size={16} className="text-neutral-400" />
+                                     <input 
+                                        type="number" 
+                                        min={1}
+                                        value={cronInterval}
+                                        onChange={(e) => setCronInterval(Number(e.target.value))}
+                                        className="bg-transparent border-none focus:outline-none flex-1 text-sm font-mono text-neutral-800 dark:text-neutral-200"
+                                     />
+                                  </div>
+                               </div>
+                             ) : (
+                               <div>
+                                  <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2">Daily Execution Time</label>
+                                  <div className="flex items-center gap-4 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-border rounded-xl p-3">
+                                     <Clock size={16} className="text-neutral-400" />
+                                     <input 
+                                        type="time" 
+                                        value={cronTime}
+                                        onChange={(e) => setCronTime(e.target.value)}
+                                        className="bg-transparent border-none focus:outline-none flex-1 text-sm font-mono text-neutral-800 dark:text-neutral-200"
+                                     />
+                                  </div>
+                               </div>
+                             )}
                           </div>
                       ) : (
                           <div className="flex flex-col gap-5">

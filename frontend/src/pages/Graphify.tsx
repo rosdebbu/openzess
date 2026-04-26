@@ -72,7 +72,7 @@ export default function Graphify() {
   const graphUrl = `${BASE_URL}/graphify/graph.html`;
 
   return (
-    <div className="flex flex-col bg-[#0f0f1a] overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
+    <div className="flex-1 flex flex-col w-full bg-[#0f0f1a] overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
       
       {/* Top Bar */}
       <div className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-white/10 bg-[#0f0f1a]/90 backdrop-blur-sm z-10">
