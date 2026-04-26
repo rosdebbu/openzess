@@ -16,7 +16,7 @@
       "label": "run_terminal_command()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L43",
+      "source_location": "L45",
       "id": "agent_run_terminal_command",
       "community": 5,
       "norm_label": "run_terminal_command()"
@@ -25,7 +25,7 @@
       "label": "search_the_web()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L51",
+      "source_location": "L53",
       "id": "agent_search_the_web",
       "community": 5,
       "norm_label": "search_the_web()"
@@ -34,7 +34,7 @@
       "label": "read_web_page()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L61",
+      "source_location": "L63",
       "id": "agent_read_web_page",
       "community": 5,
       "norm_label": "read_web_page()"
@@ -54,7 +54,7 @@
       "source_file": "main.py",
       "source_location": "L1",
       "id": "main_py",
-      "community": 2,
+      "community": 4,
       "norm_label": "main.py"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "main.py",
       "source_location": "L14",
       "id": "main_start",
-      "community": 2,
+      "community": 4,
       "norm_label": "start()"
     },
     {
@@ -79,7 +79,7 @@
       "label": "create_file()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L71",
+      "source_location": "L73",
       "id": "agent_create_file",
       "community": 5,
       "norm_label": "create_file()"
@@ -88,7 +88,7 @@
       "label": "read_file()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L82",
+      "source_location": "L84",
       "id": "agent_read_file",
       "community": 5,
       "norm_label": "read_file()"
@@ -97,7 +97,7 @@
       "label": "edit_code()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L92",
+      "source_location": "L94",
       "id": "agent_edit_code",
       "community": 5,
       "norm_label": "edit_code()"
@@ -106,25 +106,25 @@
       "label": "schedule_background_task()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L107",
+      "source_location": "L109",
       "id": "agent_schedule_background_task",
-      "community": 3,
+      "community": 2,
       "norm_label": "schedule_background_task()"
     },
     {
       "label": "monitor_directory()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L115",
+      "source_location": "L117",
       "id": "agent_monitor_directory",
-      "community": 3,
+      "community": 2,
       "norm_label": "monitor_directory()"
     },
     {
       "label": "verify_sandbox_environment()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L123",
+      "source_location": "L125",
       "id": "agent_verify_sandbox_environment",
       "community": 5,
       "norm_label": "verify_sandbox_environment()"
@@ -133,7 +133,7 @@
       "label": "take_screenshot()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L131",
+      "source_location": "L133",
       "id": "agent_take_screenshot",
       "community": 5,
       "norm_label": "take_screenshot()"
@@ -142,7 +142,7 @@
       "label": "computer_mouse_move()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L141",
+      "source_location": "L143",
       "id": "agent_computer_mouse_move",
       "community": 5,
       "norm_label": "computer_mouse_move()"
@@ -151,7 +151,7 @@
       "label": "computer_mouse_click()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L149",
+      "source_location": "L151",
       "id": "agent_computer_mouse_click",
       "community": 5,
       "norm_label": "computer_mouse_click()"
@@ -160,7 +160,7 @@
       "label": "computer_type_text()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L157",
+      "source_location": "L159",
       "id": "agent_computer_type_text",
       "community": 5,
       "norm_label": "computer_type_text()"
@@ -169,16 +169,25 @@
       "label": "computer_press_key()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L165",
+      "source_location": "L167",
       "id": "agent_computer_press_key",
       "community": 5,
       "norm_label": "computer_press_key()"
     },
     {
+      "label": "send_email()",
+      "file_type": "code",
+      "source_file": "backend\\agent.py",
+      "source_location": "L175",
+      "id": "agent_send_email",
+      "community": 5,
+      "norm_label": "send_email()"
+    },
+    {
       "label": "OpenzessAgent",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L368",
+      "source_location": "L412",
       "id": "agent_openzessagent",
       "community": 0,
       "norm_label": "openzessagent"
@@ -187,16 +196,16 @@
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L369",
+      "source_location": "L413",
       "id": "agent_openzessagent_init",
-      "community": 4,
+      "community": 3,
       "norm_label": ".__init__()"
     },
     {
       "label": "._run_tool()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L416",
+      "source_location": "L460",
       "id": "agent_openzessagent_run_tool",
       "community": 0,
       "norm_label": "._run_tool()"
@@ -205,7 +214,7 @@
       "label": "._handle_response_loop()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L426",
+      "source_location": "L470",
       "id": "agent_openzessagent_handle_response_loop",
       "community": 0,
       "norm_label": "._handle_response_loop()"
@@ -214,7 +223,7 @@
       "label": "._ingest_memory()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L491",
+      "source_location": "L535",
       "id": "agent_openzessagent_ingest_memory",
       "community": 0,
       "norm_label": "._ingest_memory()"
@@ -223,7 +232,7 @@
       "label": ".chat()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L503",
+      "source_location": "L547",
       "id": "agent_openzessagent_chat",
       "community": 0,
       "norm_label": ".chat()"
@@ -232,7 +241,7 @@
       "label": ".chat_stream()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L535",
+      "source_location": "L579",
       "id": "agent_openzessagent_chat_stream",
       "community": 0,
       "norm_label": ".chat_stream()"
@@ -241,7 +250,7 @@
       "label": ".execute_pending_tools()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L666",
+      "source_location": "L710",
       "id": "agent_openzessagent_execute_pending_tools",
       "community": 0,
       "norm_label": ".execute_pending_tools()"
@@ -250,7 +259,7 @@
       "label": ".execute_pending_tools_stream()",
       "file_type": "code",
       "source_file": "backend\\agent.py",
-      "source_location": "L703",
+      "source_location": "L747",
       "id": "agent_openzessagent_execute_pending_tools_stream",
       "community": 0,
       "norm_label": ".execute_pending_tools_stream()"
@@ -259,28 +268,28 @@
       "label": "Schedules a native agent action to run automatically in the background at an int",
       "file_type": "rationale",
       "source_file": "backend\\agent.py",
-      "source_location": "L108",
-      "community": 3,
-      "norm_label": "schedules a native agent action to run automatically in the background at an int",
-      "id": "agent_rationale_108"
+      "source_location": "L110",
+      "id": "agent_rationale_110",
+      "community": 2,
+      "norm_label": "schedules a native agent action to run automatically in the background at an int"
     },
     {
       "label": "Mounts a filesystem watchdog on a folder. When the folder changes, the Agent wil",
       "file_type": "rationale",
       "source_file": "backend\\agent.py",
-      "source_location": "L116",
-      "community": 3,
-      "norm_label": "mounts a filesystem watchdog on a folder. when the folder changes, the agent wil",
-      "id": "agent_rationale_116"
+      "source_location": "L118",
+      "id": "agent_rationale_118",
+      "community": 2,
+      "norm_label": "mounts a filesystem watchdog on a folder. when the folder changes, the agent wil"
     },
     {
       "label": "Ensure we are strictly operating inside the WSL Linux sandbox and dependencies l",
       "file_type": "rationale",
       "source_file": "backend\\agent.py",
-      "source_location": "L124",
+      "source_location": "L126",
+      "id": "agent_rationale_126",
       "community": 5,
-      "norm_label": "ensure we are strictly operating inside the wsl linux sandbox and dependencies l",
-      "id": "agent_rationale_124"
+      "norm_label": "ensure we are strictly operating inside the wsl linux sandbox and dependencies l"
     },
     {
       "label": "background_workers.py",
@@ -288,7 +297,7 @@
       "source_file": "backend\\background_workers.py",
       "source_location": "L1",
       "id": "backend_background_workers_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "background_workers.py"
     },
     {
@@ -297,7 +306,7 @@
       "source_file": "backend\\background_workers.py",
       "source_location": "L11",
       "id": "background_workers_cronmanager",
-      "community": 3,
+      "community": 2,
       "norm_label": "cronmanager"
     },
     {
@@ -306,7 +315,7 @@
       "source_file": "backend\\background_workers.py",
       "source_location": "L12",
       "id": "background_workers_cronmanager_init",
-      "community": 3,
+      "community": 2,
       "norm_label": ".__init__()"
     },
     {
@@ -315,43 +324,43 @@
       "source_file": "backend\\background_workers.py",
       "source_location": "L17",
       "id": "background_workers_cronmanager_execute_job",
-      "community": 3,
+      "community": 2,
       "norm_label": "._execute_job()"
     },
     {
       "label": ".add_job()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L34",
+      "source_location": "L50",
       "id": "background_workers_cronmanager_add_job",
-      "community": 3,
+      "community": 2,
       "norm_label": ".add_job()"
     },
     {
       "label": ".get_jobs()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L56",
+      "source_location": "L89",
       "id": "background_workers_cronmanager_get_jobs",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_jobs()"
     },
     {
       "label": ".remove_job()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L65",
+      "source_location": "L98",
       "id": "background_workers_cronmanager_remove_job",
-      "community": 3,
+      "community": 2,
       "norm_label": ".remove_job()"
     },
     {
       "label": "AgentWatchdogHandler",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L74",
+      "source_location": "L107",
       "id": "background_workers_agentwatchdoghandler",
-      "community": 3,
+      "community": 2,
       "norm_label": "agentwatchdoghandler"
     },
     {
@@ -360,71 +369,80 @@
       "source_file": "",
       "source_location": "",
       "id": "filesystemeventhandler",
-      "community": 3,
+      "community": 2,
       "norm_label": "filesystemeventhandler"
     },
     {
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L75",
+      "source_location": "L108",
       "id": "background_workers_agentwatchdoghandler_init",
-      "community": 3,
+      "community": 2,
       "norm_label": ".__init__()"
     },
     {
       "label": ".on_modified()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L80",
+      "source_location": "L113",
       "id": "background_workers_agentwatchdoghandler_on_modified",
-      "community": 3,
+      "community": 2,
       "norm_label": ".on_modified()"
     },
     {
       "label": "WatchManager",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L105",
+      "source_location": "L138",
       "id": "background_workers_watchmanager",
-      "community": 3,
+      "community": 2,
       "norm_label": "watchmanager"
     },
     {
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L106",
+      "source_location": "L139",
       "id": "background_workers_watchmanager_init",
-      "community": 3,
+      "community": 2,
       "norm_label": ".__init__()"
     },
     {
       "label": ".add_watchdog()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L109",
+      "source_location": "L142",
       "id": "background_workers_watchmanager_add_watchdog",
-      "community": 3,
+      "community": 2,
       "norm_label": ".add_watchdog()"
     },
     {
       "label": ".get_watchdogs()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L129",
+      "source_location": "L162",
       "id": "background_workers_watchmanager_get_watchdogs",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_watchdogs()"
     },
     {
       "label": ".remove_watchdog()",
       "file_type": "code",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L137",
+      "source_location": "L170",
       "id": "background_workers_watchmanager_remove_watchdog",
-      "community": 3,
+      "community": 2,
       "norm_label": ".remove_watchdog()"
+    },
+    {
+      "label": "Fire the agent via the internal /api/chat endpoint.",
+      "file_type": "rationale",
+      "source_file": "backend\\background_workers.py",
+      "source_location": "L18",
+      "id": "background_workers_rationale_18",
+      "community": 2,
+      "norm_label": "fire the agent via the internal /api/chat endpoint."
     },
     {
       "label": "database.py",
@@ -576,7 +594,7 @@
       "source_file": "backend\\database.py",
       "source_location": "L162",
       "id": "database_add_or_update_mcp_server",
-      "community": 4,
+      "community": 3,
       "norm_label": "add_or_update_mcp_server()"
     },
     {
@@ -585,7 +603,7 @@
       "source_file": "backend\\database.py",
       "source_location": "L191",
       "id": "database_get_all_mcp_servers",
-      "community": 4,
+      "community": 3,
       "norm_label": "get_all_mcp_servers()"
     },
     {
@@ -674,18 +692,18 @@
       "file_type": "rationale",
       "source_file": "backend\\database.py",
       "source_location": "L107",
-      "id": "database_rationale_107",
       "community": 0,
-      "norm_label": "context manager for safe db sessions with auto-rollback on errors."
+      "norm_label": "context manager for safe db sessions with auto-rollback on errors.",
+      "id": "database_rationale_107"
     },
     {
       "label": "Rename a chat session.",
       "file_type": "rationale",
       "source_file": "backend\\database.py",
       "source_location": "L136",
-      "id": "database_rationale_136",
       "community": 1,
-      "norm_label": "rename a chat session."
+      "norm_label": "rename a chat session.",
+      "id": "database_rationale_136"
     },
     {
       "label": "discord_worker.py",
@@ -693,7 +711,7 @@
       "source_file": "backend\\discord_worker.py",
       "source_location": "L1",
       "id": "backend_discord_worker_py",
-      "community": 2,
+      "community": 4,
       "norm_label": "discord_worker.py"
     },
     {
@@ -702,7 +720,7 @@
       "source_file": "backend\\discord_worker.py",
       "source_location": "L13",
       "id": "discord_worker_start_discord_listener",
-      "community": 2,
+      "community": 4,
       "norm_label": "start_discord_listener()"
     },
     {
@@ -711,7 +729,7 @@
       "source_file": "backend\\discord_worker.py",
       "source_location": "L158",
       "id": "discord_worker_stop_discord_listener",
-      "community": 2,
+      "community": 4,
       "norm_label": "stop_discord_listener()"
     },
     {
@@ -720,7 +738,7 @@
       "source_file": "backend\\discord_worker.py",
       "source_location": "L175",
       "id": "discord_worker_get_status",
-      "community": 2,
+      "community": 4,
       "norm_label": "get_status()"
     },
     {
@@ -729,7 +747,7 @@
       "source_file": "backend\\mcp_manager.py",
       "source_location": "L1",
       "id": "backend_mcp_manager_py",
-      "community": 4,
+      "community": 3,
       "norm_label": "mcp_manager.py"
     },
     {
@@ -738,7 +756,7 @@
       "source_file": "backend\\mcp_manager.py",
       "source_location": "L9",
       "id": "mcp_manager_mcpmanager",
-      "community": 4,
+      "community": 3,
       "norm_label": "mcpmanager"
     },
     {
@@ -747,7 +765,7 @@
       "source_file": "backend\\mcp_manager.py",
       "source_location": "L10",
       "id": "mcp_manager_mcpmanager_init",
-      "community": 2,
+      "community": 4,
       "norm_label": ".__init__()"
     },
     {
@@ -756,7 +774,7 @@
       "source_file": "backend\\mcp_manager.py",
       "source_location": "L20",
       "id": "mcp_manager_mcpmanager_start_event_loop",
-      "community": 4,
+      "community": 3,
       "norm_label": "._start_event_loop()"
     },
     {
@@ -765,88 +783,88 @@
       "source_file": "backend\\mcp_manager.py",
       "source_location": "L24",
       "id": "mcp_manager_mcpmanager_run_async",
-      "community": 4,
+      "community": 3,
       "norm_label": "._run_async()"
     },
     {
       "label": "._amake_connection()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L29",
+      "source_location": "L34",
       "id": "mcp_manager_mcpmanager_amake_connection",
-      "community": 4,
+      "community": 3,
       "norm_label": "._amake_connection()"
     },
     {
       "label": "._adisconnect()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L98",
+      "source_location": "L103",
       "id": "mcp_manager_mcpmanager_adisconnect",
-      "community": 4,
+      "community": 3,
       "norm_label": "._adisconnect()"
     },
     {
       "label": "._acall_tool()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L130",
+      "source_location": "L135",
       "id": "mcp_manager_mcpmanager_acall_tool",
-      "community": 4,
+      "community": 3,
       "norm_label": "._acall_tool()"
     },
     {
       "label": ".connect()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L144",
+      "source_location": "L149",
       "id": "mcp_manager_mcpmanager_connect",
-      "community": 4,
+      "community": 3,
       "norm_label": ".connect()"
     },
     {
       "label": ".disconnect()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L148",
+      "source_location": "L153",
       "id": "mcp_manager_mcpmanager_disconnect",
-      "community": 4,
+      "community": 3,
       "norm_label": ".disconnect()"
     },
     {
       "label": ".get_status()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L151",
+      "source_location": "L156",
       "id": "mcp_manager_mcpmanager_get_status",
-      "community": 4,
+      "community": 3,
       "norm_label": ".get_status()"
     },
     {
       "label": ".get_all_tools_for_litellm()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L160",
+      "source_location": "L165",
       "id": "mcp_manager_mcpmanager_get_all_tools_for_litellm",
-      "community": 4,
+      "community": 3,
       "norm_label": ".get_all_tools_for_litellm()"
     },
     {
       "label": ".find_server_for_tool()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L174",
+      "source_location": "L179",
       "id": "mcp_manager_mcpmanager_find_server_for_tool",
-      "community": 4,
+      "community": 3,
       "norm_label": ".find_server_for_tool()"
     },
     {
       "label": ".call_tool()",
       "file_type": "code",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L181",
+      "source_location": "L186",
       "id": "mcp_manager_mcpmanager_call_tool",
-      "community": 4,
+      "community": 3,
       "norm_label": ".call_tool()"
     },
     {
@@ -854,7 +872,7 @@
       "file_type": "rationale",
       "source_file": "backend\\mcp_manager.py",
       "source_location": "L25",
-      "community": 4,
+      "community": 3,
       "norm_label": "helper to run coroutines in the background loop from sync functions",
       "id": "mcp_manager_rationale_25"
     },
@@ -864,7 +882,7 @@
       "source_file": "backend\\mcp_test.py",
       "source_location": "L1",
       "id": "backend_mcp_test_py",
-      "community": 4,
+      "community": 3,
       "norm_label": "mcp_test.py"
     },
     {
@@ -873,7 +891,7 @@
       "source_file": "backend\\mcp_test.py",
       "source_location": "L5",
       "id": "mcp_test_run",
-      "community": 4,
+      "community": 3,
       "norm_label": "run()"
     },
     {
@@ -900,7 +918,7 @@
       "source_file": "backend\\plugin_loader.py",
       "source_location": "L1",
       "id": "backend_plugin_loader_py",
-      "community": 8,
+      "community": 9,
       "norm_label": "plugin_loader.py"
     },
     {
@@ -909,7 +927,7 @@
       "source_file": "backend\\plugin_loader.py",
       "source_location": "L4",
       "id": "plugin_loader_toolregistrar",
-      "community": 8,
+      "community": 9,
       "norm_label": "toolregistrar"
     },
     {
@@ -918,7 +936,7 @@
       "source_file": "backend\\plugin_loader.py",
       "source_location": "L5",
       "id": "plugin_loader_toolregistrar_init",
-      "community": 8,
+      "community": 9,
       "norm_label": ".__init__()"
     },
     {
@@ -927,7 +945,7 @@
       "source_file": "backend\\plugin_loader.py",
       "source_location": "L9",
       "id": "plugin_loader_toolregistrar_register",
-      "community": 8,
+      "community": 9,
       "norm_label": ".register()"
     },
     {
@@ -936,7 +954,7 @@
       "source_file": "backend\\plugin_loader.py",
       "source_location": "L33",
       "id": "plugin_loader_load_plugins",
-      "community": 8,
+      "community": 9,
       "norm_label": "load_plugins()"
     },
     {
@@ -944,7 +962,7 @@
       "file_type": "rationale",
       "source_file": "backend\\plugin_loader.py",
       "source_location": "L10",
-      "community": 8,
+      "community": 9,
       "norm_label": "decorator to register a custom python tool into the agent native ecosystem!",
       "id": "plugin_loader_rationale_10"
     },
@@ -953,7 +971,7 @@
       "file_type": "rationale",
       "source_file": "backend\\plugin_loader.py",
       "source_location": "L34",
-      "community": 8,
+      "community": 9,
       "norm_label": "scans the designated plugins directory and hot-loads all valid python modules na",
       "id": "plugin_loader_rationale_34"
     },
@@ -970,16 +988,16 @@
       "label": "init_active_mcps()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L54",
+      "source_location": "L56",
       "id": "server_init_active_mcps",
-      "community": 4,
+      "community": 3,
       "norm_label": "init_active_mcps()"
     },
     {
       "label": "ChatRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L67",
+      "source_location": "L69",
       "id": "server_chatrequest",
       "community": 0,
       "norm_label": "chatrequest"
@@ -997,7 +1015,7 @@
       "label": "swarm_debate_stream()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L82",
+      "source_location": "L84",
       "id": "server_swarm_debate_stream",
       "community": 0,
       "norm_label": "swarm_debate_stream()"
@@ -1006,7 +1024,7 @@
       "label": "chat()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L164",
+      "source_location": "L166",
       "id": "server_chat",
       "community": 0,
       "norm_label": "chat()"
@@ -1015,7 +1033,7 @@
       "label": "ApprovalRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L241",
+      "source_location": "L243",
       "id": "server_approvalrequest",
       "community": 0,
       "norm_label": "approvalrequest"
@@ -1024,7 +1042,7 @@
       "label": "chat_approve()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L248",
+      "source_location": "L250",
       "id": "server_chat_approve",
       "community": 0,
       "norm_label": "chat_approve()"
@@ -1033,7 +1051,7 @@
       "label": "list_sessions()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L272",
+      "source_location": "L274",
       "id": "server_list_sessions",
       "community": 1,
       "norm_label": "list_sessions()"
@@ -1042,7 +1060,7 @@
       "label": "get_messages()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L279",
+      "source_location": "L281",
       "id": "server_get_messages",
       "community": 1,
       "norm_label": "get_messages()"
@@ -1051,7 +1069,7 @@
       "label": "delete_message_endpoint()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L288",
+      "source_location": "L290",
       "id": "server_delete_message_endpoint",
       "community": 1,
       "norm_label": "delete_message_endpoint()"
@@ -1060,7 +1078,7 @@
       "label": "delete_session_endpoint()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L317",
+      "source_location": "L319",
       "id": "server_delete_session_endpoint",
       "community": 1,
       "norm_label": "delete_session_endpoint()"
@@ -1069,7 +1087,7 @@
       "label": "list_files()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L329",
+      "source_location": "L331",
       "id": "server_list_files",
       "community": 0,
       "norm_label": "list_files()"
@@ -1078,16 +1096,16 @@
       "label": "list_tools()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L339",
+      "source_location": "L341",
       "id": "server_list_tools",
-      "community": 4,
+      "community": 3,
       "norm_label": "list_tools()"
     },
     {
       "label": "get_memories()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L352",
+      "source_location": "L354",
       "id": "server_get_memories",
       "community": 0,
       "norm_label": "get_memories()"
@@ -1096,7 +1114,7 @@
       "label": "delete_memory()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L371",
+      "source_location": "L373",
       "id": "server_delete_memory",
       "community": 0,
       "norm_label": "delete_memory()"
@@ -1105,7 +1123,7 @@
       "label": "clear_all_memories()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L382",
+      "source_location": "L384",
       "id": "server_clear_all_memories",
       "community": 0,
       "norm_label": "clear_all_memories()"
@@ -1114,7 +1132,7 @@
       "label": "MCPConnectRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L396",
+      "source_location": "L398",
       "id": "server_mcpconnectrequest",
       "community": 0,
       "norm_label": "mcpconnectrequest"
@@ -1123,34 +1141,34 @@
       "label": "get_mcp_servers()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L407",
+      "source_location": "L409",
       "id": "server_get_mcp_servers",
-      "community": 4,
+      "community": 3,
       "norm_label": "get_mcp_servers()"
     },
     {
       "label": "connect_mcp()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L411",
+      "source_location": "L413",
       "id": "server_connect_mcp",
-      "community": 4,
+      "community": 3,
       "norm_label": "connect_mcp()"
     },
     {
       "label": "disconnect_mcp()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L422",
+      "source_location": "L424",
       "id": "server_disconnect_mcp",
-      "community": 4,
+      "community": 3,
       "norm_label": "disconnect_mcp()"
     },
     {
       "label": "remove_saved_mcp()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L432",
+      "source_location": "L434",
       "id": "server_remove_saved_mcp",
       "community": 1,
       "norm_label": "remove_saved_mcp()"
@@ -1159,7 +1177,7 @@
       "label": "CronCreateRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L437",
+      "source_location": "L439",
       "id": "server_croncreaterequest",
       "community": 0,
       "norm_label": "croncreaterequest"
@@ -1168,34 +1186,34 @@
       "label": "create_cron_job()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L442",
+      "source_location": "L446",
       "id": "server_create_cron_job",
-      "community": 3,
+      "community": 2,
       "norm_label": "create_cron_job()"
     },
     {
       "label": "get_cron_jobs()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L450",
+      "source_location": "L459",
       "id": "server_get_cron_jobs",
-      "community": 3,
+      "community": 2,
       "norm_label": "get_cron_jobs()"
     },
     {
       "label": "delete_cron_job()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L454",
+      "source_location": "L463",
       "id": "server_delete_cron_job",
-      "community": 3,
+      "community": 2,
       "norm_label": "delete_cron_job()"
     },
     {
       "label": "WatchdogCreateRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L458",
+      "source_location": "L467",
       "id": "server_watchdogcreaterequest",
       "community": 0,
       "norm_label": "watchdogcreaterequest"
@@ -1204,16 +1222,16 @@
       "label": "create_watchdog()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L463",
+      "source_location": "L472",
       "id": "server_create_watchdog",
-      "community": 3,
+      "community": 2,
       "norm_label": "create_watchdog()"
     },
     {
       "label": "get_watchdogs()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L471",
+      "source_location": "L480",
       "id": "server_get_watchdogs",
       "community": 0,
       "norm_label": "get_watchdogs()"
@@ -1222,25 +1240,25 @@
       "label": "delete_watchdog()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L475",
+      "source_location": "L484",
       "id": "server_delete_watchdog",
-      "community": 3,
+      "community": 2,
       "norm_label": "delete_watchdog()"
     },
     {
       "label": "import_persona()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L483",
+      "source_location": "L492",
       "id": "server_import_persona",
-      "community": 9,
+      "community": 10,
       "norm_label": "import_persona()"
     },
     {
       "label": "get_personas()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L506",
+      "source_location": "L515",
       "id": "server_get_personas",
       "community": 1,
       "norm_label": "get_personas()"
@@ -1249,7 +1267,7 @@
       "label": "delete_persona()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L513",
+      "source_location": "L522",
       "id": "server_delete_persona",
       "community": 0,
       "norm_label": "delete_persona()"
@@ -1258,7 +1276,7 @@
       "label": "TavernChatRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L517",
+      "source_location": "L526",
       "id": "server_tavernchatrequest",
       "community": 0,
       "norm_label": "tavernchatrequest"
@@ -1267,7 +1285,7 @@
       "label": "tavern_chat()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L527",
+      "source_location": "L536",
       "id": "server_tavern_chat",
       "community": 0,
       "norm_label": "tavern_chat()"
@@ -1276,7 +1294,7 @@
       "label": "OpenAIMessage",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L554",
+      "source_location": "L563",
       "id": "server_openaimessage",
       "community": 0,
       "norm_label": "openaimessage"
@@ -1285,7 +1303,7 @@
       "label": "OpenAIChatRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L558",
+      "source_location": "L567",
       "id": "server_openaichatrequest",
       "community": 0,
       "norm_label": "openaichatrequest"
@@ -1294,7 +1312,7 @@
       "label": "get_openai_models()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L564",
+      "source_location": "L573",
       "id": "server_get_openai_models",
       "community": 0,
       "norm_label": "get_openai_models()"
@@ -1303,7 +1321,7 @@
       "label": "guess_provider()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L570",
+      "source_location": "L579",
       "id": "server_guess_provider",
       "community": 0,
       "norm_label": "guess_provider()"
@@ -1312,7 +1330,7 @@
       "label": "openai_chat_completions()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L577",
+      "source_location": "L586",
       "id": "server_openai_chat_completions",
       "community": 0,
       "norm_label": "openai_chat_completions()"
@@ -1321,7 +1339,7 @@
       "label": "AnthropicMessage",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L610",
+      "source_location": "L619",
       "id": "server_anthropicmessage",
       "community": 0,
       "norm_label": "anthropicmessage"
@@ -1330,7 +1348,7 @@
       "label": "AnthropicChatRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L614",
+      "source_location": "L623",
       "id": "server_anthropicchatrequest",
       "community": 0,
       "norm_label": "anthropicchatrequest"
@@ -1339,7 +1357,7 @@
       "label": "anthropic_messages()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L622",
+      "source_location": "L631",
       "id": "server_anthropic_messages",
       "community": 0,
       "norm_label": "anthropic_messages()"
@@ -1348,7 +1366,7 @@
       "label": "TelegramStartRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L657",
+      "source_location": "L666",
       "id": "server_telegramstartrequest",
       "community": 0,
       "norm_label": "telegramstartrequest"
@@ -1357,34 +1375,34 @@
       "label": "start_telegram()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L663",
+      "source_location": "L672",
       "id": "server_start_telegram",
-      "community": 2,
+      "community": 8,
       "norm_label": "start_telegram()"
     },
     {
       "label": "stop_telegram()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L671",
+      "source_location": "L680",
       "id": "server_stop_telegram",
-      "community": 2,
+      "community": 8,
       "norm_label": "stop_telegram()"
     },
     {
       "label": "get_telegram_status()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L679",
+      "source_location": "L688",
       "id": "server_get_telegram_status",
-      "community": 2,
+      "community": 8,
       "norm_label": "get_telegram_status()"
     },
     {
       "label": "DiscordStartRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L685",
+      "source_location": "L694",
       "id": "server_discordstartrequest",
       "community": 0,
       "norm_label": "discordstartrequest"
@@ -1393,34 +1411,34 @@
       "label": "start_discord()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L691",
+      "source_location": "L700",
       "id": "server_start_discord",
-      "community": 2,
+      "community": 4,
       "norm_label": "start_discord()"
     },
     {
       "label": "stop_discord()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L699",
+      "source_location": "L708",
       "id": "server_stop_discord",
-      "community": 2,
+      "community": 4,
       "norm_label": "stop_discord()"
     },
     {
       "label": "get_discord_status()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L707",
+      "source_location": "L716",
       "id": "server_get_discord_status",
-      "community": 2,
+      "community": 8,
       "norm_label": "get_discord_status()"
     },
     {
       "label": "TTSRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L713",
+      "source_location": "L722",
       "id": "server_ttsrequest",
       "community": 0,
       "norm_label": "ttsrequest"
@@ -1429,7 +1447,7 @@
       "label": "generate_tts()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L717",
+      "source_location": "L726",
       "id": "server_generate_tts",
       "community": 0,
       "norm_label": "generate_tts()"
@@ -1438,7 +1456,7 @@
       "label": "SwarmSquadRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L732",
+      "source_location": "L741",
       "id": "server_swarmsquadrequest",
       "community": 0,
       "norm_label": "swarmsquadrequest"
@@ -1447,7 +1465,7 @@
       "label": "swarm_squad()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L739",
+      "source_location": "L748",
       "id": "server_swarm_squad",
       "community": 0,
       "norm_label": "swarm_squad()"
@@ -1456,7 +1474,7 @@
       "label": "NoteCreateRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L755",
+      "source_location": "L764",
       "id": "server_notecreaterequest",
       "community": 0,
       "norm_label": "notecreaterequest"
@@ -1465,7 +1483,7 @@
       "label": "NoteUpdateRequest",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L760",
+      "source_location": "L769",
       "id": "server_noteupdaterequest",
       "community": 0,
       "norm_label": "noteupdaterequest"
@@ -1474,7 +1492,7 @@
       "label": "create_note()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L766",
+      "source_location": "L775",
       "id": "server_create_note",
       "community": 0,
       "norm_label": "create_note()"
@@ -1483,7 +1501,7 @@
       "label": "get_notes()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L774",
+      "source_location": "L783",
       "id": "server_get_notes",
       "community": 1,
       "norm_label": "get_notes()"
@@ -1492,7 +1510,7 @@
       "label": "update_note()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L781",
+      "source_location": "L790",
       "id": "server_update_note",
       "community": 0,
       "norm_label": "update_note()"
@@ -1501,7 +1519,7 @@
       "label": "delete_note()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L791",
+      "source_location": "L800",
       "id": "server_delete_note",
       "community": 0,
       "norm_label": "delete_note()"
@@ -1510,7 +1528,7 @@
       "label": "upload_note_image()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L801",
+      "source_location": "L810",
       "id": "server_upload_note_image",
       "community": 0,
       "norm_label": "upload_note_image()"
@@ -1519,7 +1537,7 @@
       "label": "matrix_stream()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L818",
+      "source_location": "L827",
       "id": "server_matrix_stream",
       "community": 0,
       "norm_label": "matrix_stream()"
@@ -1528,7 +1546,7 @@
       "label": "get_graphify_report()",
       "file_type": "code",
       "source_file": "backend\\server.py",
-      "source_location": "L904",
+      "source_location": "L913",
       "id": "server_get_graphify_report",
       "community": 0,
       "norm_label": "get_graphify_report()"
@@ -1537,8 +1555,8 @@
       "label": "Returns parsed stats from the graphify GRAPH_REPORT.md for the frontend panel.",
       "file_type": "rationale",
       "source_file": "backend\\server.py",
-      "source_location": "L905",
-      "id": "server_rationale_905",
+      "source_location": "L914",
+      "id": "server_rationale_914",
       "community": 0,
       "norm_label": "returns parsed stats from the graphify graph_report.md for the frontend panel."
     },
@@ -1548,7 +1566,7 @@
       "source_file": "backend\\swarm_manager.py",
       "source_location": "L1",
       "id": "backend_swarm_manager_py",
-      "community": 10,
+      "community": 11,
       "norm_label": "swarm_manager.py"
     },
     {
@@ -1557,7 +1575,7 @@
       "source_file": "backend\\swarm_manager.py",
       "source_location": "L9",
       "id": "swarm_manager_swarmmanager",
-      "community": 10,
+      "community": 11,
       "norm_label": "swarmmanager"
     },
     {
@@ -1566,7 +1584,7 @@
       "source_file": "backend\\swarm_manager.py",
       "source_location": "L10",
       "id": "swarm_manager_swarmmanager_init",
-      "community": 10,
+      "community": 11,
       "norm_label": ".__init__()"
     },
     {
@@ -1575,7 +1593,7 @@
       "source_file": "backend\\swarm_manager.py",
       "source_location": "L14",
       "id": "swarm_manager_swarmmanager_dispatch_squad_stream",
-      "community": 10,
+      "community": 11,
       "norm_label": ".dispatch_squad_stream()"
     },
     {
@@ -1583,7 +1601,7 @@
       "file_type": "rationale",
       "source_file": "backend\\swarm_manager.py",
       "source_location": "L15",
-      "community": 10,
+      "community": 11,
       "norm_label": "dispatches a prompt to multiple specialized agents simultaneously.         squad",
       "id": "swarm_manager_rationale_15"
     },
@@ -1593,7 +1611,7 @@
       "source_file": "backend\\tavern_parser.py",
       "source_location": "L1",
       "id": "backend_tavern_parser_py",
-      "community": 9,
+      "community": 10,
       "norm_label": "tavern_parser.py"
     },
     {
@@ -1602,7 +1620,7 @@
       "source_file": "backend\\tavern_parser.py",
       "source_location": "L6",
       "id": "tavern_parser_parse_tavern_png",
-      "community": 9,
+      "community": 10,
       "norm_label": "parse_tavern_png()"
     },
     {
@@ -1611,7 +1629,7 @@
       "source_file": "backend\\tavern_parser.py",
       "source_location": "L42",
       "id": "tavern_parser_parse_tavern_json",
-      "community": 9,
+      "community": 10,
       "norm_label": "parse_tavern_json()"
     },
     {
@@ -1619,7 +1637,7 @@
       "file_type": "rationale",
       "source_file": "backend\\tavern_parser.py",
       "source_location": "L7",
-      "community": 9,
+      "community": 10,
       "norm_label": "parses a sillytavern character card (png) to extract the hidden base64 'chara' j",
       "id": "tavern_parser_rationale_7"
     },
@@ -1628,7 +1646,7 @@
       "file_type": "rationale",
       "source_file": "backend\\tavern_parser.py",
       "source_location": "L43",
-      "community": 9,
+      "community": 10,
       "norm_label": "fallback parser for direct json character files.",
       "id": "tavern_parser_rationale_43"
     },
@@ -1638,7 +1656,7 @@
       "source_file": "backend\\telegram_worker.py",
       "source_location": "L1",
       "id": "backend_telegram_worker_py",
-      "community": 2,
+      "community": 8,
       "norm_label": "telegram_worker.py"
     },
     {
@@ -1647,7 +1665,7 @@
       "source_file": "backend\\telegram_worker.py",
       "source_location": "L11",
       "id": "telegram_worker_start_telegram_listener",
-      "community": 2,
+      "community": 8,
       "norm_label": "start_telegram_listener()"
     },
     {
@@ -1656,7 +1674,7 @@
       "source_file": "backend\\telegram_worker.py",
       "source_location": "L141",
       "id": "telegram_worker_stop_telegram_listener",
-      "community": 2,
+      "community": 8,
       "norm_label": "stop_telegram_listener()"
     },
     {
@@ -1665,7 +1683,7 @@
       "source_file": "backend\\telegram_worker.py",
       "source_location": "L150",
       "id": "telegram_worker_get_status",
-      "community": 2,
+      "community": 8,
       "norm_label": "get_status()"
     },
     {
@@ -1674,7 +1692,7 @@
       "source_file": "backend\\test_manager.py",
       "source_location": "L1",
       "id": "backend_test_manager_py",
-      "community": 37,
+      "community": 38,
       "norm_label": "test_manager.py"
     },
     {
@@ -1683,7 +1701,7 @@
       "source_file": "backend\\plugins\\pc_control.py",
       "source_location": "L1",
       "id": "backend_plugins_pc_control_py",
-      "community": 11,
+      "community": 12,
       "norm_label": "pc_control.py"
     },
     {
@@ -1692,7 +1710,7 @@
       "source_file": "backend\\plugins\\pc_control.py",
       "source_location": "L17",
       "id": "pc_control_take_screenshot",
-      "community": 11,
+      "community": 12,
       "norm_label": "take_screenshot()"
     },
     {
@@ -1701,7 +1719,7 @@
       "source_file": "backend\\plugins\\pc_control.py",
       "source_location": "L41",
       "id": "pc_control_mouse_click",
-      "community": 11,
+      "community": 12,
       "norm_label": "mouse_click()"
     },
     {
@@ -1710,7 +1728,7 @@
       "source_file": "backend\\plugins\\pc_control.py",
       "source_location": "L59",
       "id": "pc_control_keyboard_type",
-      "community": 11,
+      "community": 12,
       "norm_label": "keyboard_type()"
     },
     {
@@ -1719,7 +1737,7 @@
       "source_file": "backend\\plugins\\pc_control.py",
       "source_location": "L78",
       "id": "pc_control_keyboard_press",
-      "community": 11,
+      "community": 12,
       "norm_label": "keyboard_press()"
     },
     {
@@ -1728,7 +1746,7 @@
       "source_file": "backend\\plugins\\system_health.py",
       "source_location": "L1",
       "id": "backend_plugins_system_health_py",
-      "community": 23,
+      "community": 24,
       "norm_label": "system_health.py"
     },
     {
@@ -1737,7 +1755,7 @@
       "source_file": "backend\\plugins\\system_health.py",
       "source_location": "L11",
       "id": "system_health_get_system_health",
-      "community": 23,
+      "community": 24,
       "norm_label": "get_system_health()"
     },
     {
@@ -1745,7 +1763,7 @@
       "file_type": "rationale",
       "source_file": "backend\\plugins\\system_health.py",
       "source_location": "L12",
-      "community": 23,
+      "community": 24,
       "norm_label": "returns an aggressively formatted string of current pc metrics.",
       "id": "system_health_rationale_12"
     },
@@ -1755,7 +1773,7 @@
       "source_file": "backend\\portfolio\\js\\script.js",
       "source_location": "L1",
       "id": "backend_portfolio_js_script_js",
-      "community": 38,
+      "community": 39,
       "norm_label": "script.js"
     },
     {
@@ -1764,7 +1782,7 @@
       "source_file": "frontend\\eslint.config.js",
       "source_location": "L1",
       "id": "frontend_eslint_config_js",
-      "community": 39,
+      "community": 40,
       "norm_label": "eslint.config.js"
     },
     {
@@ -1773,7 +1791,7 @@
       "source_file": "frontend\\vite.config.ts",
       "source_location": "L1",
       "id": "frontend_vite_config_ts",
-      "community": 40,
+      "community": 41,
       "norm_label": "vite.config.ts"
     },
     {
@@ -1782,7 +1800,7 @@
       "source_file": "frontend\\dist-electron\\main.js",
       "source_location": "L1",
       "id": "frontend_dist_electron_main_js",
-      "community": 15,
+      "community": 16,
       "norm_label": "main.js"
     },
     {
@@ -1791,7 +1809,7 @@
       "source_file": "frontend\\electron\\main.ts",
       "source_location": "L25",
       "id": "main_createwindow",
-      "community": 15,
+      "community": 16,
       "norm_label": "createwindow()"
     },
     {
@@ -1800,7 +1818,7 @@
       "source_file": "frontend\\electron\\main.ts",
       "source_location": "L45",
       "id": "main_createwidgetwindow",
-      "community": 15,
+      "community": 16,
       "norm_label": "createwidgetwindow()"
     },
     {
@@ -1809,7 +1827,7 @@
       "source_file": "frontend\\dist-electron\\preload.mjs",
       "source_location": "L1",
       "id": "frontend_dist_electron_preload_mjs",
-      "community": 41,
+      "community": 42,
       "norm_label": "preload.mjs"
     },
     {
@@ -1818,7 +1836,7 @@
       "source_file": "frontend\\electron\\main.ts",
       "source_location": "L1",
       "id": "frontend_electron_main_ts",
-      "community": 15,
+      "community": 16,
       "norm_label": "main.ts"
     },
     {
@@ -1827,7 +1845,7 @@
       "source_file": "frontend\\electron\\preload.ts",
       "source_location": "L1",
       "id": "frontend_electron_preload_ts",
-      "community": 42,
+      "community": 43,
       "norm_label": "preload.ts"
     },
     {
@@ -1926,7 +1944,7 @@
       "source_file": "frontend\\src\\components\\AddMCPServerModal.tsx",
       "source_location": "L1",
       "id": "frontend_src_components_addmcpservermodal_tsx",
-      "community": 28,
+      "community": 29,
       "norm_label": "addmcpservermodal.tsx"
     },
     {
@@ -1935,7 +1953,7 @@
       "source_file": "frontend\\src\\components\\AddMCPServerModal.tsx",
       "source_location": "L19",
       "id": "addmcpservermodal_handlesubmit",
-      "community": 28,
+      "community": 29,
       "norm_label": "handlesubmit()"
     },
     {
@@ -1944,7 +1962,7 @@
       "source_file": "frontend\\src\\components\\CustomCursor.tsx",
       "source_location": "L1",
       "id": "frontend_src_components_customcursor_tsx",
-      "community": 24,
+      "community": 25,
       "norm_label": "customcursor.tsx"
     },
     {
@@ -1953,7 +1971,7 @@
       "source_file": "frontend\\src\\components\\CustomCursor.tsx",
       "source_location": "L9",
       "id": "customcursor_updatemouseposition",
-      "community": 24,
+      "community": 25,
       "norm_label": "updatemouseposition()"
     },
     {
@@ -1962,7 +1980,7 @@
       "source_file": "frontend\\src\\components\\CustomCursor.tsx",
       "source_location": "L13",
       "id": "customcursor_handlemouseover",
-      "community": 24,
+      "community": 25,
       "norm_label": "handlemouseover()"
     },
     {
@@ -1971,7 +1989,7 @@
       "source_file": "frontend\\src\\components\\PageTransition.tsx",
       "source_location": "L1",
       "id": "frontend_src_components_pagetransition_tsx",
-      "community": 29,
+      "community": 30,
       "norm_label": "pagetransition.tsx"
     },
     {
@@ -1980,7 +1998,7 @@
       "source_file": "frontend\\src\\components\\PageTransition.tsx",
       "source_location": "L9",
       "id": "pagetransition_pagetransition",
-      "community": 29,
+      "community": 30,
       "norm_label": "pagetransition()"
     },
     {
@@ -1989,7 +2007,7 @@
       "source_file": "frontend\\src\\components\\Sidebar.tsx",
       "source_location": "L1",
       "id": "frontend_src_components_sidebar_tsx",
-      "community": 16,
+      "community": 17,
       "norm_label": "sidebar.tsx"
     },
     {
@@ -1998,7 +2016,7 @@
       "source_file": "frontend\\src\\components\\Sidebar.tsx",
       "source_location": "L15",
       "id": "sidebar_togglemenu",
-      "community": 16,
+      "community": 17,
       "norm_label": "togglemenu()"
     },
     {
@@ -2007,7 +2025,7 @@
       "source_file": "frontend\\src\\components\\Sidebar.tsx",
       "source_location": "L20",
       "id": "sidebar_handlezenmode",
-      "community": 16,
+      "community": 17,
       "norm_label": "handlezenmode()"
     },
     {
@@ -2016,7 +2034,7 @@
       "source_file": "frontend\\src\\components\\Sidebar.tsx",
       "source_location": "L26",
       "id": "sidebar_handleglobalthemetoggle",
-      "community": 16,
+      "community": 17,
       "norm_label": "handleglobalthemetoggle()"
     },
     {
@@ -2025,7 +2043,7 @@
       "source_file": "frontend\\src\\components\\VRMAvatar.tsx",
       "source_location": "L1",
       "id": "frontend_src_components_vrmavatar_tsx",
-      "community": 30,
+      "community": 31,
       "norm_label": "vrmavatar.tsx"
     },
     {
@@ -2034,7 +2052,7 @@
       "source_file": "frontend\\src\\components\\VRMAvatar.tsx",
       "source_location": "L14",
       "id": "vrmavatar_vrmavatar",
-      "community": 30,
+      "community": 31,
       "norm_label": "vrmavatar()"
     },
     {
@@ -2043,7 +2061,7 @@
       "source_file": "frontend\\src\\context\\ThemeContext.tsx",
       "source_location": "L1",
       "id": "frontend_src_context_themecontext_tsx",
-      "community": 25,
+      "community": 26,
       "norm_label": "themecontext.tsx"
     },
     {
@@ -2052,7 +2070,7 @@
       "source_file": "frontend\\src\\context\\ThemeContext.tsx",
       "source_location": "L12",
       "id": "themecontext_themeprovider",
-      "community": 25,
+      "community": 26,
       "norm_label": "themeprovider()"
     },
     {
@@ -2061,7 +2079,7 @@
       "source_file": "frontend\\src\\context\\ThemeContext.tsx",
       "source_location": "L37",
       "id": "themecontext_usetheme",
-      "community": 25,
+      "community": 26,
       "norm_label": "usetheme()"
     },
     {
@@ -2070,7 +2088,7 @@
       "source_file": "frontend\\src\\contexts\\ToastContext.tsx",
       "source_location": "L1",
       "id": "frontend_src_contexts_toastcontext_tsx",
-      "community": 17,
+      "community": 18,
       "norm_label": "toastcontext.tsx"
     },
     {
@@ -2079,7 +2097,7 @@
       "source_file": "frontend\\src\\contexts\\ToastContext.tsx",
       "source_location": "L20",
       "id": "toastcontext_usetoast",
-      "community": 17,
+      "community": 18,
       "norm_label": "usetoast()"
     },
     {
@@ -2088,7 +2106,7 @@
       "source_file": "frontend\\src\\pages\\Changelog.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_changelog_tsx",
-      "community": 31,
+      "community": 32,
       "norm_label": "changelog.tsx"
     },
     {
@@ -2097,7 +2115,7 @@
       "source_file": "frontend\\src\\pages\\Changelog.tsx",
       "source_location": "L42",
       "id": "changelog_changelog",
-      "community": 31,
+      "community": 32,
       "norm_label": "changelog()"
     },
     {
@@ -2106,7 +2124,7 @@
       "source_file": "frontend\\src\\pages\\Channels.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_channels_tsx",
-      "community": 26,
+      "community": 27,
       "norm_label": "channels.tsx"
     },
     {
@@ -2115,7 +2133,7 @@
       "source_file": "frontend\\src\\pages\\Channels.tsx",
       "source_location": "L66",
       "id": "channels_toggletelegram",
-      "community": 26,
+      "community": 27,
       "norm_label": "toggletelegram()"
     },
     {
@@ -2124,7 +2142,7 @@
       "source_file": "frontend\\src\\pages\\Channels.tsx",
       "source_location": "L97",
       "id": "channels_togglediscord",
-      "community": 26,
+      "community": 27,
       "norm_label": "togglediscord()"
     },
     {
@@ -2133,7 +2151,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_chat_tsx",
-      "community": 2,
+      "community": 4,
       "norm_label": "chat.tsx"
     },
     {
@@ -2142,7 +2160,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L48",
       "id": "chat_handleclickoutside",
-      "community": 2,
+      "community": 4,
       "norm_label": "handleclickoutside()"
     },
     {
@@ -2151,7 +2169,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L53",
       "id": "chat_handlepersonachanged",
-      "community": 2,
+      "community": 4,
       "norm_label": "handlepersonachanged()"
     },
     {
@@ -2160,7 +2178,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L66",
       "id": "chat_handlefileupload",
-      "community": 2,
+      "community": 4,
       "norm_label": "handlefileupload()"
     },
     {
@@ -2169,7 +2187,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L78",
       "id": "chat_handledownload",
-      "community": 2,
+      "community": 4,
       "norm_label": "handledownload()"
     },
     {
@@ -2178,7 +2196,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L89",
       "id": "chat_handlerun",
-      "community": 2,
+      "community": 4,
       "norm_label": "handlerun()"
     },
     {
@@ -2187,7 +2205,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L121",
       "id": "chat_loadsessionhistory",
-      "community": 2,
+      "community": 4,
       "norm_label": "loadsessionhistory()"
     },
     {
@@ -2196,7 +2214,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L225",
       "id": "chat_togglelisten",
-      "community": 2,
+      "community": 4,
       "norm_label": "togglelisten()"
     },
     {
@@ -2205,7 +2223,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L239",
       "id": "chat_handlesend",
-      "community": 2,
+      "community": 4,
       "norm_label": "handlesend()"
     },
     {
@@ -2214,7 +2232,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L411",
       "id": "chat_handleapproval",
-      "community": 2,
+      "community": 4,
       "norm_label": "handleapproval()"
     },
     {
@@ -2223,7 +2241,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L494",
       "id": "chat_handletooltoggle",
-      "community": 2,
+      "community": 4,
       "norm_label": "handletooltoggle()"
     },
     {
@@ -2232,7 +2250,7 @@
       "source_file": "frontend\\src\\pages\\Chat.tsx",
       "source_location": "L500",
       "id": "chat_handledeletemessage",
-      "community": 2,
+      "community": 4,
       "norm_label": "handledeletemessage()"
     },
     {
@@ -2241,7 +2259,7 @@
       "source_file": "frontend\\src\\pages\\Companion.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_companion_tsx",
-      "community": 27,
+      "community": 28,
       "norm_label": "companion.tsx"
     },
     {
@@ -2250,7 +2268,7 @@
       "source_file": "frontend\\src\\pages\\Companion.tsx",
       "source_location": "L10",
       "id": "companion_handlefileupload",
-      "community": 27,
+      "community": 28,
       "norm_label": "handlefileupload()"
     },
     {
@@ -2259,7 +2277,7 @@
       "source_file": "frontend\\src\\pages\\Companion.tsx",
       "source_location": "L19",
       "id": "companion_handleclear",
-      "community": 27,
+      "community": 28,
       "norm_label": "handleclear()"
     },
     {
@@ -2268,34 +2286,34 @@
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_cronjobs_tsx",
-      "community": 18,
+      "community": 19,
       "norm_label": "cronjobs.tsx"
     },
     {
       "label": "fetchData()",
       "file_type": "code",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L36",
+      "source_location": "L40",
       "id": "cronjobs_fetchdata",
-      "community": 18,
+      "community": 19,
       "norm_label": "fetchdata()"
     },
     {
       "label": "deleteJob()",
       "file_type": "code",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L57",
+      "source_location": "L61",
       "id": "cronjobs_deletejob",
-      "community": 18,
+      "community": 19,
       "norm_label": "deletejob()"
     },
     {
       "label": "handleCreate()",
       "file_type": "code",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L70",
+      "source_location": "L74",
       "id": "cronjobs_handlecreate",
-      "community": 18,
+      "community": 19,
       "norm_label": "handlecreate()"
     },
     {
@@ -2304,7 +2322,7 @@
       "source_file": "frontend\\src\\pages\\DebateArena.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_debatearena_tsx",
-      "community": 43,
+      "community": 44,
       "norm_label": "debatearena.tsx"
     },
     {
@@ -2331,7 +2349,7 @@
       "source_file": "frontend\\src\\pages\\Doc.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_doc_tsx",
-      "community": 32,
+      "community": 33,
       "norm_label": "doc.tsx"
     },
     {
@@ -2340,7 +2358,7 @@
       "source_file": "frontend\\src\\pages\\Doc.tsx",
       "source_location": "L4",
       "id": "doc_doc",
-      "community": 32,
+      "community": 33,
       "norm_label": "doc()"
     },
     {
@@ -2349,7 +2367,7 @@
       "source_file": "frontend\\src\\pages\\FAQ.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_faq_tsx",
-      "community": 33,
+      "community": 34,
       "norm_label": "faq.tsx"
     },
     {
@@ -2358,7 +2376,7 @@
       "source_file": "frontend\\src\\pages\\FAQ.tsx",
       "source_location": "L10",
       "id": "faq_faq",
-      "community": 33,
+      "community": 34,
       "norm_label": "faq()"
     },
     {
@@ -2367,7 +2385,7 @@
       "source_file": "frontend\\src\\pages\\Files.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_files_tsx",
-      "community": 44,
+      "community": 45,
       "norm_label": "files.tsx"
     },
     {
@@ -2376,7 +2394,7 @@
       "source_file": "frontend\\src\\pages\\Graphify.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_graphify_tsx",
-      "community": 45,
+      "community": 46,
       "norm_label": "graphify.tsx"
     },
     {
@@ -2385,7 +2403,7 @@
       "source_file": "frontend\\src\\pages\\KnowledgeBase.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_knowledgebase_tsx",
-      "community": 17,
+      "community": 18,
       "norm_label": "knowledgebase.tsx"
     },
     {
@@ -2394,7 +2412,7 @@
       "source_file": "frontend\\src\\pages\\KnowledgeBase.tsx",
       "source_location": "L17",
       "id": "knowledgebase_knowledgebase",
-      "community": 17,
+      "community": 18,
       "norm_label": "knowledgebase()"
     },
     {
@@ -2403,7 +2421,7 @@
       "source_file": "frontend\\src\\pages\\Marketplace.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_marketplace_tsx",
-      "community": 19,
+      "community": 20,
       "norm_label": "marketplace.tsx"
     },
     {
@@ -2412,7 +2430,7 @@
       "source_file": "frontend\\src\\pages\\Marketplace.tsx",
       "source_location": "L83",
       "id": "marketplace_fetchinstalled",
-      "community": 19,
+      "community": 20,
       "norm_label": "fetchinstalled()"
     },
     {
@@ -2421,7 +2439,7 @@
       "source_file": "frontend\\src\\pages\\Marketplace.tsx",
       "source_location": "L96",
       "id": "marketplace_handleinstall",
-      "community": 19,
+      "community": 20,
       "norm_label": "handleinstall()"
     },
     {
@@ -2430,7 +2448,7 @@
       "source_file": "frontend\\src\\pages\\Marketplace.tsx",
       "source_location": "L114",
       "id": "marketplace_isinstalled",
-      "community": 19,
+      "community": 20,
       "norm_label": "isinstalled()"
     },
     {
@@ -2439,7 +2457,7 @@
       "source_file": "frontend\\src\\pages\\MatrixViewer.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_matrixviewer_tsx",
-      "community": 34,
+      "community": 35,
       "norm_label": "matrixviewer.tsx"
     },
     {
@@ -2448,7 +2466,7 @@
       "source_file": "frontend\\src\\pages\\MatrixViewer.tsx",
       "source_location": "L63",
       "id": "matrixviewer_handlepointerdown",
-      "community": 34,
+      "community": 35,
       "norm_label": "handlepointerdown()"
     },
     {
@@ -2457,7 +2475,7 @@
       "source_file": "frontend\\src\\pages\\MCP.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_mcp_tsx",
-      "community": 12,
+      "community": 13,
       "norm_label": "mcp.tsx"
     },
     {
@@ -2466,7 +2484,7 @@
       "source_file": "frontend\\src\\pages\\MCP.tsx",
       "source_location": "L48",
       "id": "mcp_fetchservers",
-      "community": 12,
+      "community": 13,
       "norm_label": "fetchservers()"
     },
     {
@@ -2475,7 +2493,7 @@
       "source_file": "frontend\\src\\pages\\MCP.tsx",
       "source_location": "L63",
       "id": "mcp_toggleserver",
-      "community": 12,
+      "community": 13,
       "norm_label": "toggleserver()"
     },
     {
@@ -2484,7 +2502,7 @@
       "source_file": "frontend\\src\\pages\\MCP.tsx",
       "source_location": "L90",
       "id": "mcp_handleaddcustom",
-      "community": 12,
+      "community": 13,
       "norm_label": "handleaddcustom()"
     },
     {
@@ -2493,7 +2511,7 @@
       "source_file": "frontend\\src\\pages\\MCP.tsx",
       "source_location": "L104",
       "id": "mcp_handledeletesaved",
-      "community": 12,
+      "community": 13,
       "norm_label": "handledeletesaved()"
     },
     {
@@ -2502,7 +2520,7 @@
       "source_file": "frontend\\src\\pages\\Memory.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_memory_tsx",
-      "community": 20,
+      "community": 21,
       "norm_label": "memory.tsx"
     },
     {
@@ -2511,7 +2529,7 @@
       "source_file": "frontend\\src\\pages\\Memory.tsx",
       "source_location": "L21",
       "id": "memory_fetchmemories",
-      "community": 20,
+      "community": 21,
       "norm_label": "fetchmemories()"
     },
     {
@@ -2520,7 +2538,7 @@
       "source_file": "frontend\\src\\pages\\Memory.tsx",
       "source_location": "L34",
       "id": "memory_deletememory",
-      "community": 20,
+      "community": 21,
       "norm_label": "deletememory()"
     },
     {
@@ -2529,7 +2547,7 @@
       "source_file": "frontend\\src\\pages\\Memory.tsx",
       "source_location": "L44",
       "id": "memory_clearallmemories",
-      "community": 20,
+      "community": 21,
       "norm_label": "clearallmemories()"
     },
     {
@@ -2538,7 +2556,7 @@
       "source_file": "frontend\\src\\pages\\Sessions.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_sessions_tsx",
-      "community": 21,
+      "community": 22,
       "norm_label": "sessions.tsx"
     },
     {
@@ -2547,7 +2565,7 @@
       "source_file": "frontend\\src\\pages\\Sessions.tsx",
       "source_location": "L22",
       "id": "sessions_fetchsessions",
-      "community": 21,
+      "community": 22,
       "norm_label": "fetchsessions()"
     },
     {
@@ -2556,7 +2574,7 @@
       "source_file": "frontend\\src\\pages\\Sessions.tsx",
       "source_location": "L33",
       "id": "sessions_handledelete",
-      "community": 21,
+      "community": 22,
       "norm_label": "handledelete()"
     },
     {
@@ -2565,7 +2583,7 @@
       "source_file": "frontend\\src\\pages\\Sessions.tsx",
       "source_location": "L45",
       "id": "sessions_formatdate",
-      "community": 21,
+      "community": 22,
       "norm_label": "formatdate()"
     },
     {
@@ -2574,7 +2592,7 @@
       "source_file": "frontend\\src\\pages\\Skills.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_skills_tsx",
-      "community": 13,
+      "community": 14,
       "norm_label": "skills.tsx"
     },
     {
@@ -2583,7 +2601,7 @@
       "source_file": "frontend\\src\\pages\\Skills.tsx",
       "source_location": "L40",
       "id": "skills_loadskills",
-      "community": 13,
+      "community": 14,
       "norm_label": "loadskills()"
     },
     {
@@ -2592,7 +2610,7 @@
       "source_file": "frontend\\src\\pages\\Skills.tsx",
       "source_location": "L71",
       "id": "skills_handlesavecustomskill",
-      "community": 13,
+      "community": 14,
       "norm_label": "handlesavecustomskill()"
     },
     {
@@ -2601,7 +2619,7 @@
       "source_file": "frontend\\src\\pages\\Skills.tsx",
       "source_location": "L104",
       "id": "skills_handledeletecustomskill",
-      "community": 13,
+      "community": 14,
       "norm_label": "handledeletecustomskill()"
     },
     {
@@ -2610,7 +2628,7 @@
       "source_file": "frontend\\src\\pages\\Skills.tsx",
       "source_location": "L117",
       "id": "skills_resetform",
-      "community": 13,
+      "community": 14,
       "norm_label": "resetform()"
     },
     {
@@ -2700,7 +2718,7 @@
       "source_file": "frontend\\src\\pages\\Tools.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_tools_tsx",
-      "community": 35,
+      "community": 36,
       "norm_label": "tools.tsx"
     },
     {
@@ -2709,7 +2727,7 @@
       "source_file": "frontend\\src\\pages\\Tools.tsx",
       "source_location": "L11",
       "id": "tools_tools",
-      "community": 35,
+      "community": 36,
       "norm_label": "tools()"
     },
     {
@@ -2718,7 +2736,7 @@
       "source_file": "frontend\\src\\pages\\WarRoom.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_warroom_tsx",
-      "community": 22,
+      "community": 23,
       "norm_label": "warroom.tsx"
     },
     {
@@ -2727,7 +2745,7 @@
       "source_file": "frontend\\src\\pages\\WarRoom.tsx",
       "source_location": "L53",
       "id": "warroom_savekeys",
-      "community": 22,
+      "community": 23,
       "norm_label": "savekeys()"
     },
     {
@@ -2736,7 +2754,7 @@
       "source_file": "frontend\\src\\pages\\WarRoom.tsx",
       "source_location": "L167",
       "id": "warroom_seterrorprompt",
-      "community": 22,
+      "community": 23,
       "norm_label": "seterrorprompt()"
     },
     {
@@ -2745,7 +2763,7 @@
       "source_file": "frontend\\src\\pages\\WarRoom.tsx",
       "source_location": "L236",
       "id": "warroom_if",
-      "community": 22,
+      "community": 23,
       "norm_label": "if()"
     },
     {
@@ -2754,7 +2772,7 @@
       "source_file": "frontend\\src\\pages\\Welcome.tsx",
       "source_location": "L1",
       "id": "frontend_src_pages_welcome_tsx",
-      "community": 36,
+      "community": 37,
       "norm_label": "welcome.tsx"
     },
     {
@@ -2763,7 +2781,7 @@
       "source_file": "frontend\\src\\pages\\Welcome.tsx",
       "source_location": "L48",
       "id": "welcome_handleconnect",
-      "community": 36,
+      "community": 37,
       "norm_label": "handleconnect()"
     },
     {
@@ -2772,7 +2790,7 @@
       "source_file": "frontend\\src\\utils\\personas.ts",
       "source_location": "L1",
       "id": "frontend_src_utils_personas_ts",
-      "community": 46,
+      "community": 47,
       "norm_label": "personas.ts"
     },
     {
@@ -2781,7 +2799,7 @@
       "source_file": "venv_wsl\\bin\\Activate.ps1",
       "source_location": "L1",
       "id": "venv_wsl_bin_activate_ps1",
-      "community": 14,
+      "community": 15,
       "norm_label": "activate.ps1"
     },
     {
@@ -2790,7 +2808,7 @@
       "source_file": "venv_wsl\\bin\\Activate.ps1",
       "source_location": "L73",
       "id": "activate_global_deactivate",
-      "community": 14,
+      "community": 15,
       "norm_label": "global:deactivate()"
     },
     {
@@ -2799,7 +2817,7 @@
       "source_file": "venv_wsl\\bin\\Activate.ps1",
       "source_location": "L131",
       "id": "activate_get_pyvenvconfig",
-      "community": 14,
+      "community": 15,
       "norm_label": "get-pyvenvconfig()"
     },
     {
@@ -2808,7 +2826,7 @@
       "source_file": "venv_wsl\\bin\\Activate.ps1",
       "source_location": "L230",
       "id": "activate_global_old_virtual_prompt",
-      "community": 14,
+      "community": 15,
       "norm_label": "global:_old_virtual_prompt()"
     },
     {
@@ -2817,8 +2835,44 @@
       "source_file": "venv_wsl\\bin\\Activate.ps1",
       "source_location": "L234",
       "id": "activate_global_prompt",
-      "community": 14,
+      "community": 15,
       "norm_label": "global:prompt()"
+    },
+    {
+      "label": "Schedules a native agent action to run automatically in the background at an int",
+      "file_type": "rationale",
+      "source_file": "backend\\agent.py",
+      "source_location": "L108",
+      "community": 48,
+      "norm_label": "schedules a native agent action to run automatically in the background at an int",
+      "id": "agent_rationale_108"
+    },
+    {
+      "label": "Mounts a filesystem watchdog on a folder. When the folder changes, the Agent wil",
+      "file_type": "rationale",
+      "source_file": "backend\\agent.py",
+      "source_location": "L116",
+      "community": 49,
+      "norm_label": "mounts a filesystem watchdog on a folder. when the folder changes, the agent wil",
+      "id": "agent_rationale_116"
+    },
+    {
+      "label": "Ensure we are strictly operating inside the WSL Linux sandbox and dependencies l",
+      "file_type": "rationale",
+      "source_file": "backend\\agent.py",
+      "source_location": "L124",
+      "community": 50,
+      "norm_label": "ensure we are strictly operating inside the wsl linux sandbox and dependencies l",
+      "id": "agent_rationale_124"
+    },
+    {
+      "label": "Returns parsed stats from the graphify GRAPH_REPORT.md for the frontend panel.",
+      "file_type": "rationale",
+      "source_file": "backend\\server.py",
+      "source_location": "L905",
+      "community": 0,
+      "norm_label": "returns parsed stats from the graphify graph_report.md for the frontend panel.",
+      "id": "server_rationale_905"
     }
   ],
   "links": [
@@ -2886,7 +2940,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L43",
+      "source_location": "L45",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_run_terminal_command",
@@ -2922,7 +2976,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L51",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_search_the_web",
@@ -2946,7 +3000,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L61",
+      "source_location": "L63",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_read_web_page",
@@ -3042,7 +3096,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L71",
+      "source_location": "L73",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_create_file",
@@ -3054,7 +3108,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L82",
+      "source_location": "L84",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_read_file",
@@ -3066,7 +3120,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L92",
+      "source_location": "L94",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_edit_code",
@@ -3078,7 +3132,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L107",
+      "source_location": "L109",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_schedule_background_task",
@@ -3090,7 +3144,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L115",
+      "source_location": "L117",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_monitor_directory",
@@ -3102,7 +3156,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L123",
+      "source_location": "L125",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_verify_sandbox_environment",
@@ -3114,7 +3168,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L131",
+      "source_location": "L133",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_take_screenshot",
@@ -3126,7 +3180,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L141",
+      "source_location": "L143",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_computer_mouse_move",
@@ -3138,7 +3192,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L149",
+      "source_location": "L151",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_computer_mouse_click",
@@ -3150,7 +3204,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L157",
+      "source_location": "L159",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_computer_type_text",
@@ -3162,7 +3216,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L165",
+      "source_location": "L167",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_computer_press_key",
@@ -3174,7 +3228,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L368",
+      "source_location": "L175",
+      "weight": 1.0,
+      "_src": "backend_agent_py",
+      "_tgt": "agent_send_email",
+      "source": "backend_agent_py",
+      "target": "agent_send_email",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend\\agent.py",
+      "source_location": "L412",
       "weight": 1.0,
       "_src": "backend_agent_py",
       "_tgt": "agent_openzessagent",
@@ -3186,12 +3252,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L108",
+      "source_location": "L110",
       "weight": 1.0,
-      "_src": "agent_rationale_108",
+      "_src": "agent_rationale_110",
       "_tgt": "agent_schedule_background_task",
       "source": "agent_schedule_background_task",
-      "target": "agent_rationale_108",
+      "target": "agent_rationale_110",
       "confidence_score": 1.0
     },
     {
@@ -3210,12 +3276,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L116",
+      "source_location": "L118",
       "weight": 1.0,
-      "_src": "agent_rationale_116",
+      "_src": "agent_rationale_118",
       "_tgt": "agent_monitor_directory",
       "source": "agent_monitor_directory",
-      "target": "agent_rationale_116",
+      "target": "agent_rationale_118",
       "confidence_score": 1.0
     },
     {
@@ -3234,7 +3300,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L133",
+      "source_location": "L135",
       "weight": 1.0,
       "_src": "agent_take_screenshot",
       "_tgt": "agent_verify_sandbox_environment",
@@ -3246,7 +3312,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L143",
+      "source_location": "L145",
       "weight": 1.0,
       "_src": "agent_computer_mouse_move",
       "_tgt": "agent_verify_sandbox_environment",
@@ -3258,7 +3324,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L151",
+      "source_location": "L153",
       "weight": 1.0,
       "_src": "agent_computer_mouse_click",
       "_tgt": "agent_verify_sandbox_environment",
@@ -3270,7 +3336,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L159",
+      "source_location": "L161",
       "weight": 1.0,
       "_src": "agent_computer_type_text",
       "_tgt": "agent_verify_sandbox_environment",
@@ -3282,7 +3348,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L167",
+      "source_location": "L169",
       "weight": 1.0,
       "_src": "agent_computer_press_key",
       "_tgt": "agent_verify_sandbox_environment",
@@ -3294,19 +3360,19 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L124",
+      "source_location": "L126",
       "weight": 1.0,
-      "_src": "agent_rationale_124",
+      "_src": "agent_rationale_126",
       "_tgt": "agent_verify_sandbox_environment",
       "source": "agent_verify_sandbox_environment",
-      "target": "agent_rationale_124",
+      "target": "agent_rationale_126",
       "confidence_score": 1.0
     },
     {
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L369",
+      "source_location": "L413",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_init",
@@ -3318,7 +3384,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L416",
+      "source_location": "L460",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_run_tool",
@@ -3330,7 +3396,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L426",
+      "source_location": "L470",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_handle_response_loop",
@@ -3342,7 +3408,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L491",
+      "source_location": "L535",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_ingest_memory",
@@ -3354,7 +3420,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L503",
+      "source_location": "L547",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_chat",
@@ -3366,7 +3432,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L535",
+      "source_location": "L579",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_chat_stream",
@@ -3378,7 +3444,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L666",
+      "source_location": "L710",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_execute_pending_tools",
@@ -3390,7 +3456,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L703",
+      "source_location": "L747",
       "weight": 1.0,
       "_src": "agent_openzessagent",
       "_tgt": "agent_openzessagent_execute_pending_tools_stream",
@@ -3594,12 +3660,12 @@
       "relation": "uses",
       "confidence": "INFERRED",
       "source_file": "backend\\server.py",
-      "source_location": "L85",
+      "source_location": "L87",
       "weight": 0.8,
-      "_src": "server_rationale_905",
+      "_src": "server_rationale_914",
       "_tgt": "agent_openzessagent",
       "source": "agent_openzessagent",
-      "target": "server_rationale_905",
+      "target": "server_rationale_914",
       "confidence_score": 0.5
     },
     {
@@ -3687,6 +3753,18 @@
       "target": "server_anthropic_messages"
     },
     {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "backend\\server.py",
+      "source_location": "L85",
+      "weight": 0.8,
+      "_src": "agent_openzessagent",
+      "_tgt": "server_rationale_905",
+      "confidence_score": 0.5,
+      "source": "agent_openzessagent",
+      "target": "server_rationale_905"
+    },
+    {
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -3702,7 +3780,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L465",
+      "source_location": "L509",
       "weight": 1.0,
       "_src": "agent_openzessagent_handle_response_loop",
       "_tgt": "agent_openzessagent_run_tool",
@@ -3714,7 +3792,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L632",
+      "source_location": "L676",
       "weight": 1.0,
       "_src": "agent_openzessagent_chat_stream",
       "_tgt": "agent_openzessagent_run_tool",
@@ -3726,7 +3804,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L678",
+      "source_location": "L722",
       "weight": 1.0,
       "_src": "agent_openzessagent_execute_pending_tools",
       "_tgt": "agent_openzessagent_run_tool",
@@ -3738,7 +3816,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L715",
+      "source_location": "L759",
       "weight": 1.0,
       "_src": "agent_openzessagent_execute_pending_tools_stream",
       "_tgt": "agent_openzessagent_run_tool",
@@ -3774,7 +3852,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L523",
+      "source_location": "L567",
       "weight": 1.0,
       "_src": "agent_openzessagent_chat",
       "_tgt": "agent_openzessagent_handle_response_loop",
@@ -3786,7 +3864,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L687",
+      "source_location": "L731",
       "weight": 1.0,
       "_src": "agent_openzessagent_execute_pending_tools",
       "_tgt": "agent_openzessagent_handle_response_loop",
@@ -3798,7 +3876,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L527",
+      "source_location": "L571",
       "weight": 1.0,
       "_src": "agent_openzessagent_chat",
       "_tgt": "agent_openzessagent_ingest_memory",
@@ -3810,7 +3888,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L601",
+      "source_location": "L645",
       "weight": 1.0,
       "_src": "agent_openzessagent_chat_stream",
       "_tgt": "agent_openzessagent_ingest_memory",
@@ -3822,7 +3900,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L695",
+      "source_location": "L739",
       "weight": 1.0,
       "_src": "agent_openzessagent_execute_pending_tools",
       "_tgt": "agent_openzessagent_ingest_memory",
@@ -3834,7 +3912,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\agent.py",
-      "source_location": "L724",
+      "source_location": "L768",
       "weight": 1.0,
       "_src": "agent_openzessagent_execute_pending_tools_stream",
       "_tgt": "agent_openzessagent_chat_stream",
@@ -3882,7 +3960,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L74",
+      "source_location": "L107",
       "weight": 1.0,
       "_src": "backend_background_workers_py",
       "_tgt": "background_workers_agentwatchdoghandler",
@@ -3894,7 +3972,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L105",
+      "source_location": "L138",
       "weight": 1.0,
       "_src": "backend_background_workers_py",
       "_tgt": "background_workers_watchmanager",
@@ -3930,7 +4008,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L34",
+      "source_location": "L50",
       "weight": 1.0,
       "_src": "background_workers_cronmanager",
       "_tgt": "background_workers_cronmanager_add_job",
@@ -3942,7 +4020,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L56",
+      "source_location": "L89",
       "weight": 1.0,
       "_src": "background_workers_cronmanager",
       "_tgt": "background_workers_cronmanager_get_jobs",
@@ -3954,12 +4032,24 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L65",
+      "source_location": "L98",
       "weight": 1.0,
       "_src": "background_workers_cronmanager",
       "_tgt": "background_workers_cronmanager_remove_job",
       "source": "background_workers_cronmanager",
       "target": "background_workers_cronmanager_remove_job",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "backend\\background_workers.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "background_workers_rationale_18",
+      "_tgt": "background_workers_cronmanager_execute_job",
+      "source": "background_workers_cronmanager_execute_job",
+      "target": "background_workers_rationale_18",
       "confidence_score": 1.0
     },
     {
@@ -4002,7 +4092,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L74",
+      "source_location": "L107",
       "weight": 1.0,
       "_src": "background_workers_agentwatchdoghandler",
       "_tgt": "filesystemeventhandler",
@@ -4014,7 +4104,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L75",
+      "source_location": "L108",
       "weight": 1.0,
       "_src": "background_workers_agentwatchdoghandler",
       "_tgt": "background_workers_agentwatchdoghandler_init",
@@ -4026,7 +4116,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L80",
+      "source_location": "L113",
       "weight": 1.0,
       "_src": "background_workers_agentwatchdoghandler",
       "_tgt": "background_workers_agentwatchdoghandler_on_modified",
@@ -4038,7 +4128,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L114",
+      "source_location": "L147",
       "weight": 1.0,
       "_src": "background_workers_watchmanager_add_watchdog",
       "_tgt": "background_workers_agentwatchdoghandler",
@@ -4050,7 +4140,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L76",
+      "source_location": "L109",
       "weight": 1.0,
       "_src": "background_workers_agentwatchdoghandler_init",
       "_tgt": "background_workers_watchmanager_init",
@@ -4062,7 +4152,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L106",
+      "source_location": "L139",
       "weight": 1.0,
       "_src": "background_workers_watchmanager",
       "_tgt": "background_workers_watchmanager_init",
@@ -4074,7 +4164,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L109",
+      "source_location": "L142",
       "weight": 1.0,
       "_src": "background_workers_watchmanager",
       "_tgt": "background_workers_watchmanager_add_watchdog",
@@ -4086,7 +4176,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L129",
+      "source_location": "L162",
       "weight": 1.0,
       "_src": "background_workers_watchmanager",
       "_tgt": "background_workers_watchmanager_get_watchdogs",
@@ -4098,7 +4188,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\background_workers.py",
-      "source_location": "L137",
+      "source_location": "L170",
       "weight": 1.0,
       "_src": "background_workers_watchmanager",
       "_tgt": "background_workers_watchmanager_remove_watchdog",
@@ -4545,8 +4635,8 @@
       "source_file": "backend\\migrate_to_postgres.py",
       "source_location": "L52",
       "weight": 1.0,
-      "_src": "migrate_to_postgres_migrate",
-      "_tgt": "database_message",
+      "_src": "database_message",
+      "_tgt": "migrate_to_postgres_migrate",
       "source": "database_message",
       "target": "migrate_to_postgres_migrate"
     },
@@ -4569,8 +4659,8 @@
       "source_file": "backend\\migrate_to_postgres.py",
       "source_location": "L90",
       "weight": 1.0,
-      "_src": "migrate_to_postgres_migrate",
-      "_tgt": "database_mcpserver",
+      "_src": "database_mcpserver",
+      "_tgt": "migrate_to_postgres_migrate",
       "source": "database_mcpserver",
       "target": "migrate_to_postgres_migrate"
     },
@@ -4593,8 +4683,8 @@
       "source_file": "backend\\migrate_to_postgres.py",
       "source_location": "L62",
       "weight": 1.0,
-      "_src": "migrate_to_postgres_migrate",
-      "_tgt": "database_persona",
+      "_src": "database_persona",
+      "_tgt": "migrate_to_postgres_migrate",
       "source": "database_persona",
       "target": "migrate_to_postgres_migrate"
     },
@@ -4617,8 +4707,8 @@
       "source_file": "backend\\migrate_to_postgres.py",
       "source_location": "L77",
       "weight": 1.0,
-      "_src": "migrate_to_postgres_migrate",
-      "_tgt": "database_note",
+      "_src": "database_note",
+      "_tgt": "migrate_to_postgres_migrate",
       "source": "database_note",
       "target": "migrate_to_postgres_migrate"
     },
@@ -4986,7 +5076,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L29",
+      "source_location": "L34",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_amake_connection",
@@ -4998,7 +5088,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L98",
+      "source_location": "L103",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_adisconnect",
@@ -5010,7 +5100,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L130",
+      "source_location": "L135",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_acall_tool",
@@ -5022,7 +5112,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L144",
+      "source_location": "L149",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_connect",
@@ -5034,7 +5124,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L148",
+      "source_location": "L153",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_disconnect",
@@ -5046,7 +5136,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L151",
+      "source_location": "L156",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_get_status",
@@ -5058,7 +5148,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L160",
+      "source_location": "L165",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_get_all_tools_for_litellm",
@@ -5070,7 +5160,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L174",
+      "source_location": "L179",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_find_server_for_tool",
@@ -5082,7 +5172,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L181",
+      "source_location": "L186",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager",
       "_tgt": "mcp_manager_mcpmanager_call_tool",
@@ -5094,7 +5184,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L146",
+      "source_location": "L151",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_connect",
       "_tgt": "mcp_manager_mcpmanager_run_async",
@@ -5106,7 +5196,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L149",
+      "source_location": "L154",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_disconnect",
       "_tgt": "mcp_manager_mcpmanager_run_async",
@@ -5118,7 +5208,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L186",
+      "source_location": "L191",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_call_tool",
       "_tgt": "mcp_manager_mcpmanager_run_async",
@@ -5142,7 +5232,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L31",
+      "source_location": "L36",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_amake_connection",
       "_tgt": "mcp_manager_mcpmanager_adisconnect",
@@ -5154,7 +5244,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L146",
+      "source_location": "L151",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_connect",
       "_tgt": "mcp_manager_mcpmanager_amake_connection",
@@ -5190,7 +5280,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L149",
+      "source_location": "L154",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_disconnect",
       "_tgt": "mcp_manager_mcpmanager_adisconnect",
@@ -5202,7 +5292,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L186",
+      "source_location": "L191",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_call_tool",
       "_tgt": "mcp_manager_mcpmanager_acall_tool",
@@ -5217,8 +5307,8 @@
       "source_file": "backend\\migrate_to_postgres.py",
       "source_location": "L32",
       "weight": 1.0,
-      "_src": "migrate_to_postgres_migrate",
-      "_tgt": "mcp_manager_mcpmanager_connect",
+      "_src": "mcp_manager_mcpmanager_connect",
+      "_tgt": "migrate_to_postgres_migrate",
       "source": "mcp_manager_mcpmanager_connect",
       "target": "migrate_to_postgres_migrate"
     },
@@ -5274,7 +5364,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\mcp_manager.py",
-      "source_location": "L182",
+      "source_location": "L187",
       "weight": 1.0,
       "_src": "mcp_manager_mcpmanager_call_tool",
       "_tgt": "mcp_manager_mcpmanager_find_server_for_tool",
@@ -5394,7 +5484,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L54",
+      "source_location": "L56",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_init_active_mcps",
@@ -5406,7 +5496,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L67",
+      "source_location": "L69",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_chatrequest",
@@ -5418,7 +5508,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L82",
+      "source_location": "L84",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_swarm_debate_stream",
@@ -5430,7 +5520,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L164",
+      "source_location": "L166",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_chat",
@@ -5442,7 +5532,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L241",
+      "source_location": "L243",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_approvalrequest",
@@ -5454,7 +5544,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L248",
+      "source_location": "L250",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_chat_approve",
@@ -5466,7 +5556,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L272",
+      "source_location": "L274",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_list_sessions",
@@ -5478,7 +5568,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L279",
+      "source_location": "L281",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_messages",
@@ -5490,7 +5580,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L288",
+      "source_location": "L290",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_delete_message_endpoint",
@@ -5502,7 +5592,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L317",
+      "source_location": "L319",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_delete_session_endpoint",
@@ -5514,7 +5604,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L329",
+      "source_location": "L331",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_list_files",
@@ -5526,7 +5616,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L339",
+      "source_location": "L341",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_list_tools",
@@ -5538,7 +5628,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L352",
+      "source_location": "L354",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_memories",
@@ -5550,7 +5640,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L371",
+      "source_location": "L373",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_delete_memory",
@@ -5562,7 +5652,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L382",
+      "source_location": "L384",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_clear_all_memories",
@@ -5574,7 +5664,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L396",
+      "source_location": "L398",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_mcpconnectrequest",
@@ -5586,7 +5676,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L407",
+      "source_location": "L409",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_mcp_servers",
@@ -5598,7 +5688,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L411",
+      "source_location": "L413",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_connect_mcp",
@@ -5610,7 +5700,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L422",
+      "source_location": "L424",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_disconnect_mcp",
@@ -5622,7 +5712,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L432",
+      "source_location": "L434",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_remove_saved_mcp",
@@ -5634,7 +5724,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L437",
+      "source_location": "L439",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_croncreaterequest",
@@ -5646,7 +5736,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L442",
+      "source_location": "L446",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_create_cron_job",
@@ -5658,7 +5748,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L450",
+      "source_location": "L459",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_cron_jobs",
@@ -5670,7 +5760,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L454",
+      "source_location": "L463",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_delete_cron_job",
@@ -5682,7 +5772,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L458",
+      "source_location": "L467",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_watchdogcreaterequest",
@@ -5694,7 +5784,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L463",
+      "source_location": "L472",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_create_watchdog",
@@ -5706,7 +5796,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L471",
+      "source_location": "L480",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_watchdogs",
@@ -5718,7 +5808,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L475",
+      "source_location": "L484",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_delete_watchdog",
@@ -5730,7 +5820,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L483",
+      "source_location": "L492",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_import_persona",
@@ -5742,7 +5832,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L506",
+      "source_location": "L515",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_personas",
@@ -5754,7 +5844,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L513",
+      "source_location": "L522",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_delete_persona",
@@ -5766,7 +5856,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L517",
+      "source_location": "L526",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_tavernchatrequest",
@@ -5778,7 +5868,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L527",
+      "source_location": "L536",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_tavern_chat",
@@ -5790,7 +5880,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L554",
+      "source_location": "L563",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_openaimessage",
@@ -5802,7 +5892,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L558",
+      "source_location": "L567",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_openaichatrequest",
@@ -5814,7 +5904,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L564",
+      "source_location": "L573",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_openai_models",
@@ -5826,7 +5916,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L570",
+      "source_location": "L579",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_guess_provider",
@@ -5838,7 +5928,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L577",
+      "source_location": "L586",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_openai_chat_completions",
@@ -5850,7 +5940,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L610",
+      "source_location": "L619",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_anthropicmessage",
@@ -5862,7 +5952,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L614",
+      "source_location": "L623",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_anthropicchatrequest",
@@ -5874,7 +5964,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L622",
+      "source_location": "L631",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_anthropic_messages",
@@ -5886,7 +5976,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L657",
+      "source_location": "L666",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_telegramstartrequest",
@@ -5898,7 +5988,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L663",
+      "source_location": "L672",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_start_telegram",
@@ -5910,7 +6000,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L671",
+      "source_location": "L680",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_stop_telegram",
@@ -5922,7 +6012,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L679",
+      "source_location": "L688",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_telegram_status",
@@ -5934,7 +6024,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L685",
+      "source_location": "L694",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_discordstartrequest",
@@ -5946,7 +6036,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L691",
+      "source_location": "L700",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_start_discord",
@@ -5958,7 +6048,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L699",
+      "source_location": "L708",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_stop_discord",
@@ -5970,7 +6060,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L707",
+      "source_location": "L716",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_discord_status",
@@ -5982,7 +6072,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L713",
+      "source_location": "L722",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_ttsrequest",
@@ -5994,7 +6084,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L717",
+      "source_location": "L726",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_generate_tts",
@@ -6006,7 +6096,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L732",
+      "source_location": "L741",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_swarmsquadrequest",
@@ -6018,7 +6108,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L739",
+      "source_location": "L748",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_swarm_squad",
@@ -6030,7 +6120,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L755",
+      "source_location": "L764",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_notecreaterequest",
@@ -6042,7 +6132,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L760",
+      "source_location": "L769",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_noteupdaterequest",
@@ -6054,7 +6144,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L766",
+      "source_location": "L775",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_create_note",
@@ -6066,7 +6156,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L774",
+      "source_location": "L783",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_notes",
@@ -6078,7 +6168,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L781",
+      "source_location": "L790",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_update_note",
@@ -6090,7 +6180,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L791",
+      "source_location": "L800",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_delete_note",
@@ -6102,7 +6192,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L801",
+      "source_location": "L810",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_upload_note_image",
@@ -6114,7 +6204,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L818",
+      "source_location": "L827",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_matrix_stream",
@@ -6126,7 +6216,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L904",
+      "source_location": "L913",
       "weight": 1.0,
       "_src": "backend_server_py",
       "_tgt": "server_get_graphify_report",
@@ -6138,7 +6228,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L67",
+      "source_location": "L69",
       "weight": 1.0,
       "_src": "server_chatrequest",
       "_tgt": "basemodel",
@@ -6150,7 +6240,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L539",
+      "source_location": "L548",
       "weight": 1.0,
       "_src": "server_tavern_chat",
       "_tgt": "server_chatrequest",
@@ -6162,7 +6252,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L241",
+      "source_location": "L243",
       "weight": 1.0,
       "_src": "server_approvalrequest",
       "_tgt": "basemodel",
@@ -6174,7 +6264,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L396",
+      "source_location": "L398",
       "weight": 1.0,
       "_src": "server_mcpconnectrequest",
       "_tgt": "basemodel",
@@ -6186,7 +6276,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L437",
+      "source_location": "L439",
       "weight": 1.0,
       "_src": "server_croncreaterequest",
       "_tgt": "basemodel",
@@ -6198,7 +6288,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L458",
+      "source_location": "L467",
       "weight": 1.0,
       "_src": "server_watchdogcreaterequest",
       "_tgt": "basemodel",
@@ -6210,7 +6300,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L517",
+      "source_location": "L526",
       "weight": 1.0,
       "_src": "server_tavernchatrequest",
       "_tgt": "basemodel",
@@ -6222,7 +6312,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L554",
+      "source_location": "L563",
       "weight": 1.0,
       "_src": "server_openaimessage",
       "_tgt": "basemodel",
@@ -6234,7 +6324,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L558",
+      "source_location": "L567",
       "weight": 1.0,
       "_src": "server_openaichatrequest",
       "_tgt": "basemodel",
@@ -6246,7 +6336,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L610",
+      "source_location": "L619",
       "weight": 1.0,
       "_src": "server_anthropicmessage",
       "_tgt": "basemodel",
@@ -6258,7 +6348,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L614",
+      "source_location": "L623",
       "weight": 1.0,
       "_src": "server_anthropicchatrequest",
       "_tgt": "basemodel",
@@ -6270,7 +6360,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L657",
+      "source_location": "L666",
       "weight": 1.0,
       "_src": "server_telegramstartrequest",
       "_tgt": "basemodel",
@@ -6282,7 +6372,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L685",
+      "source_location": "L694",
       "weight": 1.0,
       "_src": "server_discordstartrequest",
       "_tgt": "basemodel",
@@ -6294,7 +6384,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L713",
+      "source_location": "L722",
       "weight": 1.0,
       "_src": "server_ttsrequest",
       "_tgt": "basemodel",
@@ -6306,7 +6396,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L732",
+      "source_location": "L741",
       "weight": 1.0,
       "_src": "server_swarmsquadrequest",
       "_tgt": "basemodel",
@@ -6318,7 +6408,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L755",
+      "source_location": "L764",
       "weight": 1.0,
       "_src": "server_notecreaterequest",
       "_tgt": "basemodel",
@@ -6330,7 +6420,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L760",
+      "source_location": "L769",
       "weight": 1.0,
       "_src": "server_noteupdaterequest",
       "_tgt": "basemodel",
@@ -6342,7 +6432,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L217",
+      "source_location": "L219",
       "weight": 1.0,
       "_src": "server_chat",
       "_tgt": "server_swarm_debate_stream",
@@ -6354,7 +6444,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L549",
+      "source_location": "L558",
       "weight": 1.0,
       "_src": "server_tavern_chat",
       "_tgt": "server_chat",
@@ -6366,7 +6456,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L593",
+      "source_location": "L602",
       "weight": 1.0,
       "_src": "server_openai_chat_completions",
       "_tgt": "server_chat",
@@ -6378,7 +6468,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L638",
+      "source_location": "L647",
       "weight": 1.0,
       "_src": "server_anthropic_messages",
       "_tgt": "server_chat",
@@ -6426,7 +6516,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L580",
+      "source_location": "L589",
       "weight": 1.0,
       "_src": "server_openai_chat_completions",
       "_tgt": "server_guess_provider",
@@ -6438,7 +6528,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L625",
+      "source_location": "L634",
       "weight": 1.0,
       "_src": "server_anthropic_messages",
       "_tgt": "server_guess_provider",
@@ -6498,12 +6588,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "backend\\server.py",
-      "source_location": "L905",
+      "source_location": "L914",
       "weight": 1.0,
-      "_src": "server_rationale_905",
+      "_src": "server_rationale_914",
       "_tgt": "server_get_graphify_report",
       "source": "server_get_graphify_report",
-      "target": "server_rationale_905",
+      "target": "server_rationale_914",
       "confidence_score": 1.0
     },
     {
@@ -7230,7 +7320,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L36",
+      "source_location": "L40",
       "weight": 1.0,
       "_src": "frontend_src_pages_cronjobs_tsx",
       "_tgt": "cronjobs_fetchdata",
@@ -7242,7 +7332,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L57",
+      "source_location": "L61",
       "weight": 1.0,
       "_src": "frontend_src_pages_cronjobs_tsx",
       "_tgt": "cronjobs_deletejob",
@@ -7254,7 +7344,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L70",
+      "source_location": "L74",
       "weight": 1.0,
       "_src": "frontend_src_pages_cronjobs_tsx",
       "_tgt": "cronjobs_handlecreate",
@@ -7266,7 +7356,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L64",
+      "source_location": "L68",
       "weight": 1.0,
       "_src": "cronjobs_deletejob",
       "_tgt": "cronjobs_fetchdata",
@@ -7278,7 +7368,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "frontend\\src\\pages\\CronJobs.tsx",
-      "source_location": "L87",
+      "source_location": "L93",
       "weight": 1.0,
       "_src": "cronjobs_handlecreate",
       "_tgt": "cronjobs_fetchdata",
