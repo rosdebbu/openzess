@@ -1,96 +1,143 @@
-import { FileText, Rocket, Sparkles, Code2 } from 'lucide-react';
+import { FileText, Rocket, Sparkles, Code2, ChevronRight, Star, Zap, GitBranch, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const changelogData = [
   {
-     version: "v1.2.0 - The Ecosystem Update",
+     version: "v1.2.0",
+     codename: "The Ecosystem Update",
      date: "Today",
      type: "major",
-     icon: <Rocket />,
+     icon: Rocket,
+     gradient: "from-brand to-violet-600",
      changes: [
         "Implemented full Channels workspace for system broadcast monitoring.",
         "Added Cron Jobs visualizer for background task scheduling.",
         "Introduced Heartbeat live telemetry panel.",
         "Integrated MCP Protocol marketplace UI.",
-        "Replaced 'Coming Soon' placeholders with functional mockups."
+        "Replaced 'Coming Soon' placeholders with functional mockups.",
+        "Added Knowledge Base personal canvas with markdown support.",
+        "Debate Arena multi-agent discussion feature."
      ]
   },
   {
      version: "v1.1.5",
+     codename: "Premium Interface",
      date: "April 4, 2026",
      type: "minor",
-     icon: <Sparkles />,
+     icon: Sparkles,
+     gradient: "from-emerald-500 to-cyan-500",
      changes: [
         "Upgraded ChromaDB Memory Vault integration.",
         "Implemented 'Awwwards' tier animations and glassmorphic UI.",
-        "Refined Semantic Memory viewer grid."
+        "Refined Semantic Memory viewer grid.",
+        "Added Graphify codebase visualization page.",
+        "Integrated VRM companion 3D avatar viewer."
      ]
   },
   {
-     version: "v1.0.0 - Alpha Release",
+     version: "v1.0.0",
+     codename: "Alpha Release",
      date: "March 20, 2026",
      type: "major",
-     icon: <Code2 />,
+     icon: Code2,
+     gradient: "from-amber-500 to-orange-500",
      changes: [
         "Initial release of the generic Openzess prototype.",
         "Terminal command execution and basic filesystem integration.",
-        "Dark mode context switching setup."
+        "Dark mode context switching setup.",
+        "Multi-provider LLM support (Gemini, OpenAI, Anthropic, etc.)",
+        "WebSocket-based chat streaming."
      ]
   }
 ];
 
 export default function Changelog() {
   return (
-    <div className="flex-1 p-10 overflow-y-auto w-full custom-scrollbar">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-3 mb-10 pb-6 border-b border-neutral-200 dark:border-border">
-           <div className="w-12 h-12 bg-brand/10 text-brand rounded-2xl flex items-center justify-center shadow-sm">
-             <FileText size={24} />
-           </div>
-           <div>
-             <h2 className="text-3xl font-semibold text-neutral-900 dark:text-white">Changelog</h2>
-             <p className="text-neutral-500 dark:text-neutral-400">Track all updates and features of the openzess system.</p>
-           </div>
-        </div>
+    <div className="flex-1 flex flex-col h-full bg-transparent p-10 overflow-hidden">
+      <div className="max-w-4xl w-full mx-auto flex flex-col h-full">
+        <header className="mb-10 shrink-0 border-b border-neutral-200 dark:border-neutral-800 pb-6">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-14 h-14 bg-brand/10 text-brand rounded-2xl flex items-center justify-center shadow-lg shadow-brand/5 border border-brand/20">
+              <GitBranch size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">Changelog</h1>
+              <p className="text-neutral-500 dark:text-neutral-400">Track all updates and features of the openzess system</p>
+            </div>
+          </div>
+        </header>
 
-        <div className="relative pl-8 md:pl-0">
-           {/* Timeline line */}
-           <div className="absolute left-8 md:left-1/2 top-4 bottom-0 w-px bg-neutral-200 dark:bg-border -translate-x-1/2"></div>
-           
-           <div className="space-y-12">
-              {changelogData.map((log, i) => (
-                 <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    key={i} 
-                    className={`relative flex flex-col md:flex-row gap-8 items-start ${i % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
-                 >
-                    {/* Timeline dot/icon */}
-                    <div className="absolute left-0 md:left-1/2 w-10 h-10 rounded-full border-4 border-white dark:border-neutral-950 bg-brand text-white flex items-center justify-center -translate-x-1/2 shadow-lg z-10">
-                       <div className="scale-75">{log.icon}</div>
+        <div className="flex-1 overflow-y-auto pb-16 custom-scrollbar pr-2">
+          {/* Vertical Timeline */}
+          <div className="relative pl-8">
+            {/* Timeline Line */}
+            <div className="absolute left-[15px] top-0 bottom-0 w-px bg-gradient-to-b from-brand/50 via-neutral-300 dark:via-neutral-700 to-transparent"></div>
+
+            <div className="space-y-10">
+              {changelogData.map((log, i) => {
+                const Icon = log.icon;
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.15 }}
+                    key={i}
+                    className="relative"
+                  >
+                    {/* Timeline Dot */}
+                    <div className={`absolute -left-8 w-8 h-8 rounded-full bg-gradient-to-br ${log.gradient} flex items-center justify-center shadow-lg z-10 ring-4 ring-white dark:ring-neutral-950`}>
+                      <Icon size={14} className="text-white" />
                     </div>
 
-                    <div className="w-full md:w-1/2"></div> {/* Spacer for alternate sides */}
+                    {/* Card */}
+                    <div className="bg-white dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-brand/30 transition-colors group ml-4">
+                      {/* Header */}
+                      <div className={`px-6 py-4 bg-gradient-to-r ${log.gradient} bg-opacity-10 border-b border-neutral-100 dark:border-neutral-800/50 relative overflow-hidden`}>
+                        <div className="absolute inset-0 bg-white/90 dark:bg-neutral-900/90"></div>
+                        <div className="relative z-10 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-xl font-bold text-neutral-900 dark:text-white">{log.version}</h3>
+                            <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border ${
+                              log.type === 'major' 
+                                ? 'bg-brand/10 text-brand border-brand/20' 
+                                : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                            }`}>
+                              {log.type}
+                            </span>
+                          </div>
+                          <span className="text-sm font-mono text-neutral-500">{log.date}</span>
+                        </div>
+                        <p className="relative z-10 text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-1">{log.codename}</p>
+                      </div>
 
-                    <div className={`w-full md:w-1/2 p-6 bg-white dark:bg-surface border border-neutral-200 dark:border-border rounded-2xl shadow-sm ${i % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}>
-                       <div className={`flex flex-col md:flex-row md:items-center gap-2 mb-4 ${i % 2 === 0 ? '' : 'md:flex-row-reverse'}`}>
-                          <h3 className="text-xl font-bold text-brand">{log.version}</h3>
-                          <span className="text-sm font-mono text-neutral-400">{log.date}</span>
-                       </div>
-                       
-                       <ul className={`space-y-2 text-neutral-600 dark:text-neutral-300 text-sm ${i % 2 === 0 ? '' : 'mdInlineText'}`}>
+                      {/* Changes */}
+                      <div className="p-6">
+                        <div className="space-y-2.5">
                           {log.changes.map((change, j) => (
-                             <li key={j} className="flex items-start gap-2">
-                                <span className="text-brand shrink-0 mt-1">•</span>
-                                <span className={i % 2 !== 0 && window.innerWidth >= 768 ? 'text-right' : 'text-left'}>{change}</span>
-                             </li>
+                            <motion.div
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.15 + j * 0.05 }}
+                              key={j}
+                              className="flex items-start gap-3 group/item"
+                            >
+                              <div className="w-5 h-5 rounded-md bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-brand/10 group-hover/item:border-brand/30 group-hover/item:text-brand transition-colors">
+                                <ChevronRight size={12} className="text-neutral-400 group-hover/item:text-brand transition-colors" />
+                              </div>
+                              <span className="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed">{change}</span>
+                            </motion.div>
                           ))}
-                       </ul>
+                        </div>
+                      </div>
                     </div>
-                 </motion.div>
-              ))}
-           </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Timeline End */}
+            <div className="absolute left-[11px] bottom-0 w-2 h-2 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+          </div>
         </div>
       </div>
     </div>
