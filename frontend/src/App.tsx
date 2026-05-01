@@ -160,27 +160,27 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
       <BrowserRouter>
-        <div className="w-full h-full relative overflow-hidden flex flex-col bg-white dark:bg-neutral-900 transition-colors duration-500">
+        <div className="w-full h-full relative overflow-hidden flex flex-col bg-[#F5F0EB] dark:bg-[#1E1C1C] transition-colors duration-500">
           
           {/* Main Floating Application Container */}
-          <div className="relative z-10 w-full h-full flex flex-col bg-white dark:bg-neutral-900 overflow-hidden">
+          <div className="relative z-10 w-full h-full flex flex-col bg-[#F5F0EB] dark:bg-[#1E1C1C] overflow-hidden">
             
             {/* Global Header */}
-            <header className="h-[64px] shrink-0 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between px-6 bg-white dark:bg-neutral-900">
+            <header className="h-[64px] shrink-0 border-b border-[#E2DAD2] dark:border-[#3A3838] flex items-center justify-between px-6 bg-[#F5F0EB] dark:bg-[#1E1C1C]">
               <div className="flex items-center gap-3">
-                <div className="font-bold text-xl tracking-tight text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
+                <div className="font-bold text-xl tracking-tight text-[#3A3838] dark:text-[#E2DAD2] flex items-center gap-2">
                   OpenZess
                   <span className="text-[10px] text-brand/80 font-medium tracking-normal mt-1">v1.1.0</span>
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-400 ml-1 mt-1"></div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand ml-1 mt-1"></div>
                 </div>
               </div>
-              <div className="flex items-center gap-6 text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              <div className="flex items-center gap-6 text-sm font-medium text-[#B8AFA8] dark:text-[#B8AFA8]">
                 <Link to="/changelog" className="hover:text-brand transition-colors">Changelog</Link>
                 <a href="https://openzess-docs.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">Doc</a>
                 <Link to="/faq" className="hover:text-brand transition-colors">FAQ</Link>
                 <a href="https://github.com/rosdebbu/openzess" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">GitHub</a>
-                <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-2"></div>
-                <button onClick={() => alert('Language Options (En, Es, Fr, etc.) will be automatically supported in the next module release!')} className="hover:text-brand flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded text-xs">
+                <div className="w-px h-4 bg-[#E2DAD2] dark:bg-[#3A3838] mx-2"></div>
+                <button onClick={() => alert('Language Options (En, Es, Fr, etc.) will be automatically supported in the next module release!')} className="hover:text-brand flex items-center gap-1 border border-[#E2DAD2] dark:border-[#3A3838] px-1.5 py-0.5 rounded text-xs">
                   En
                 </button>
                 <button onClick={() => window.dispatchEvent(new Event('toggle-theme-global'))} className="hover:text-brand transition-colors">
@@ -190,7 +190,7 @@ function App() {
             </header>
 
             {/* Main Split */}
-            <div className="flex flex-1 overflow-hidden relative text-neutral-900 dark:text-neutral-200 bg-[#fbfbfb] dark:bg-neutral-950">
+            <div className="flex flex-1 overflow-hidden relative text-[#3A3838] dark:text-[#E2DAD2] bg-[#F0EBE5] dark:bg-[#1A1818]">
               <Sidebar />
               <AnimatedRoutes persona={persona} />
             </div>
@@ -209,9 +209,9 @@ function App() {
                 <motion.div 
                   initial={{ y: 30, opacity: 0, scale: 0.95 }}
                   animate={{ y: 0, opacity: 1, scale: 1 }}
-                  className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
+                  className="bg-[#F5F0EB] dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838] rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
                 >
-                <div className="flex border-b border-neutral-200 dark:border-border shrink-0">
+                <div className="flex border-b border-[#E2DAD2] dark:border-[#3A3838] shrink-0">
                   <button 
                     onClick={() => setActiveTab('general')}
                     className={`flex-1 py-4 flex items-center justify-center gap-2 font-medium transition-colors ${activeTab === 'general' ? 'text-brand border-b-2 border-brand bg-brand/5' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'}`}
@@ -371,7 +371,7 @@ function App() {
                   )}
                 </div>
                 
-                <div className="p-6 border-t border-neutral-200 dark:border-border bg-neutral-50 dark:bg-surface shrink-0">
+                <div className="p-6 border-t border-[#E2DAD2] dark:border-[#3A3838] bg-[#EDE8E2] dark:bg-[#252222] shrink-0">
                   <button 
                     className="w-full py-3.5 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.98]"
                     onClick={saveConfig}

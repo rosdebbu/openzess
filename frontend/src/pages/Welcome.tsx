@@ -55,11 +55,11 @@ export default function Welcome({ onComplete }: WelcomeProps) {
     };
 
     return (
-        <div className="flex h-screen w-screen bg-neutral-950 items-center justify-center relative overflow-hidden font-sans">
+        <div className="flex h-screen w-screen bg-[#1E1C1C] items-center justify-center relative overflow-hidden font-sans">
             {/* Immersive Animated Background */}
             <div className="absolute inset-0 z-0">
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vh] bg-brand/20 opacity-40 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-[5000ms]" />
-                 <div className="absolute top-1/3 left-1/4 w-[40vw] h-[40vh] bg-purple-600/20 opacity-30 blur-[100px] rounded-full mix-blend-screen animate-pulse duration-[7000ms]" />
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vh] bg-[#A89080]/20 opacity-40 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-[5000ms]" />
+                 <div className="absolute top-1/3 left-1/4 w-[40vw] h-[40vh] bg-[#B8AFA8]/20 opacity-30 blur-[100px] rounded-full mix-blend-screen animate-pulse duration-[7000ms]" />
                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDEiLz4KPHBhdGggZD0iTTAgMEw4IDhaTTAgOEw4IDBaIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjAxNSIgc3Ryb2tlLXdpZHRoPSIxIi8+Cjwvc3ZnPg==')] opacity-100 z-0 pointer-events-none"></div>
             </div>
 
@@ -168,7 +168,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                     disabled={isConnecting || (!apiKey && provider !== 'ollama')}
                                     className="w-full relative overflow-hidden bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 mt-4 shadow-[0_0_30px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:cursor-not-allowed group transition-shadow hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"
                                 >
-                                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-brand/80 to-purple-600/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#A89080] to-[#3A3838] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     {isConnecting ? (
                                         <span className="relative z-10 flex items-center gap-2 text-black group-hover:text-white transition-colors duration-300">
                                             <Activity className="animate-pulse" size={18} /> Establishing Link...

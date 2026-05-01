@@ -4,34 +4,60 @@
 /* Enable class-based dark mode in Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ═══════════════════════════════════════════════
+   OPENZESS — Warm Earth Palette
+   
+   Color System (from palette):
+   1. Cream      #E2DAD2  — Light bg, light text
+   2. Warm Gray  #B8AFA8  — Muted text, borders
+   3. Taupe      #A89080  — Brand accent
+   4. Charcoal   #3A3838  — Dark surface
+   5. Near Black #1E1C1C  — Darkest bg
+   ═══════════════════════════════════════════════ */
+
 :root {
-  --surface: rgba(0, 0, 0, 0.03);
-  --border: rgba(0, 0, 0, 0.08);
-  --scrollbar: rgba(0, 0, 0, 0.15);
-  --scrollbar-hover: rgba(0, 0, 0, 0.25);
+  --surface: rgba(168, 144, 128, 0.06);
+  --border: rgba(168, 144, 128, 0.15);
+  --scrollbar: rgba(168, 144, 128, 0.20);
+  --scrollbar-hover: rgba(168, 144, 128, 0.35);
+  --brand-rgb: 168, 144, 128;
 }
 
 .dark {
-  --surface: rgba(255, 255, 255, 0.04);
-  --border: rgba(255, 255, 255, 0.05);
-  --scrollbar: rgba(255, 255, 255, 0.08); /* Softer scrollbar */
-  --scrollbar-hover: rgba(255, 255, 255, 0.15);
+  --surface: rgba(226, 218, 210, 0.05);
+  --border: rgba(226, 218, 210, 0.08);
+  --scrollbar: rgba(226, 218, 210, 0.10);
+  --scrollbar-hover: rgba(226, 218, 210, 0.20);
   color-scheme: dark;
 }
 
 @theme {
-  --color-brand: #6366f1; /* Cyber Indigo */
-  --color-brand-hover: #4f46e5;
+  --color-brand: #A89080; /* Warm Taupe */
+  --color-brand-hover: #978070;
   --color-surface: var(--surface);
   --color-border: var(--border);
+
+  /* Custom palette tokens */
+  --color-earth-cream: #E2DAD2;
+  --color-earth-gray: #B8AFA8;
+  --color-earth-taupe: #A89080;
+  --color-earth-charcoal: #3A3838;
+  --color-earth-black: #1E1C1C;
+
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    @apply antialiased font-sans h-screen w-screen m-0 p-0 overflow-hidden transition-colors duration-500 text-neutral-900 dark:text-neutral-100;
+    @apply antialiased font-sans h-screen w-screen m-0 p-0 overflow-hidden transition-colors duration-500;
+    color: #3A3838;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .dark body,
+  body:where(.dark *) {
+    color: #E2DAD2;
   }
   
   #root {
@@ -43,22 +69,29 @@
   }
 
   .glass-panel {
-    @apply bg-white/70 dark:bg-[#0a0a0c]/60 backdrop-blur-3xl border border-black/5 dark:border-white/5 shadow-2xl;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(40px);
+    border: 1px solid rgba(168, 144, 128, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  }
+  
+  .dark .glass-panel {
+    background: rgba(30, 28, 28, 0.65);
+    border: 1px solid rgba(226, 218, 210, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 
   .premium-shadow {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 40px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(58, 56, 56, 0.15), 0 0 40px rgba(168, 144, 128, 0.08);
   }
   
   .dark .premium-shadow {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 60px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 60px rgba(168, 144, 128, 0.06);
   }
   
   .hover-scale {
     @apply transition-transform duration-300 hover:scale-[1.02] active:scale-95;
   }
-  
-
   
   .ambient-orb {
       position: fixed;
@@ -67,7 +100,7 @@
       width: 80vw;
       height: 80vh;
       border-radius: 50%;
-      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.20) 0%, rgba(236, 72, 153, 0.15) 40%, transparent 70%);
+      background: radial-gradient(circle at center, rgba(168, 144, 128, 0.15) 0%, rgba(184, 175, 168, 0.10) 40%, transparent 70%);
       filter: blur(100px);
       z-index: 0;
       pointer-events: none;
@@ -76,7 +109,7 @@
   }
   
   .dark .ambient-orb {
-      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.35) 0%, rgba(236, 72, 153, 0.25) 40%, transparent 70%);
+      background: radial-gradient(circle at center, rgba(168, 144, 128, 0.20) 0%, rgba(184, 175, 168, 0.12) 40%, transparent 70%);
       filter: blur(120px);
   }
   
@@ -98,7 +131,7 @@
       100% { opacity: 1; }
   }
   
-  /* Additional scrollbar styling for extra premium feel */
+  /* Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

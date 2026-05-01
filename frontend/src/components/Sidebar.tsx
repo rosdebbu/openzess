@@ -94,7 +94,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className={`bg-[#fdfdfd] dark:bg-neutral-900 border-r border-neutral-100 dark:border-neutral-800 shrink-0 flex flex-col h-full transition-all duration-300 relative z-20 ${isCollapsed ? 'w-[80px]' : 'w-[260px]'}`}>
+    <div className={`bg-[#F5F0EB] dark:bg-[#1E1C1C] border-r border-[#E2DAD2] dark:border-[#3A3838] shrink-0 flex flex-col h-full transition-all duration-300 relative z-20 ${isCollapsed ? 'w-[80px]' : 'w-[260px]'}`}>
       
       {/* Current Agent Dropdown Area Inspired by QwenPaw */}
       <div className={`p-4 border-b border-transparent shrink-0 flex flex-col justify-center relative ${isCollapsed ? 'items-center px-2' : ''}`}>
@@ -103,10 +103,10 @@ export default function Sidebar() {
                  <span className="text-[11px] text-neutral-400 font-medium tracking-wide uppercase px-1 mb-1">Current Agent ({Object.keys(PERSONAS).length})</span>
                  <button 
                     onClick={() => setShowAgentMenu(!showAgentMenu)}
-                    className="flex items-center justify-between w-full p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors text-sm font-medium text-neutral-800 dark:text-neutral-200"
+                    className="flex items-center justify-between w-full p-2.5 rounded-xl bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#2A2828] dark:hover:bg-[#3A3838] transition-colors text-sm font-medium text-[#3A3838] dark:text-[#E2DAD2]"
                  >
                      <div className="flex items-center gap-2">
-                         <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-xs"><Smile size={12}/></div>
+                         <div className="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-brand font-bold text-xs"><Smile size={12}/></div>
                          <span className="truncate max-w-[130px] text-left">{activeAgentName}</span>
                      </div>
                      <ChevronDown size={14} className={`text-neutral-400 transition-transform ${showAgentMenu ? 'rotate-180' : ''}`} />
@@ -118,13 +118,13 @@ export default function Sidebar() {
                            initial={{ opacity: 0, y: -5 }}
                            animate={{ opacity: 1, y: 0 }}
                            exit={{ opacity: 0, y: -5 }}
-                           className="absolute top-[65px] left-0 w-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl z-50 overflow-hidden py-1"
+                           className="absolute top-[65px] left-0 w-full bg-[#F5F0EB] dark:bg-[#2A2828] border border-[#E2DAD2] dark:border-[#3A3838] rounded-xl shadow-xl z-50 overflow-hidden py-1"
                         >
                            {Object.entries(PERSONAS).map(([key, p]) => (
                                <button 
                                   key={key}
                                   onClick={() => handleAgentSelect(key)}
-                                  className="w-full text-left px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                                  className="w-full text-left px-3 py-2 text-sm text-[#3A3838] dark:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-[#3A3838] transition-colors"
                                >
                                   {p.name}
                                </button>
@@ -134,8 +134,8 @@ export default function Sidebar() {
                  </AnimatePresence>
              </div>
          ) : (
-             <button onClick={() => setShowAgentMenu(!showAgentMenu)} className="w-10 h-10 mt-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-xl flex items-center justify-center transition-colors">
-                 <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-500"><Smile size={14}/></div>
+             <button onClick={() => setShowAgentMenu(!showAgentMenu)} className="w-10 h-10 mt-2 bg-[#EDE8E2] dark:bg-[#2A2828] hover:bg-[#E2DAD2] dark:hover:bg-[#3A3838] rounded-xl flex items-center justify-center transition-colors">
+                 <div className="w-6 h-6 rounded-full bg-brand/20 flex items-center justify-center text-brand"><Smile size={14}/></div>
              </button>
          )}
       </div>
@@ -157,7 +157,7 @@ export default function Sidebar() {
                 to="/"
                 className={({ isActive }) => `
                     flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent
-                    ${isActive ? 'bg-[#f0f0f0] dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50'}
+                    ${isActive ? 'bg-[#EDE8E2] dark:bg-[#2A2828] text-[#3A3838] dark:text-[#E2DAD2] shadow-sm' : 'text-[#B8AFA8] dark:text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2]/50 dark:hover:bg-[#2A2828]/50'}
                 `}
             >
                 <span className="shrink-0"><MessageSquare size={16} /></span>
@@ -167,7 +167,7 @@ export default function Sidebar() {
 
         {navSections.map((section) => (
           <div key={section.title} className="flex flex-col gap-1.5">
-            <p className={`text-[11px] text-neutral-400 dark:text-neutral-500 mb-1 font-medium tracking-wide ${isCollapsed ? 'text-center pl-0' : 'pl-3'}`}>
+            <p className={`text-[11px] text-[#B8AFA8] dark:text-[#B8AFA8] mb-1 font-medium tracking-wide ${isCollapsed ? 'text-center pl-0' : 'pl-3'}`}>
                 {isCollapsed ? '—' : section.title}
             </p>
             {section.items.map((item) => (
@@ -183,7 +183,7 @@ export default function Sidebar() {
                   <div className="flex flex-col gap-1">
                       <button 
                          onClick={() => toggleMenu(item.name)}
-                         className={`w-full flex items-center justify-between ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-[#fafafa] dark:hover:bg-neutral-800/80`}
+                         className={`w-full flex items-center justify-between ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent text-[#B8AFA8] dark:text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-[#2A2828]`}
                       >
                          <div className="flex items-center gap-3">
                              <span className="shrink-0">{item.icon}</span>
@@ -200,7 +200,7 @@ export default function Sidebar() {
                                 exit={{ height: 0, opacity: 0 }}
                                 className="flex flex-col overflow-hidden relative"
                              >
-                                 <div className="absolute left-[21px] top-1 bottom-1 w-[1px] bg-neutral-200 dark:bg-neutral-800 z-0"></div>
+                                 <div className="absolute left-[21px] top-1 bottom-1 w-[1px] bg-[#E2DAD2] dark:bg-[#3A3838] z-0"></div>
                                  <div className="flex flex-col pl-9 pr-2 py-1 gap-1 z-10">
                                      {item.subItems.map((subItem: any) => (
                                          <NavLink 
@@ -208,7 +208,7 @@ export default function Sidebar() {
                                              to={subItem.path}
                                              className={({ isActive }) => `
                                                 flex items-center py-2 px-3 rounded-lg transition-all duration-200 ease-out font-medium text-[13px] border border-transparent
-                                                ${isActive ? 'bg-[#f0f0f0] dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-[#fafafa] dark:hover:bg-neutral-800/80'}
+                                                ${isActive ? 'bg-[#EDE8E2] dark:bg-[#2A2828] text-[#3A3838] dark:text-[#E2DAD2] shadow-sm' : 'text-[#B8AFA8] dark:text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-[#2A2828]'}
                                              `}
                                          >
                                              {subItem.name}
@@ -224,7 +224,7 @@ export default function Sidebar() {
                     to={item.path}
                     className={({ isActive }) => `
                       flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent
-                      ${isActive ? 'bg-[#f0f0f0] dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-[#fafafa] dark:hover:bg-neutral-800/80'}
+                      ${isActive ? 'bg-[#EDE8E2] dark:bg-[#2A2828] text-[#3A3838] dark:text-[#E2DAD2] shadow-sm' : 'text-[#B8AFA8] dark:text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-[#2A2828]'}
                     `}
                   >
                     <span className="shrink-0">{item.icon}</span>
@@ -233,7 +233,7 @@ export default function Sidebar() {
                 ) : (
                   <button 
                     onClick={item.action}
-                    className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-[#fafafa] dark:hover:bg-neutral-800/80`}
+                    className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2.5 rounded-lg transition-all duration-200 ease-out font-medium text-sm border border-transparent text-[#B8AFA8] dark:text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-[#2A2828]`}
                   >
                     <span className="shrink-0">{item.icon}</span>
                     {!isCollapsed && <span className="truncate">{item.name}</span>}
@@ -250,7 +250,7 @@ export default function Sidebar() {
       <div className="p-3 border-t border-transparent flex justify-end shrink-0">
          <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-white rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10 hidden sm:flex items-center justify-center"
+            className="p-2 text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] rounded-lg hover:bg-[#EDE8E2] dark:hover:bg-[#2A2828] transition-colors z-10 hidden sm:flex items-center justify-center"
          >
             {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
          </button>

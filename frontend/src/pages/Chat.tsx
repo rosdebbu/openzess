@@ -507,20 +507,20 @@ export default function Chat() {
   };
 
   return (
-    <div className={`flex flex-1 h-full w-full bg-white dark:bg-[#131314] transition-colors duration-500 overflow-hidden relative ${zenMode ? 'p-2 md:p-6' : 'p-0'}`}>
-      <div className={`flex flex-col relative h-full transition-all duration-500 ease-in-out shrink-0 ${activeArtifact ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'} ${zenMode ? 'rounded-2xl border border-neutral-200 dark:border-white/10 shadow-2xl bg-white/50 dark:bg-black/20 overflow-hidden backdrop-blur-xl scale-[0.98]' : ''}`}>
+    <div className={`flex flex-1 h-full w-full bg-[#F5F0EB] dark:bg-[#1A1818] transition-colors duration-500 overflow-hidden relative ${zenMode ? 'p-2 md:p-6' : 'p-0'}`}>
+      <div className={`flex flex-col relative h-full transition-all duration-500 ease-in-out shrink-0 ${activeArtifact ? 'w-1/2 border-r border-[#E2DAD2] dark:border-[#3A3838]' : 'w-full'} ${zenMode ? 'rounded-2xl border border-[#E2DAD2] dark:border-[#3A3838] shadow-2xl bg-[#F5F0EB]/50 dark:bg-[#1E1C1C]/20 overflow-hidden backdrop-blur-xl scale-[0.98]' : ''}`}>
         
         {/* Modern Clean Header */}
         <div className={`w-full px-5 pt-5 pb-2 z-30 flex items-center justify-between shrink-0 transition-all ${zenMode ? 'px-8 pt-8' : ''}`}>
             {/* Left Header - Dropdowns */}
             <div className="flex items-center gap-1">
-               <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 dark:bg-white/5 rounded-xl border border-neutral-200 dark:border-neutral-800">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="text-[13px] font-medium text-neutral-600 dark:text-neutral-300">
+               <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EDE8E2] dark:bg-[#2A2828] rounded-xl border border-[#E2DAD2] dark:border-[#3A3838]">
+                  <span className="w-2 h-2 rounded-full bg-brand animate-pulse"></span>
+                  <span className="text-[13px] font-medium text-[#3A3838] dark:text-[#E2DAD2]">
                      {PERSONAS[currentPersonaKey]?.name || 'Developer'}
                   </span>
                </div>
-               <div className="w-[1px] h-4 bg-neutral-200 dark:bg-neutral-700/50 mx-1"></div>
+               <div className="w-[1px] h-4 bg-[#E2DAD2] dark:bg-[#3A3838] mx-1"></div>
                <div className="relative group/select">
                   <select 
                      className="appearance-none bg-transparent hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-600 dark:text-neutral-300 text-[14px] font-medium py-2 pl-3 pr-8 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-0 max-w-[200px] outline-none"
@@ -583,30 +583,30 @@ export default function Chat() {
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col justify-center p-6 md:p-10 relative overflow-y-auto max-w-4xl mx-auto w-full custom-scrollbar">
              <div className="mt-auto pb-8 pt-20">
-                <h1 className="text-[44px] md:text-[52px] font-semibold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent pb-2 tracking-tight leading-tight">Hello, {PERSONAS[currentPersonaKey]?.name || 'Developer'}</h1>
+                <h1 className="text-[44px] md:text-[52px] font-semibold bg-gradient-to-r from-[#A89080] via-[#B8AFA8] to-[#3A3838] bg-clip-text text-transparent pb-2 tracking-tight leading-tight">Hello, {PERSONAS[currentPersonaKey]?.name || 'Developer'}</h1>
                 <p className="text-[32px] md:text-[38px] font-medium text-neutral-400 dark:text-neutral-500 tracking-tight mt-1 leading-tight">How can I help you today?</p>
              </div>
              
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full mt-auto">
-                <button onClick={() => setInput("Link and explore this Github repository: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                <button onClick={() => setInput("Link and explore this Github repository: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Explore a<br/>GitHub Repository</div>
                     <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
                        <Globe size={18} className="text-blue-500" />
                     </div>
                 </button>
-                <button onClick={() => setInput("Let's brainstorm ideas and analysis for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                <button onClick={() => setInput("Let's brainstorm ideas and analysis for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Brainstorm ideas<br/>& workflow logic</div>
                     <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
                        <Brain size={18} className="text-purple-500" />
                     </div>
                 </button>
-                <button onClick={() => setInput("Analyze the attached PDF report: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                <button onClick={() => setInput("Analyze the attached PDF report: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Analyze a<br/>PDF report</div>
                     <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
                        <FileText size={18} className="text-emerald-500" />
                     </div>
                 </button>
-                <button onClick={() => setInput("Make a roadmap and workflow for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-neutral-50 hover:bg-neutral-100 dark:bg-[#1e1f20] dark:hover:bg-[#2a2b2e] transition-colors text-left group h-40 justify-between">
+                <button onClick={() => setInput("Make a roadmap and workflow for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Make a roadmap<br/>& project workflow</div>
                     <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
                        <Code size={18} className="text-orange-500" />
@@ -628,7 +628,7 @@ export default function Chat() {
                     <div className="flex max-w-full lg:max-w-[90%] gap-4 w-full">
                       {/* Agent Avatar */}
                       <div className="flex-shrink-0 mt-1 hidden md:block">
-                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#A89080] to-[#3A3838] flex items-center justify-center text-white shadow-sm">
                             <Sparkles size={14} />
                          </div>
                       </div>
@@ -704,7 +704,7 @@ export default function Chat() {
                   {msg.role === 'user' && (
                       <div className="flex items-start gap-3 max-w-[85%] lg:max-w-[65%] ml-auto">
                          <div className="flex flex-col items-end gap-1 w-full">
-                           <div className="px-5 py-3.5 rounded-[1.5rem] bg-[#f0f4f9] dark:bg-[#1e1f20] text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap text-[15px] leading-relaxed w-full inline-block">
+                           <div className="px-5 py-3.5 rounded-[1.5rem] bg-[#EDE8E2] dark:bg-[#252222] text-[#3A3838] dark:text-[#E2DAD2] whitespace-pre-wrap text-[15px] leading-relaxed w-full inline-block">
                               {msg.content}
                            </div>
                          </div>
@@ -715,13 +715,13 @@ export default function Chat() {
               {isLoading && !pendingCalls && (
                 <div className="flex max-w-full lg:max-w-[90%] gap-4 w-full">
                    <div className="flex-shrink-0 mt-1 hidden md:block">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#A89080] to-[#3A3838] flex items-center justify-center text-white shadow-sm">
                          <Sparkles size={14} className="animate-spin" style={{ animationDuration: '3s' }} />
                       </div>
                    </div>
                    <div className="flex flex-col gap-1 w-full min-w-0 pr-10">
                       <div className="relative group/bubble pt-1 pb-2 text-neutral-800 dark:text-neutral-100 w-full prose dark:prose-invert max-w-none">
-                         <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} className="w-24 h-4 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-[4px] my-2"></motion.div>
+                         <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} className="w-24 h-4 bg-gradient-to-r from-[#A89080]/20 to-[#B8AFA8]/20 rounded-[4px] my-2"></motion.div>
                       </div>
                    </div>
                 </div>
@@ -731,7 +731,7 @@ export default function Chat() {
           </div>
         )}
 
-        <div className="px-4 md:px-10 pb-6 md:pb-8 flex justify-center sticky bottom-0 bg-gradient-to-t from-white via-white dark:from-[#131314] dark:via-[#131314] to-transparent pt-10 shrink-0">
+        <div className="px-4 md:px-10 pb-6 md:pb-8 flex justify-center sticky bottom-0 bg-gradient-to-t from-[#F5F0EB] via-[#F5F0EB] dark:from-[#1A1818] dark:via-[#1A1818] to-transparent pt-10 shrink-0">
           
           {pendingCalls ? (
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-full max-w-4xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex flex-col p-5 shadow-xl z-20">
@@ -759,7 +759,7 @@ export default function Chat() {
                  </div>
               </motion.div>
           ) : (
-            <div className="w-full max-w-4xl bg-[#f0f4f9] dark:bg-[#1e1f20] border border-transparent rounded-[2rem] flex items-end p-2 md:p-3 transition-all focus-within:bg-white dark:focus-within:bg-[#2a2b2e] focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.05)] dark:focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.3)] focus-within:border-neutral-200 dark:focus-within:border-neutral-700/50 relative z-20">
+            <div className="w-full max-w-4xl bg-[#EDE8E2] dark:bg-[#252222] border border-transparent rounded-[2rem] flex items-end p-2 md:p-3 transition-all focus-within:bg-[#F5F0EB] dark:focus-within:bg-[#2A2828] focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.05)] dark:focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.3)] focus-within:border-[#E2DAD2] dark:focus-within:border-[#3A3838] relative z-20">
               <div ref={plusMenuRef} className="relative flex gap-1.5 mb-[3px] shrink-0 pl-1 mr-2">
                   <input 
                       type="file" 
@@ -851,7 +851,7 @@ export default function Chat() {
                     <Mic size={18} />
                   </button>
                   <button 
-                    className="bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ml-1 active:scale-95 shadow-sm"
+                    className="bg-[#3A3838] hover:bg-[#1E1C1C] dark:bg-[#E2DAD2] dark:hover:bg-white text-white dark:text-[#1E1C1C] rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ml-1 active:scale-95 shadow-sm"
                     onClick={() => handleSend()} 
                     disabled={!input.trim() || isLoading}
                   >
