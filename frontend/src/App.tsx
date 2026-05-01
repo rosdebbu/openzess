@@ -170,7 +170,7 @@ function App() {
               <div className="flex items-center gap-3">
                 <div className="font-bold text-xl tracking-tight text-[#3A3838] dark:text-[#E2DAD2] flex items-center gap-2">
                   OpenZess
-                  <span className="text-[10px] text-brand/80 font-medium tracking-normal mt-1">v1.1.0</span>
+                  <span className="text-[10px] text-[#A89080] font-bold tracking-normal mt-1">v1.1.0</span>
                   <div className="w-1.5 h-1.5 rounded-full bg-brand ml-1 mt-1"></div>
                 </div>
               </div>

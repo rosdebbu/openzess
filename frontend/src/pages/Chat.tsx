@@ -587,28 +587,28 @@ export default function Chat() {
                 <p className="text-[32px] md:text-[38px] font-medium text-[#B8AFA8] dark:text-[#B8AFA8] tracking-tight mt-1 leading-tight">How can I help you today?</p>
              </div>
              
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full mt-auto">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full mt-auto mb-8 md:mb-12">
                 <button onClick={() => setInput("Link and explore this Github repository: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Explore a<br/>GitHub Repository</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                    <div className="w-10 h-10 rounded-full bg-brand/5 dark:bg-brand/10 border border-brand/10 shadow-sm flex items-center justify-center shrink-0 self-end transition-colors group-hover:bg-brand/10">
                        <Globe size={18} className="text-blue-500" />
                     </div>
                 </button>
                 <button onClick={() => setInput("Let's brainstorm ideas and analysis for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Brainstorm ideas<br/>& workflow logic</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                    <div className="w-10 h-10 rounded-full bg-brand/5 dark:bg-brand/10 border border-brand/10 shadow-sm flex items-center justify-center shrink-0 self-end transition-colors group-hover:bg-brand/10">
                        <Brain size={18} className="text-brand" />
                     </div>
                 </button>
                 <button onClick={() => setInput("Analyze the attached PDF report: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Analyze a<br/>PDF report</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                    <div className="w-10 h-10 rounded-full bg-brand/5 dark:bg-brand/10 border border-brand/10 shadow-sm flex items-center justify-center shrink-0 self-end transition-colors group-hover:bg-brand/10">
                        <FileText size={18} className="text-emerald-500" />
                     </div>
                 </button>
                 <button onClick={() => setInput("Make a roadmap and workflow for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
                     <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Make a roadmap<br/>& project workflow</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                    <div className="w-10 h-10 rounded-full bg-brand/5 dark:bg-brand/10 border border-brand/10 shadow-sm flex items-center justify-center shrink-0 self-end transition-colors group-hover:bg-brand/10">
                        <Code size={18} className="text-brand" />
                     </div>
                 </button>

@@ -19,11 +19,21 @@ import shutil
 import tavern_parser
 from swarm_manager import swarm_manager
 import mss
-try:
-    import pyautogui
-except Exception:
-    pyautogui = None
-    print("Warning: pyautogui unavailable (no X display). Matrix/PC control disabled.", flush=True)
+# pyautogui is lazy-loaded inside the Matrix WebSocket handler to avoid
+# failing at server startup when the Xvfb display isn't ready yet.
+pyautogui = None
+
+def _get_pyautogui():
+    """Lazy-load pyautogui on first use so Xvfb has time to initialize."""
+    global pyautogui
+    if pyautogui is None:
+        try:
+            import pyautogui as _pag
+            _pag.FAILSAFE = False
+            pyautogui = _pag
+        except Exception as e:
+            print(f"Warning: pyautogui failed to load: {e}", flush=True)
+    return pyautogui
 from PIL import Image
 import asyncio
 
@@ -869,19 +879,25 @@ async def matrix_stream(websocket: WebSocket):
                         native_y = int(y_pct * monitor["height"])
                         
                         # Use PyAutoGUI to click directly inside the invisible sandbox!
-                        pyautogui.click(x=native_x, y=native_y)
+                        pag = _get_pyautogui()
+                        if pag:
+                            pag.click(x=native_x, y=native_y)
                         
                     elif action == "type":
                         text = payload.get("text", "")
                         if text:
-                            # Use tiny intervals to be safe on Xvfb
-                            pyautogui.write(text, interval=0.01)
+                            pag = _get_pyautogui()
+                            if pag:
+                                # Use tiny intervals to be safe on Xvfb
+                                pag.write(text, interval=0.01)
                             
                     elif action == "key":
                         key = payload.get("key", "")
                         # E.g., 'enter', 'backspace'
                         if key:
-                            pyautogui.press(key)
+                            pag = _get_pyautogui()
+                            if pag:
+                                pag.press(key)
                             
                 except Exception as e:
                     print(f"[Matrix] Error processing input: {e}")

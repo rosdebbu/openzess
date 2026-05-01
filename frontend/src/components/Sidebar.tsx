@@ -56,6 +56,7 @@ export default function Sidebar() {
             { name: 'MCP Plugins', path: '/mcp' }
           ]
         },
+        { name: 'Debate Arena', icon: <Swords size={18} />, path: '/debate' },
         { name: 'Configuration', icon: <SlidersHorizontal size={18} />, action: () => window.dispatchEvent(new Event('open-settings')) },
       ]
     },
@@ -167,7 +168,7 @@ export default function Sidebar() {
 
         {navSections.map((section) => (
           <div key={section.title} className="flex flex-col gap-1.5">
-            <p className={`text-[11px] text-[#B8AFA8] dark:text-[#B8AFA8] mb-1 font-medium tracking-wide ${isCollapsed ? 'text-center pl-0' : 'pl-3'}`}>
+            <p className={`text-[11px] text-[#8C7A6B] dark:text-[#A89080] mb-2 font-bold tracking-widest uppercase ${isCollapsed ? 'text-center pl-0' : 'pl-3 mt-4'}`}>
                 {isCollapsed ? '—' : section.title}
             </p>
             {section.items.map((item) => (
