@@ -71,24 +71,24 @@ export default function FAQ() {
     <div className="flex-1 flex flex-col h-full bg-transparent p-10 overflow-hidden">
       <div className="max-w-4xl w-full mx-auto flex flex-col h-full">
         <header className="mb-10 shrink-0">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#E2DAD2] dark:border-[#3A3838]">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-brand/10 text-brand rounded-2xl flex items-center justify-center shadow-lg shadow-brand/5 border border-brand/20">
                 <HelpCircle size={28} />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">FAQ</h1>
-                <p className="text-neutral-500 dark:text-neutral-400">Frequently asked questions & troubleshooting guides</p>
+                <h1 className="text-3xl font-bold text-[#3A3838] dark:text-[#E2DAD2] tracking-tight">FAQ</h1>
+                <p className="text-[#B8AFA8] dark:text-[#B8AFA8]">Frequently asked questions & troubleshooting guides</p>
               </div>
             </div>
             <div className="relative">
-              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B8AFA8] dark:text-[#B8AFA8]" />
               <input
                 type="text"
                 placeholder="Search questions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-200 pl-11 pr-4 py-2.5 rounded-xl w-64 focus:outline-none focus:border-brand/40 shadow-sm dark:shadow-none transition-colors text-sm font-medium"
+                className="bg-white dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838] text-[#3A3838] dark:text-[#E2DAD2] pl-11 pr-4 py-2.5 rounded-xl w-64 focus:outline-none focus:border-brand/40 shadow-sm dark:shadow-none transition-colors text-sm font-medium"
               />
             </div>
           </div>
@@ -96,17 +96,17 @@ export default function FAQ() {
 
         <div className="flex-1 overflow-y-auto pb-10 custom-scrollbar pr-2">
           {filteredFaqs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-20 bg-white dark:bg-neutral-900/40 rounded-3xl border border-neutral-200 dark:border-neutral-800/60 border-dashed">
-              <HelpCircle size={48} className="text-neutral-400 dark:text-neutral-600 mb-4" />
-              <h2 className="text-xl font-medium text-neutral-800 dark:text-neutral-300 mb-2">No matching questions</h2>
-              <p className="text-neutral-500 text-center max-w-md">Try adjusting your search query.</p>
+            <div className="flex flex-col items-center justify-center p-20 bg-white dark:bg-[#1E1C1C]/40 rounded-3xl border border-[#E2DAD2] dark:border-[#3A3838]/60 border-dashed">
+              <HelpCircle size={48} className="text-[#B8AFA8] dark:text-[#3A3838]/80 mb-4" />
+              <h2 className="text-xl font-medium text-[#3A3838] dark:text-[#E2DAD2]/80 mb-2">No matching questions</h2>
+              <p className="text-[#B8AFA8] text-center max-w-md">Try adjusting your search query.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {filteredFaqs.map((faq, i) => {
                 const isOpen = openIndex === i;
                 const Icon = faq.icon;
-                const catColor = categoryColors[faq.category] || 'bg-neutral-100 text-neutral-500';
+                const catColor = categoryColors[faq.category] || 'bg-[#EDE8E2] text-[#B8AFA8]';
 
                 return (
                   <motion.div
@@ -114,10 +114,10 @@ export default function FAQ() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.08 }}
                     key={i}
-                    className={`bg-white dark:bg-neutral-900/60 border rounded-2xl overflow-hidden transition-all ${
+                    className={`bg-white dark:bg-[#1E1C1C]/60 border rounded-2xl overflow-hidden transition-all ${
                       isOpen
                         ? 'border-brand/30 shadow-lg shadow-brand/5'
-                        : 'border-neutral-200 dark:border-neutral-800 shadow-sm dark:shadow-none hover:border-neutral-300 dark:hover:border-neutral-700'
+                        : 'border-[#E2DAD2] dark:border-[#3A3838] shadow-sm dark:shadow-none hover:border-[#E2DAD2] dark:hover:border-[#3A3838]'
                     }`}
                   >
                     <button
@@ -127,13 +127,13 @@ export default function FAQ() {
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                         isOpen
                           ? 'bg-brand/10 text-brand'
-                          : 'bg-neutral-100 dark:bg-white/5 text-neutral-400 dark:text-neutral-500'
+                          : 'bg-[#EDE8E2] dark:bg-white/5 text-[#B8AFA8] dark:text-[#B8AFA8]/80'
                       }`}>
                         <Icon size={20} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className={`font-semibold text-[15px] leading-snug transition-colors ${
-                          isOpen ? 'text-brand' : 'text-neutral-900 dark:text-white'
+                          isOpen ? 'text-brand' : 'text-[#3A3838] dark:text-[#E2DAD2]'
                         }`}>
                           {faq.q}
                         </h3>
@@ -142,7 +142,7 @@ export default function FAQ() {
                         {faq.category}
                       </span>
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                        isOpen ? 'bg-brand/10 text-brand' : 'bg-neutral-100 dark:bg-white/5 text-neutral-400'
+                        isOpen ? 'bg-brand/10 text-brand' : 'bg-[#EDE8E2] dark:bg-white/5 text-[#B8AFA8]'
                       }`}>
                         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </div>
@@ -158,8 +158,8 @@ export default function FAQ() {
                           className="overflow-hidden"
                         >
                           <div className="px-5 pb-5 pl-[4.5rem]">
-                            <div className="bg-neutral-50 dark:bg-white/5 rounded-xl p-5 border border-neutral-100 dark:border-white/5">
-                              <p className="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed">{faq.a}</p>
+                            <div className="bg-[#EDE8E2] dark:bg-white/5 rounded-xl p-5 border border-[#E2DAD2] dark:border-[#3A3838]/60">
+                              <p className="text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-sm leading-relaxed">{faq.a}</p>
                             </div>
                           </div>
                         </motion.div>

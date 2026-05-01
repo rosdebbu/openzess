@@ -79,7 +79,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.1 }}
-                                className={`mb-2 font-medium ${log.startsWith('[OK]') ? 'text-brand drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'text-neutral-300'}`}
+                                className={`mb-2 font-medium ${log.startsWith('[OK]') ? 'text-brand drop-shadow-[0_0_8px_rgba(168,144,128,0.5)]' : 'text-[#B8AFA8]/60'}`}
                             >
                                 {log}
                             </motion.div>
@@ -108,7 +108,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                 <img src={logoUrl} alt="Openzess Logo" className="w-20 h-20 object-contain mix-blend-screen drop-shadow-[0_0_20px_rgba(255,100,100,0.6)]" />
                             </motion.div>
                             <h1 className="text-4xl font-bold tracking-tight text-white mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>openzess</h1>
-                            <p className="text-neutral-400 font-medium">Initialize your AI workspace</p>
+                            <p className="text-[#B8AFA8] font-medium">Initialize your AI workspace</p>
                         </div>
 
                         {/* Login Glass Card */}
@@ -118,7 +118,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                             <div className="space-y-6 relative z-10">
                                 {/* Provider Select */}
                                 <div className="space-y-2">
-                                     <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest pl-1">Neural Core / Provider</label>
+                                     <label className="text-xs font-bold text-[#B8AFA8] uppercase tracking-widest pl-1">Neural Core / Provider</label>
                                      <div className="relative">
                                          <select 
                                              value={provider}
@@ -136,7 +136,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                              <option value="kimi" className="text-black">Kimi (Moonshot 8k)</option>
                                              <option value="ollama" className="text-black">Ollama (Local/Airgapped)</option>
                                          </select>
-                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500">
+                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#B8AFA8]">
                                              <Zap size={16} />
                                          </div>
                                      </div>
@@ -144,9 +144,9 @@ export default function Welcome({ onComplete }: WelcomeProps) {
 
                                 {/* API Key Input */}
                                 <div className="space-y-2">
-                                     <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest pl-1">Authorization Sequence</label>
+                                     <label className="text-xs font-bold text-[#B8AFA8] uppercase tracking-widest pl-1">Authorization Sequence</label>
                                      <div className="relative">
-                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500">
+                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B8AFA8]">
                                              <Key size={16} />
                                          </div>
                                          <input 
@@ -155,7 +155,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                              onChange={(e) => setApiKey(e.target.value)}
                                              disabled={provider === 'ollama' || isConnecting}
                                              placeholder={provider === 'ollama' ? "Local mode - No key required" : "Enter Master API Key..."}
-                                             className="w-full bg-white/5 border border-white/10 text-white p-3.5 pl-11 rounded-xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/50 transition-all disabled:opacity-50 font-mono tracking-widest placeholder:tracking-normal placeholder:font-sans placeholder:text-neutral-600"
+                                             className="w-full bg-white/5 border border-white/10 text-white p-3.5 pl-11 rounded-xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/50 transition-all disabled:opacity-50 font-mono tracking-widest placeholder:tracking-normal placeholder:font-sans placeholder:text-[#3A3838]/80"
                                          />
                                      </div>
                                 </div>

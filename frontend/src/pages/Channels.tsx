@@ -159,15 +159,15 @@ export default function Channels() {
   });
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-transparent text-neutral-900 dark:text-neutral-200">
+    <div className="flex h-full w-full overflow-hidden bg-transparent text-[#3A3838] dark:text-[#E2DAD2]">
       {/* Sidebar for Channels */}
-      <div className="w-72 border-r border-neutral-200 dark:border-border bg-white/50 dark:bg-surface/50 flex flex-col backdrop-blur-md">
-        <div className="p-6 border-b border-neutral-200 dark:border-border">
+      <div className="w-72 border-r border-[#E2DAD2] dark:border-border bg-white/50 dark:bg-surface/50 flex flex-col backdrop-blur-md">
+        <div className="p-6 border-b border-[#E2DAD2] dark:border-border">
           <div className="w-12 h-12 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-4 shadow-sm">
             <Radio size={24} />
           </div>
-          <h2 className="text-xl font-semibold mb-1 text-neutral-900 dark:text-white">Channels</h2>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">High-Velocity Logs</p>
+          <h2 className="text-xl font-semibold mb-1 text-[#3A3838] dark:text-[#E2DAD2]">Channels</h2>
+          <p className="text-xs text-[#B8AFA8] dark:text-[#B8AFA8]">High-Velocity Logs</p>
         </div>
         
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -175,9 +175,9 @@ export default function Channels() {
             <button
               key={c.id}
               onClick={() => setActiveChannel(c.id)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-left ${activeChannel === c.id ? 'bg-brand/10 text-brand' : 'hover:bg-neutral-100 dark:hover:bg-surface text-neutral-600 dark:text-neutral-400'}`}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-left ${activeChannel === c.id ? 'bg-brand/10 text-brand' : 'hover:bg-[#EDE8E2] dark:hover:bg-surface text-[#3A3838]/80 dark:text-[#B8AFA8]'}`}
             >
-              <c.icon size={18} className={activeChannel === c.id ? 'text-brand' : 'text-neutral-400'} />
+              <c.icon size={18} className={activeChannel === c.id ? 'text-brand' : 'text-[#B8AFA8]'} />
               <span className="font-medium text-sm flex-1">{c.name}</span>
               {c.unread > 0 && (
                 <span className="bg-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">{c.unread > 999 ? '999+' : c.unread}</span>
@@ -188,19 +188,19 @@ export default function Channels() {
       </div>
 
       {/* Main Channel Area */}
-      <div className="flex-1 flex flex-col bg-neutral-50 dark:bg-neutral-950/50 relative overflow-hidden">
-        <div className="p-6 border-b border-neutral-200 dark:border-border bg-white/50 dark:bg-surface/50 backdrop-blur-md flex items-center gap-4 z-10">
+      <div className="flex-1 flex flex-col bg-[#EDE8E2] dark:bg-[#1A1818]/50 relative overflow-hidden">
+        <div className="p-6 border-b border-[#E2DAD2] dark:border-border bg-white/50 dark:bg-surface/50 backdrop-blur-md flex items-center gap-4 z-10">
           <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand">
             {currentChannel && <currentChannel.icon size={20} />}
           </div>
           <div>
-            <h3 className="font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
+            <h3 className="font-semibold text-[#3A3838] dark:text-[#E2DAD2] flex items-center gap-2">
               #{currentChannel?.name}
               {activeChannel !== 'telegram' && activeChannel !== 'discord' && <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2">Pretext V-Sync</span>}
               {activeChannel === 'telegram' && isTelegramRunning && <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2 shadow-sm animate-pulse">Online</span>}
               {activeChannel === 'discord' && isDiscordRunning && <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2 shadow-sm animate-pulse">Online</span>}
             </h3>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">{currentChannel?.desc}</p>
+            <p className="text-xs text-[#B8AFA8] dark:text-[#B8AFA8]">{currentChannel?.desc}</p>
           </div>
         </div>
 
@@ -215,27 +215,27 @@ export default function Channels() {
           >
             {activeChannel === 'telegram' ? (
                <div className="flex-1 p-8 overflow-y-auto">
-                  <div className="max-w-2xl mx-auto bg-white dark:bg-surface border border-neutral-200 dark:border-border p-8 rounded-2xl shadow-sm">
+                  <div className="max-w-2xl mx-auto bg-white dark:bg-surface border border-[#E2DAD2] dark:border-border p-8 rounded-2xl shadow-sm">
                      <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-6 shadow-sm">
                         <Send size={32} />
                      </div>
                      <h2 className="text-2xl font-bold mb-2">Connect Telegram</h2>
-                     <p className="text-neutral-500 mb-8 text-sm leading-relaxed">
+                     <p className="text-[#B8AFA8] mb-8 text-sm leading-relaxed">
                        Link your Openzess local environment to a Telegram Bot. Once active, any message sent to your bot from anywhere in the world goes straight to your local AI array.
                      </p>
                      
                      <div className="space-y-6">
                         <div>
-                          <label className="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Bot API Token</label>
+                          <label className="block text-sm font-medium mb-2 text-[#3A3838] dark:text-[#E2DAD2]">Bot API Token</label>
                           <input
                             type="password"
                             placeholder="1234567890:AAH_XxXxXxXxXxXxXxXxXxXxXxXxXx"
                             value={telegramToken}
                             onChange={e => setTelegramToken(e.target.value)}
-                            className="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
+                            className="w-full bg-[#EDE8E2] dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand transition-colors font-mono"
                             disabled={isTelegramRunning}
                           />
-                          <p className="text-xs text-neutral-400 mt-2">Get this from @BotFather on Telegram.</p>
+                          <p className="text-xs text-[#B8AFA8] mt-2">Get this from @BotFather on Telegram.</p>
                         </div>
 
                         <button
@@ -244,7 +244,7 @@ export default function Channels() {
                            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold transition-all transform active:scale-[0.98] ${
                               isTelegramRunning 
                               ? 'bg-red-500/10 text-red-600 border border-red-500/30 hover:bg-red-500 hover:text-white shadow-xl shadow-red-500/10' 
-                              : 'bg-indigo-500 text-white hover:bg-indigo-600 shadow-xl shadow-indigo-500/20'
+                              : 'bg-brand text-white hover:bg-brand-hover shadow-xl shadow-brand/20'
                            }`}
                         >
                            {isToggling && <Loader2 size={18} className="animate-spin" />}
@@ -273,24 +273,24 @@ export default function Channels() {
                </div>
             ) : activeChannel === 'discord' ? (
                <div className="flex-1 p-8 overflow-y-auto">
-                  <div className="max-w-2xl mx-auto bg-white dark:bg-surface border border-neutral-200 dark:border-border p-8 rounded-2xl shadow-sm">
-                     <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-6 shadow-sm">
+                  <div className="max-w-2xl mx-auto bg-white dark:bg-surface border border-[#E2DAD2] dark:border-border p-8 rounded-2xl shadow-sm">
+                     <div className="w-16 h-16 rounded-2xl bg-brand/10 text-brand flex items-center justify-center mb-6 shadow-sm">
                         <MessageSquare size={32} />
                      </div>
                      <h2 className="text-2xl font-bold mb-2">Connect Discord</h2>
-                     <p className="text-neutral-500 mb-8 text-sm leading-relaxed">
+                     <p className="text-[#B8AFA8] mb-8 text-sm leading-relaxed">
                        Link your Openzess local environment to a Discord Bot. Ensure your bot has the Message Content intent enabled in the Discord Developer Portal.
                      </p>
                      
                      <div className="space-y-6">
                         <div>
-                          <label className="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Bot Token</label>
+                          <label className="block text-sm font-medium mb-2 text-[#3A3838] dark:text-[#E2DAD2]">Bot Token</label>
                           <input
                             type="password"
                             placeholder="MTAx..._xxx..."
                             value={discordToken}
                             onChange={e => setDiscordToken(e.target.value)}
-                            className="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
+                            className="w-full bg-[#EDE8E2] dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand transition-colors font-mono"
                             disabled={isDiscordRunning}
                           />
                         </div>
@@ -301,7 +301,7 @@ export default function Channels() {
                            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold transition-all transform active:scale-[0.98] ${
                               isDiscordRunning 
                               ? 'bg-red-500/10 text-red-600 border border-red-500/30 hover:bg-red-500 hover:text-white shadow-xl shadow-red-500/10' 
-                              : 'bg-indigo-500 text-white hover:bg-indigo-600 shadow-xl shadow-indigo-500/20'
+                              : 'bg-brand text-white hover:bg-brand-hover shadow-xl shadow-brand/20'
                            }`}
                         >
                            {isToggling && <Loader2 size={18} className="animate-spin" />}
@@ -357,13 +357,13 @@ export default function Channels() {
                         >
                           <div className={`flex flex-col max-w-[80%] pb-6 ${msg.align === 'right' ? 'self-end ml-auto' : 'self-start'}`}>
                             <div className={`flex items-center gap-2 mb-1 text-xs ${msg.align === 'right' ? 'justify-end flex-row-reverse' : ''}`}>
-                               {msg.role === 'system' && <Radio size={12} className="text-neutral-400" />}
+                               {msg.role === 'system' && <Radio size={12} className="text-[#B8AFA8]" />}
                                {msg.role === 'agent' && <Bot size={12} className="text-brand" />}
                                {msg.role === 'user' && <User size={12} className="text-blue-500" />}
-                               <span className="font-medium text-neutral-500">{msg.sender}</span>
-                               <span className="text-neutral-400">{msg.time}</span>
+                               <span className="font-medium text-[#B8AFA8]">{msg.sender}</span>
+                               <span className="text-[#B8AFA8]">{msg.time}</span>
                             </div>
-                            <div className={`p-4 rounded-2xl shadow-sm text-sm leading-[22px] ${msg.align === 'right' ? 'bg-brand text-white rounded-tr-sm' : 'bg-white dark:bg-surface border border-neutral-200 dark:border-border text-neutral-800 dark:text-neutral-200 rounded-tl-sm'}`}>
+                            <div className={`p-4 rounded-2xl shadow-sm text-sm leading-[22px] ${msg.align === 'right' ? 'bg-brand text-white rounded-tr-sm' : 'bg-white dark:bg-surface border border-[#E2DAD2] dark:border-border text-[#3A3838] dark:text-[#E2DAD2] rounded-tl-sm'}`}>
                               {msg.text}
                             </div>
                           </div>
@@ -373,14 +373,14 @@ export default function Channels() {
                   </div>
                 </div>
 
-                <div className="p-4 border-t border-neutral-200 dark:border-border bg-white/50 dark:bg-surface/50 backdrop-blur-md shrink-0">
+                <div className="p-4 border-t border-[#E2DAD2] dark:border-border bg-white/50 dark:bg-surface/50 backdrop-blur-md shrink-0">
                   <div className="flex items-center gap-2 max-w-4xl mx-auto relative">
                      <input
                         type="text"
                         placeholder={`Read Only - Pretext Render Pipeline Benchmark Active.`}
                         value={inputVal}
                         onChange={e => setInputVal(e.target.value)}
-                        className="w-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand/50 transition-colors"
+                        className="w-full bg-[#EDE8E2] dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand/50 transition-colors"
                         disabled
                      />
                      <button disabled className="absolute right-2 p-2 bg-brand text-white rounded-lg opacity-50 cursor-not-allowed">

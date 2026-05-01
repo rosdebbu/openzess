@@ -77,12 +77,12 @@ export default function Graphify() {
       {/* Top Bar */}
       <div className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-white/10 bg-[#0f0f1a]/90 backdrop-blur-sm z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">
-            <GitBranch size={16} className="text-indigo-400" />
+          <div className="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center">
+            <GitBranch size={16} className="text-brand" />
           </div>
           <div>
             <h1 className="text-white font-semibold text-sm leading-tight">Graphify — Codebase Graph</h1>
-            <p className="text-neutral-500 text-xs">openzess · {stats.nodes} nodes · {stats.edges} edges · {stats.communities} communities</p>
+            <p className="text-[#B8AFA8] text-xs">openzess · {stats.nodes} nodes · {stats.edges} edges · {stats.communities} communities</p>
           </div>
         </div>
         
@@ -92,7 +92,7 @@ export default function Graphify() {
           </span>
           <button
             onClick={() => setGraphKey(k => k + 1)}
-            className="p-1.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 text-[#B8AFA8] hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             title="Reload Graph"
           >
             <RefreshCw size={15} />
@@ -101,14 +101,14 @@ export default function Graphify() {
             href={graphUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-1.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 text-[#B8AFA8] hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             title="Open in new tab"
           >
             <ExternalLink size={15} />
           </a>
           <button
             onClick={() => setShowPanel(v => !v)}
-            className={`p-1.5 rounded-lg transition-colors ${showPanel ? 'text-indigo-400 bg-indigo-400/10' : 'text-neutral-400 hover:text-white hover:bg-white/10'}`}
+            className={`p-1.5 rounded-lg transition-colors ${showPanel ? 'text-brand bg-brand/10' : 'text-[#B8AFA8] hover:text-white hover:bg-white/10'}`}
             title="Toggle Stats Panel"
           >
             <Info size={15} />
@@ -146,8 +146,8 @@ export default function Graphify() {
                   onClick={() => setActiveTab(tab)}
                   className={`flex-1 py-2.5 text-xs font-medium capitalize transition-colors ${
                     activeTab === tab
-                      ? 'text-indigo-400 border-b-2 border-indigo-400 bg-indigo-400/5'
-                      : 'text-neutral-500 hover:text-neutral-300'
+                      ? 'text-brand border-b-2 border-brand bg-brand/5'
+                      : 'text-[#B8AFA8] hover:text-[#B8AFA8]/60'
                   }`}
                 >
                   {tab === 'gods' ? 'God Nodes' : tab === 'gaps' ? 'Gaps' : 'Overview'}
@@ -163,21 +163,21 @@ export default function Graphify() {
                   {/* Stats Grid */}
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { label: 'Nodes', value: stats.nodes, color: 'text-indigo-400', icon: <Circle size={12} /> },
+                      { label: 'Nodes', value: stats.nodes, color: 'text-brand', icon: <Circle size={12} /> },
                       { label: 'Edges', value: stats.edges, color: 'text-emerald-400', icon: <ArrowRight size={12} /> },
                       { label: 'Communities', value: stats.communities, color: 'text-amber-400', icon: <Layers size={12} /> },
                     ].map(s => (
                       <div key={s.label} className="bg-white/5 rounded-xl p-3 flex flex-col gap-1 items-center">
                         <div className={s.color}>{s.icon}</div>
                         <div className={`text-xl font-bold ${s.color}`}>{s.value}</div>
-                        <div className="text-neutral-500 text-[10px]">{s.label}</div>
+                        <div className="text-[#B8AFA8] text-[10px]">{s.label}</div>
                       </div>
                     ))}
                   </div>
                   
                   {/* Extraction Quality */}
                   <div className="bg-white/5 rounded-xl p-3">
-                    <p className="text-neutral-400 text-[10px] uppercase tracking-widest mb-2 font-medium">Extraction Quality</p>
+                    <p className="text-[#B8AFA8] text-[10px] uppercase tracking-widest mb-2 font-medium">Extraction Quality</p>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -196,7 +196,7 @@ export default function Graphify() {
                   
                   {/* Surprising Connections */}
                   <div className="bg-white/5 rounded-xl p-3">
-                    <p className="text-neutral-400 text-[10px] uppercase tracking-widest mb-2 font-medium flex items-center gap-1">
+                    <p className="text-[#B8AFA8] text-[10px] uppercase tracking-widest mb-2 font-medium flex items-center gap-1">
                       <AlertTriangle size={10} className="text-amber-400" />
                       Surprising Connections
                     </p>
@@ -213,16 +213,16 @@ export default function Graphify() {
               
               {activeTab === 'gods' && (
                 <div className="flex flex-col gap-2">
-                  <p className="text-neutral-400 text-[10px] uppercase tracking-widest font-medium">Most Connected Nodes</p>
+                  <p className="text-[#B8AFA8] text-[10px] uppercase tracking-widest font-medium">Most Connected Nodes</p>
                   {stats.godNodes.map((g, i) => (
                     <div key={i} className="bg-white/5 rounded-xl p-3 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-5 h-5 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0">
-                          <span className="text-indigo-400 text-[10px] font-bold">{i + 1}</span>
+                        <div className="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center shrink-0">
+                          <span className="text-brand text-[10px] font-bold">{i + 1}</span>
                         </div>
                         <span className="text-white text-xs font-mono truncate">{g.name}</span>
                       </div>
-                      <div className="shrink-0 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-md font-mono">
+                      <div className="shrink-0 bg-brand/20 text-brand/80 text-[10px] font-bold px-2 py-0.5 rounded-md font-mono">
                         {g.edges}e
                       </div>
                     </div>
@@ -232,7 +232,7 @@ export default function Graphify() {
               
               {activeTab === 'gaps' && (
                 <div className="flex flex-col gap-2">
-                  <p className="text-neutral-400 text-[10px] uppercase tracking-widest font-medium flex items-center gap-1">
+                  <p className="text-[#B8AFA8] text-[10px] uppercase tracking-widest font-medium flex items-center gap-1">
                     <AlertTriangle size={10} className="text-red-400" />
                     Knowledge Gaps
                   </p>
@@ -244,14 +244,14 @@ export default function Graphify() {
                   ))}
                   
                   <div className="mt-2 bg-white/5 rounded-xl p-3">
-                    <p className="text-neutral-400 text-[10px] uppercase tracking-widest mb-2 font-medium">Suggested Questions</p>
+                    <p className="text-[#B8AFA8] text-[10px] uppercase tracking-widest mb-2 font-medium">Suggested Questions</p>
                     <div className="flex flex-col gap-2">
                       {[
                         'Why does OpenzessAgent bridge Communities 0, 1, 3, 5?',
                         'Should Community 0 be split into smaller modules?',
                         'Are 23 inferred edges on OpenzessAgent correct?',
                       ].map((q, i) => (
-                        <div key={i} className="text-indigo-300/70 text-xs bg-indigo-400/5 rounded-lg px-2.5 py-2 leading-relaxed">
+                        <div key={i} className="text-brand/80/70 text-xs bg-brand/5 rounded-lg px-2.5 py-2 leading-relaxed">
                           💡 {q}
                         </div>
                       ))}
@@ -263,8 +263,8 @@ export default function Graphify() {
             
             {/* Panel Footer */}
             <div className="shrink-0 p-3 border-t border-white/10">
-              <p className="text-neutral-600 text-[10px] text-center">
-                Generated by <span className="text-indigo-400">graphifyy</span> · openzess · April 2026
+              <p className="text-[#3A3838]/80 text-[10px] text-center">
+                Generated by <span className="text-brand">graphifyy</span> · openzess · April 2026
               </p>
             </div>
           </div>

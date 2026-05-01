@@ -80,22 +80,22 @@ export default function MatrixViewer() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-neutral-100 dark:bg-neutral-900 overflow-hidden relative">
-      <div className="flex items-center justify-between px-6 py-4 bg-white/50 dark:bg-neutral-950/50 backdrop-blur-md border-b border-neutral-200 dark:border-border shrink-0 z-10">
+    <div className="flex-1 flex flex-col h-full bg-[#EDE8E2] dark:bg-[#1E1C1C] overflow-hidden relative">
+      <div className="flex items-center justify-between px-6 py-4 bg-white/50 dark:bg-[#1A1818]/50 backdrop-blur-md border-b border-[#E2DAD2] dark:border-border shrink-0 z-10">
         <h1 className="text-xl font-semibold flex items-center gap-3">
           <Monitor size={24} className="text-brand" /> Matrix Virtual Desktop
         </h1>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400 ml-2">Stream Power</span>
+            <span className="text-sm font-medium text-[#B8AFA8] dark:text-[#B8AFA8] ml-2">Stream Power</span>
             <button 
               onClick={() => setIsSystemActive(!isSystemActive)}
-              className={`w-12 h-6 rounded-full p-1 transition-colors ${isSystemActive ? 'bg-brand' : 'bg-neutral-300 dark:bg-neutral-700'}`}
+              className={`w-12 h-6 rounded-full p-1 transition-colors ${isSystemActive ? 'bg-brand' : 'bg-[#E2DAD2] dark:bg-[#3A3838]'}`}
             >
               <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isSystemActive ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
           </div>
-          <div className="w-px h-6 bg-neutral-200 dark:bg-border" />
+          <div className="w-px h-6 bg-[#E2DAD2] dark:bg-border" />
           {status === 'connected' ? (
             <div className="text-emerald-500 flex items-center gap-2 text-sm font-medium bg-emerald-500/10 px-3 py-1 rounded-full"><Wifi size={16} /> Live Access</div>
           ) : status === 'connecting' ? (
@@ -110,17 +110,17 @@ export default function MatrixViewer() {
         {/* Background purely aesthetic matrix glow */}
         <div className="absolute inset-0 bg-gradient-to-b from-brand/5 to-transparent pointer-events-none"></div>
         
-        <div className="w-full h-full max-w-6xl max-h-[800px] border border-neutral-200 dark:border-white/10 rounded-xl overflow-hidden shadow-2xl premium-shadow bg-black relative flex items-center justify-center group">
+        <div className="w-full h-full max-w-6xl max-h-[800px] border border-[#E2DAD2] dark:border-[#3A3838] rounded-xl overflow-hidden shadow-2xl premium-shadow bg-black relative flex items-center justify-center group">
              
              {status !== 'connected' && (
-                 <div className="absolute inset-0 z-20 flex flex-col bg-neutral-950/90 backdrop-blur-md overflow-hidden">
+                 <div className="absolute inset-0 z-20 flex flex-col bg-[#1E1C1C]/90 backdrop-blur-md overflow-hidden">
                      {/* Radar/Grid Aesthetic */}
                      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
                      
                      <div className="flex flex-col items-center justify-center flex-1 p-8 text-center relative z-10">
                          <div className="w-24 h-24 rounded-full border-2 border-brand/30 border-dashed animate-[spin_10s_linear_infinite] flex items-center justify-center shadow-[0_0_50px_rgba(var(--brand-rgb),0.2)] mb-8">
                              <div className="w-16 h-16 rounded-full bg-brand/10 backdrop-blur-sm flex items-center justify-center">
-                                 {status === 'connecting' ? <Wifi className="text-brand animate-ping" size={28} /> : <WifiOff className="text-neutral-500" size={28} />}
+                                 {status === 'connecting' ? <Wifi className="text-brand animate-ping" size={28} /> : <WifiOff className="text-[#B8AFA8]" size={28} />}
                              </div>
                          </div>
                          
@@ -128,27 +128,27 @@ export default function MatrixViewer() {
                              {!isSystemActive ? 'Matrix Subsystem Offline' : status === 'connecting' ? 'Establishing VNC Handshake...' : 'Connection Failed'}
                          </h2>
                          
-                         <p className="text-neutral-400 max-w-lg mb-8 leading-relaxed font-mono text-sm">
+                         <p className="text-[#B8AFA8] max-w-lg mb-8 leading-relaxed font-mono text-sm">
                              The Matrix Viewer is a real-time visual bridge that allows you to watch the AI autonomously control a sandboxed Linux GUI desktop (Xvfb) without escaping into your host Windows machine.
                          </p>
                          
                          {!isSystemActive && (
-                             <div className="bg-white/5 border border-white/10 rounded-lg p-4 font-mono text-xs text-neutral-300 text-left w-full max-w-md shadow-inner">
+                             <div className="bg-white/5 border border-white/10 rounded-lg p-4 font-mono text-xs text-[#B8AFA8]/60 text-left w-full max-w-md shadow-inner">
                                  <div className="text-brand font-bold mb-2 flex items-center gap-2"><Monitor size={14} /> SYSTEM STANDBY</div>
-                                 <div className="text-neutral-400 leading-relaxed">
+                                 <div className="text-[#B8AFA8] leading-relaxed">
                                      The Matrix bridge is currently powered down to save resources. Toggle the Power switch in the header to activate the WebSocket streaming proxy and establish a live connection to the sandbox display.
                                  </div>
                              </div>
                          )}
                          {isSystemActive && status === 'disconnected' && (
-                             <div className="bg-white/5 border border-red-500/30 rounded-lg p-4 font-mono text-xs text-neutral-300 text-left w-full max-w-md shadow-inner">
+                             <div className="bg-white/5 border border-red-500/30 rounded-lg p-4 font-mono text-xs text-[#B8AFA8]/60 text-left w-full max-w-md shadow-inner">
                                  <div className="text-amber-500 font-bold mb-2 flex items-center gap-2"><Monitor size={14} /> CONNECTION FAILED</div>
                                  <div className="flex gap-4">
-                                     <span className="text-neutral-500">HOST:</span>
+                                     <span className="text-[#B8AFA8]">HOST:</span>
                                      <span className="text-emerald-400">Environment Ready</span>
                                  </div>
                                  <div className="flex gap-4 mt-1">
-                                     <span className="text-neutral-500">SERVICE:</span>
+                                     <span className="text-[#B8AFA8]">SERVICE:</span>
                                      <span className="text-red-400">Websockify / Xvfb Not Responding</span>
                                  </div>
                                  <div className="mt-4 pt-4 border-t border-white/10 text-brand font-bold">

@@ -24,12 +24,12 @@ export default function Companion() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-neutral-950 overflow-hidden relative border-l border-neutral-200 dark:border-border">
+    <div className="flex-1 flex flex-col h-full bg-[#1E1C1C] overflow-hidden relative border-l border-[#E2DAD2] dark:border-border">
       {/* Top Bar */}
       <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-start pointer-events-none">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white drop-shadow-md">Desktop Companion</h1>
-          <p className="text-neutral-500 dark:text-neutral-400 drop-shadow-sm text-sm mt-1">Upload a .vrm model (Phase 1 Preview)</p>
+          <h1 className="text-2xl font-bold text-[#3A3838] dark:text-[#E2DAD2] drop-shadow-md">Desktop Companion</h1>
+          <p className="text-[#B8AFA8] dark:text-[#B8AFA8] drop-shadow-sm text-sm mt-1">Upload a .vrm model (Phase 1 Preview)</p>
         </div>
         <div className="pointer-events-auto">
            {!vrmUrl ? (
@@ -42,7 +42,7 @@ export default function Companion() {
               <div className="flex items-center gap-3">
                  <button 
                    onClick={() => window.electronAPI?.spawnCompanion(vrmUrl)} 
-                   className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-xl cursor-pointer transition-colors shadow-lg shadow-indigo-500/20 font-medium active:scale-95"
+                   className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white px-4 py-2.5 rounded-xl cursor-pointer transition-colors shadow-lg shadow-brand/20 font-medium active:scale-95"
                  >
                     🚀 Spawn on Desktop
                  </button>
@@ -57,7 +57,7 @@ export default function Companion() {
       </div>
 
       {vrmUrl && (
-         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 bg-white/80 dark:bg-black/60 backdrop-blur-md px-6 py-2.5 rounded-full border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/70 text-xs shadow-sm font-medium tracking-wide">
+         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 bg-white/80 dark:bg-black/60 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#E2DAD2] dark:border-[#3A3838] text-[#3A3838]/80 dark:text-[#E2DAD2]/70 text-xs shadow-sm font-medium tracking-wide">
             Left Click: Rotate • Right Click: Pan • Scroll: Zoom
          </div>
       )}
@@ -97,13 +97,13 @@ export default function Companion() {
              />
            </Canvas>
         ) : (
-           <div className="absolute inset-8 flex items-center justify-center border-2 border-dashed border-neutral-300 dark:border-neutral-800 rounded-[2rem] bg-neutral-50/50 dark:bg-neutral-900/30">
-              <div className="flex flex-col items-center text-neutral-400 space-y-4">
-                 <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-                    <Upload size={32} className="text-neutral-400 dark:text-neutral-500" />
+           <div className="absolute inset-8 flex items-center justify-center border-2 border-dashed border-[#E2DAD2] dark:border-[#3A3838] rounded-[2rem] bg-[#EDE8E2]/50 dark:bg-[#1E1C1C]/30">
+              <div className="flex flex-col items-center text-[#B8AFA8] space-y-4">
+                 <div className="w-16 h-16 rounded-full bg-[#EDE8E2] dark:bg-[#2A2828] flex items-center justify-center">
+                    <Upload size={32} className="text-[#B8AFA8] dark:text-[#B8AFA8]" />
                  </div>
                  <div className="text-center">
-                    <p className="font-medium text-neutral-600 dark:text-neutral-300">No companion loaded</p>
+                    <p className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80">No companion loaded</p>
                     <p className="text-sm mt-1">Upload a .vrm file to preview your avatar in 3D</p>
                  </div>
               </div>

@@ -55,14 +55,14 @@ export default function Changelog() {
   return (
     <div className="flex-1 flex flex-col h-full bg-transparent p-10 overflow-hidden">
       <div className="max-w-4xl w-full mx-auto flex flex-col h-full">
-        <header className="mb-10 shrink-0 border-b border-neutral-200 dark:border-neutral-800 pb-6">
+        <header className="mb-10 shrink-0 border-b border-[#E2DAD2] dark:border-[#3A3838] pb-6">
           <div className="flex items-center gap-4 mb-2">
             <div className="w-14 h-14 bg-brand/10 text-brand rounded-2xl flex items-center justify-center shadow-lg shadow-brand/5 border border-brand/20">
               <GitBranch size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">Changelog</h1>
-              <p className="text-neutral-500 dark:text-neutral-400">Track all updates and features of the openzess system</p>
+              <h1 className="text-3xl font-bold text-[#3A3838] dark:text-[#E2DAD2] tracking-tight">Changelog</h1>
+              <p className="text-[#B8AFA8] dark:text-[#B8AFA8]">Track all updates and features of the openzess system</p>
             </div>
           </div>
         </header>
@@ -90,13 +90,13 @@ export default function Changelog() {
                     </div>
 
                     {/* Card */}
-                    <div className="bg-white dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-brand/30 transition-colors group ml-4">
+                    <div className="bg-white dark:bg-[#1E1C1C]/60 border border-[#E2DAD2] dark:border-[#3A3838] rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-brand/30 transition-colors group ml-4">
                       {/* Header */}
-                      <div className={`px-6 py-4 bg-gradient-to-r ${log.gradient} bg-opacity-10 border-b border-neutral-100 dark:border-neutral-800/50 relative overflow-hidden`}>
-                        <div className="absolute inset-0 bg-white/90 dark:bg-neutral-900/90"></div>
+                      <div className={`px-6 py-4 bg-gradient-to-r ${log.gradient} bg-opacity-10 border-b border-[#E2DAD2] dark:border-[#3A3838]/50 relative overflow-hidden`}>
+                        <div className="absolute inset-0 bg-white/90 dark:bg-[#1E1C1C]/90"></div>
                         <div className="relative z-10 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <h3 className="text-xl font-bold text-neutral-900 dark:text-white">{log.version}</h3>
+                            <h3 className="text-xl font-bold text-[#3A3838] dark:text-[#E2DAD2]">{log.version}</h3>
                             <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border ${
                               log.type === 'major' 
                                 ? 'bg-brand/10 text-brand border-brand/20' 
@@ -105,9 +105,9 @@ export default function Changelog() {
                               {log.type}
                             </span>
                           </div>
-                          <span className="text-sm font-mono text-neutral-500">{log.date}</span>
+                          <span className="text-sm font-mono text-[#B8AFA8]">{log.date}</span>
                         </div>
-                        <p className="relative z-10 text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-1">{log.codename}</p>
+                        <p className="relative z-10 text-sm font-medium text-[#B8AFA8] dark:text-[#B8AFA8] mt-1">{log.codename}</p>
                       </div>
 
                       {/* Changes */}
@@ -121,10 +121,10 @@ export default function Changelog() {
                               key={j}
                               className="flex items-start gap-3 group/item"
                             >
-                              <div className="w-5 h-5 rounded-md bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-brand/10 group-hover/item:border-brand/30 group-hover/item:text-brand transition-colors">
-                                <ChevronRight size={12} className="text-neutral-400 group-hover/item:text-brand transition-colors" />
+                              <div className="w-5 h-5 rounded-md bg-[#EDE8E2] dark:bg-white/5 border border-[#E2DAD2] dark:border-[#3A3838] flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-brand/10 group-hover/item:border-brand/30 group-hover/item:text-brand transition-colors">
+                                <ChevronRight size={12} className="text-[#B8AFA8] group-hover/item:text-brand transition-colors" />
                               </div>
-                              <span className="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed">{change}</span>
+                              <span className="text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-sm leading-relaxed">{change}</span>
                             </motion.div>
                           ))}
                         </div>
@@ -136,7 +136,7 @@ export default function Changelog() {
             </div>
 
             {/* Timeline End */}
-            <div className="absolute left-[11px] bottom-0 w-2 h-2 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+            <div className="absolute left-[11px] bottom-0 w-2 h-2 rounded-full bg-[#E2DAD2] dark:bg-[#3A3838]"></div>
           </div>
         </div>
       </div>

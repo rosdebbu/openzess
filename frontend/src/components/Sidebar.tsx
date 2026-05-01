@@ -100,7 +100,7 @@ export default function Sidebar() {
       <div className={`p-4 border-b border-transparent shrink-0 flex flex-col justify-center relative ${isCollapsed ? 'items-center px-2' : ''}`}>
          {!isCollapsed ? (
              <div className="flex flex-col gap-1 w-full mt-2 relative">
-                 <span className="text-[11px] text-neutral-400 font-medium tracking-wide uppercase px-1 mb-1">Current Agent ({Object.keys(PERSONAS).length})</span>
+                 <span className="text-[11px] text-[#B8AFA8] font-medium tracking-wide uppercase px-1 mb-1">Current Agent ({Object.keys(PERSONAS).length})</span>
                  <button 
                     onClick={() => setShowAgentMenu(!showAgentMenu)}
                     className="flex items-center justify-between w-full p-2.5 rounded-xl bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#2A2828] dark:hover:bg-[#3A3838] transition-colors text-sm font-medium text-[#3A3838] dark:text-[#E2DAD2]"
@@ -109,7 +109,7 @@ export default function Sidebar() {
                          <div className="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-brand font-bold text-xs"><Smile size={12}/></div>
                          <span className="truncate max-w-[130px] text-left">{activeAgentName}</span>
                      </div>
-                     <ChevronDown size={14} className={`text-neutral-400 transition-transform ${showAgentMenu ? 'rotate-180' : ''}`} />
+                     <ChevronDown size={14} className={`text-[#B8AFA8] transition-transform ${showAgentMenu ? 'rotate-180' : ''}`} />
                  </button>
                  
                  <AnimatePresence>
@@ -237,7 +237,7 @@ export default function Sidebar() {
                   >
                     <span className="shrink-0">{item.icon}</span>
                     {!isCollapsed && <span className="truncate">{item.name}</span>}
-                    {!isCollapsed && item.external && <ExternalLink size={12} className="ml-auto text-neutral-400 shrink-0" />}
+                    {!isCollapsed && item.external && <ExternalLink size={12} className="ml-auto text-[#B8AFA8] shrink-0" />}
                   </button>
                 )}
               </motion.div>

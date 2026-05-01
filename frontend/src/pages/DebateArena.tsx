@@ -25,9 +25,9 @@ const ALL_MODELS: ArenaModel[] = [
         provider: 'deepseek',
         storageKey: 'openzess_deepseek_key',
         icon: <Sparkles size={22} />,
-        accentColor: 'text-indigo-400',
-        glowColor: 'shadow-indigo-500/20',
-        gradientFrom: 'from-indigo-500',
+        accentColor: 'text-brand',
+        glowColor: 'shadow-brand/20',
+        gradientFrom: 'from-[#A89080]',
         gradientTo: 'to-blue-700',
     },
     {
@@ -73,10 +73,10 @@ const ALL_MODELS: ArenaModel[] = [
         provider: 'deepseek',
         storageKey: 'openzess_deepseek5_key',
         icon: <Zap size={22} />,
-        accentColor: 'text-purple-400',
+        accentColor: 'text-brand/80',
         glowColor: 'shadow-purple-500/20',
         gradientFrom: 'from-purple-600',
-        gradientTo: 'to-indigo-700',
+        gradientTo: 'to-[#3A3838]',
     },
     {
         id: 'qwen',
@@ -121,7 +121,7 @@ const ALL_MODELS: ArenaModel[] = [
         provider: 'openai',
         storageKey: 'openzess_openai_key',
         icon: <Layers size={22} />,
-        accentColor: 'text-neutral-400',
+        accentColor: 'text-[#B8AFA8]',
         glowColor: 'shadow-neutral-500/20',
         gradientFrom: 'from-neutral-600',
         gradientTo: 'to-neutral-900',
@@ -157,9 +157,9 @@ const ALL_MODELS: ArenaModel[] = [
         provider: 'kimi',
         storageKey: 'openzess_kimi_key',
         icon: <Sparkles size={22} />,
-        accentColor: 'text-indigo-400',
-        glowColor: 'shadow-indigo-500/20',
-        gradientFrom: 'from-indigo-500',
+        accentColor: 'text-brand',
+        glowColor: 'shadow-brand/20',
+        gradientFrom: 'from-[#A89080]',
         gradientTo: 'to-blue-700',
     },
     {
@@ -378,11 +378,11 @@ export default function DebateArena() {
         if (s === 'generating') return 'bg-amber-400 animate-pulse';
         if (s === 'done') return 'bg-emerald-400';
         if (s === 'error') return 'bg-red-400';
-        return 'bg-neutral-600';
+        return 'bg-[#3A3838]/80';
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-neutral-50 dark:bg-[#0a0a0f] transition-colors overflow-hidden relative">
+        <div className="flex flex-col h-full w-full bg-[#EDE8E2] dark:bg-[#0a0a0f] transition-colors overflow-hidden relative">
             {!hasStarted ? (
                 /* ── Initial Hero State ── */
                 <div className="h-full flex flex-col items-center justify-center p-6 relative">
@@ -394,13 +394,13 @@ export default function DebateArena() {
                                window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
                             }}
                             title="Focus Mode" 
-                            className={`flex w-9 h-9 items-center justify-center rounded-full transition-all backdrop-blur-md border ${zenMode ? 'bg-neutral-800 dark:bg-neutral-800 border-brand/50 text-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'bg-white/5 dark:bg-white/[0.03] hover:bg-white/10 dark:hover:bg-white/[0.08] text-neutral-600 dark:text-neutral-300 border-neutral-200/50 dark:border-white/10'}`}
+                            className={`flex w-9 h-9 items-center justify-center rounded-full transition-all backdrop-blur-md border ${zenMode ? 'bg-[#2A2828] dark:bg-[#2A2828] border-brand/50 text-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'bg-white/5 dark:bg-white/[0.03] hover:bg-white/10 dark:hover:bg-white/[0.08] text-[#3A3838]/80 dark:text-[#E2DAD2]/80 border-[#E2DAD2]/50 dark:border-[#3A3838]'}`}
                         >
                             <Focus size={14} />
                         </button>
                         <button 
                             onClick={() => setShowKeyModal(true)}
-                            className="flex items-center gap-2 bg-white/5 dark:bg-white/[0.03] hover:bg-white/10 dark:hover:bg-white/[0.08] text-neutral-600 dark:text-neutral-300 px-4 py-2 rounded-full text-sm font-medium transition-all backdrop-blur-md border border-neutral-200/50 dark:border-white/10"
+                            className="flex items-center gap-2 bg-white/5 dark:bg-white/[0.03] hover:bg-white/10 dark:hover:bg-white/[0.08] text-[#3A3838]/80 dark:text-[#E2DAD2]/80 px-4 py-2 rounded-full text-sm font-medium transition-all backdrop-blur-md border border-[#E2DAD2]/50 dark:border-[#3A3838]"
                         >
                             <Key size={14} className="text-brand" />
                             <span className="hidden md:inline">Keys</span>
@@ -411,15 +411,15 @@ export default function DebateArena() {
                         <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(244,63,94,0.3)] mb-6">
                             <Swords size={40} className="text-white" />
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-neutral-900 dark:text-white mb-3 leading-tight">Warroom Debate</h1>
-                        <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-400 mb-10">
+                        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#3A3838] dark:text-[#E2DAD2] mb-3 leading-tight">Warroom Debate</h1>
+                        <p className="text-sm md:text-base text-[#B8AFA8] dark:text-[#B8AFA8] mb-10">
                             Drop a complex problem and watch up to {ALL_MODELS.length} connected agents race to solve it in parallel.
                             Currently tracking <strong className="text-brand">{activeModels.length}</strong> active agents.
                         </p>
                         
-                        <div className="w-full bg-white dark:bg-[#111118]/80 backdrop-blur-xl border border-neutral-200/60 dark:border-white/[0.06] rounded-[24px] flex flex-col shadow-xl transition-all focus-within:border-brand/40 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.08)]">
+                        <div className="w-full bg-[#F5F0EB] dark:bg-[#1E1C1C]/80 backdrop-blur-xl border border-[#E2DAD2]/60 dark:border-white/[0.06] rounded-[24px] flex flex-col shadow-xl transition-all focus-within:border-brand/40 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.08)]">
                             <textarea
-                                className="w-full bg-transparent border-none text-neutral-900 dark:text-neutral-200 text-base md:text-lg resize-none px-6 py-5 min-h-[120px] focus:outline-none placeholder:text-neutral-400 font-sans"
+                                className="w-full bg-transparent border-none text-[#3A3838] dark:text-[#E2DAD2] text-base md:text-lg resize-none px-6 py-5 min-h-[120px] focus:outline-none placeholder:text-[#B8AFA8] font-sans"
                                 placeholder="What logic puzzle or coding architecture do you need debated?..."
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
@@ -430,8 +430,8 @@ export default function DebateArena() {
                                     }
                                 }}
                             />
-                            <div className="flex items-center justify-between px-3 pb-3 pt-2 border-t border-neutral-100 dark:border-white/[0.04]">
-                                <div className="text-xs text-neutral-400 pl-3">Press Enter to send</div>
+                            <div className="flex items-center justify-between px-3 pb-3 pt-2 border-t border-[#E2DAD2] dark:border-white/[0.04]">
+                                <div className="text-xs text-[#B8AFA8] pl-3">Press Enter to send</div>
                                 <button 
                                     className="bg-brand hover:bg-brand-hover text-white rounded-xl w-12 h-12 shrink-0 flex items-center justify-center transition-all disabled:opacity-30 shadow-md"
                                     onClick={handleFight}
@@ -447,15 +447,15 @@ export default function DebateArena() {
                 /* ── Active Arena State ── */
                 <>
                     {/* ── Compact Top Bar ── */}
-                    <div className="shrink-0 px-5 pt-14 pb-4 flex items-center justify-between border-b border-neutral-200/60 dark:border-white/5 bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl z-20">
+                    <div className="shrink-0 px-5 pt-14 pb-4 flex items-center justify-between border-b border-[#E2DAD2]/60 dark:border-[#3A3838]/60 bg-[#F5F0EB]/60 dark:bg-[#252222]/60 backdrop-blur-xl z-20">
                 {/* Left: Title */}
                 <div className="flex items-center gap-3 shrink-0">
                     <div className="w-9 h-9 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
                         <Swords size={18} className="text-white" />
                     </div>
                     <div>
-                        <h1 className="text-base font-bold tracking-tight text-neutral-900 dark:text-white leading-tight">Warroom Debate</h1>
-                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 leading-tight">4-way parallel generation</p>
+                        <h1 className="text-base font-bold tracking-tight text-[#3A3838] dark:text-[#E2DAD2] leading-tight">Warroom Debate</h1>
+                        <p className="text-[11px] text-[#B8AFA8] dark:text-[#B8AFA8] leading-tight">4-way parallel generation</p>
                     </div>
                 </div>
 
@@ -473,13 +473,13 @@ export default function DebateArena() {
                            window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
                         }}
                         title="Focus Mode" 
-                        className={`flex w-[38px] h-[38px] items-center justify-center rounded-xl transition-all border ${zenMode ? 'bg-neutral-800 dark:bg-neutral-800 border-brand/50 text-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'bg-neutral-100/80 dark:bg-white/[0.06] hover:bg-neutral-200/80 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-300 border-neutral-200/50 dark:border-white/[0.08]'}`}
+                        className={`flex w-[38px] h-[38px] items-center justify-center rounded-xl transition-all border ${zenMode ? 'bg-[#2A2828] dark:bg-[#2A2828] border-brand/50 text-brand shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'bg-[#EDE8E2]/80 dark:bg-white/[0.06] hover:bg-[#E2DAD2]/80 dark:hover:bg-white/10 text-[#3A3838]/80 dark:text-[#E2DAD2]/80 border-[#E2DAD2]/50 dark:border-white/[0.08]'}`}
                     >
                         <Focus size={16} />
                     </button>
                     <button
                         onClick={() => setShowKeyModal(true)}
-                        className="flex items-center gap-2 px-3 py-2 bg-neutral-100/80 dark:bg-white/[0.06] hover:bg-neutral-200/80 dark:hover:bg-white/10 border border-neutral-200/50 dark:border-white/[0.08] rounded-xl text-neutral-600 dark:text-neutral-300 transition-all text-sm font-medium"
+                        className="flex items-center gap-2 px-3 py-2 bg-[#EDE8E2]/80 dark:bg-white/[0.06] hover:bg-[#E2DAD2]/80 dark:hover:bg-white/10 border border-[#E2DAD2]/50 dark:border-white/[0.08] rounded-xl text-[#3A3838]/80 dark:text-[#E2DAD2]/80 transition-all text-sm font-medium"
                     >
                         <Key size={14} />
                         <span className="hidden md:inline">Keys</span>
@@ -488,13 +488,13 @@ export default function DebateArena() {
             </div>
 
             {/* ── Chat Feed Arena ── */}
-            <div className="flex-1 p-4 md:p-6 overflow-y-auto custom-scrollbar flex flex-col relative behavior-smooth text-neutral-900 dark:text-neutral-200">
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto custom-scrollbar flex flex-col relative behavior-smooth text-[#3A3838] dark:text-[#E2DAD2]">
                 <div className="max-w-7xl mx-auto w-full flex flex-col gap-6 lg:gap-10 pb-6">
                 {activeModels.length === 0 ? (
-                    <div className="w-full flex-1 flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-neutral-200 dark:border-white/10 rounded-3xl mt-12 min-h-[400px]">
-                        <Key className="text-neutral-400 mb-4" size={48} />
-                        <h2 className="text-lg font-bold text-neutral-800 dark:text-white mb-2">Configure Your Arena</h2>
-                        <p className="text-sm text-neutral-500 max-w-sm mb-6">You must provide at least one API key in the "Keys" menu above to launch a debate grid.</p>
+                    <div className="w-full flex-1 flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-[#E2DAD2] dark:border-[#3A3838] rounded-3xl mt-12 min-h-[400px]">
+                        <Key className="text-[#B8AFA8] mb-4" size={48} />
+                        <h2 className="text-lg font-bold text-[#3A3838] dark:text-[#E2DAD2] mb-2">Configure Your Arena</h2>
+                        <p className="text-sm text-[#B8AFA8] max-w-sm mb-6">You must provide at least one API key in the "Keys" menu above to launch a debate grid.</p>
                         <button onClick={() => setShowKeyModal(true)} className="bg-brand text-white px-6 py-2.5 rounded-xl font-medium shadow-lg hover:bg-brand-hover transition-colors">
                             Setup Provider Keys
                         </button>
@@ -504,7 +504,7 @@ export default function DebateArena() {
                     {/* User Prompt Bubble */}
                     {submittedPrompt && (
                         <div className="flex flex-col items-end w-full animate-fade-in-up mt-4 max-w-4xl self-end">
-                            <div className="bg-neutral-100 dark:bg-white/[0.04] border border-neutral-200/50 dark:border-white/[0.06] text-neutral-800 dark:text-neutral-200 px-6 py-4 rounded-[24px] rounded-tr-[4px] shadow-sm whitespace-pre-wrap leading-relaxed text-[15px]">
+                            <div className="bg-[#EDE8E2] dark:bg-white/[0.04] border border-[#E2DAD2]/50 dark:border-white/[0.06] text-[#3A3838] dark:text-[#E2DAD2] px-6 py-4 rounded-[24px] rounded-tr-[4px] shadow-sm whitespace-pre-wrap leading-relaxed text-[15px]">
                                 {submittedPrompt}
                             </div>
                         </div>
@@ -538,7 +538,7 @@ export default function DebateArena() {
                                     border
                                     ${isWinner
                                         ? 'border-amber-400/60 shadow-[0_0_30px_rgba(251,191,36,0.15)]'
-                                        : 'border-neutral-200/50 dark:border-white/[0.06] hover:border-neutral-300/80 dark:hover:border-white/[0.12]'
+                                        : 'border-[#E2DAD2]/50 dark:border-white/[0.06] hover:border-[#E2DAD2]/80 dark:hover:border-white/[0.12]'
                                     }
                                     backdrop-blur-sm
                                     group
@@ -552,16 +552,16 @@ export default function DebateArena() {
                                 )}
 
                                 {/* Card Header */}
-                                <div className="shrink-0 px-4 py-3 flex items-center gap-3 border-b border-neutral-200/30 dark:border-white/[0.04]">
+                                <div className="shrink-0 px-4 py-3 flex items-center gap-3 border-b border-[#E2DAD2]/30 dark:border-white/[0.04]">
                                     <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} flex items-center justify-center text-white shadow-md ${model.glowColor}`}>
                                         {model.icon}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
-                                            <h3 className="font-bold text-sm text-neutral-900 dark:text-white tracking-wide">{model.name}</h3>
+                                            <h3 className="font-bold text-sm text-[#3A3838] dark:text-[#E2DAD2] tracking-wide">{model.name}</h3>
                                             <div className={`w-1.5 h-1.5 rounded-full ${statusDot(statuses[model.id])}`} />
                                         </div>
-                                        <p className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono tracking-wide">{model.label}</p>
+                                        <p className="text-[10px] text-[#B8AFA8] dark:text-[#B8AFA8] font-mono tracking-wide">{model.label}</p>
                                     </div>
 
                                     {/* Action buttons */}
@@ -570,7 +570,7 @@ export default function DebateArena() {
                                             <>
                                                 <button
                                                     onClick={() => handleCopy(model.id, responses[model.id])}
-                                                    className="p-1.5 text-neutral-400 hover:text-brand rounded-lg hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                                                    className="p-1.5 text-[#B8AFA8] hover:text-brand rounded-lg hover:bg-[#EDE8E2] dark:hover:bg-white/10 transition-colors"
                                                     title="Copy"
                                                 >
                                                     {copiedId === model.id ? <CheckCircle2 size={14} className="text-emerald-500" /> : <Copy size={14} />}
@@ -578,7 +578,7 @@ export default function DebateArena() {
                                                 {allDone && (
                                                     <button
                                                         onClick={() => setSelectedWinner(isWinner ? null : model.id)}
-                                                        className={`p-1.5 rounded-lg transition-colors ${isWinner ? 'text-amber-500 bg-amber-500/10' : 'text-neutral-400 hover:text-amber-500 hover:bg-amber-500/10'}`}
+                                                        className={`p-1.5 rounded-lg transition-colors ${isWinner ? 'text-amber-500 bg-amber-500/10' : 'text-[#B8AFA8] hover:text-amber-500 hover:bg-amber-500/10'}`}
                                                         title="Pick as winner"
                                                     >
                                                         <Trophy size={14} />
@@ -600,20 +600,20 @@ export default function DebateArena() {
                                             <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} flex items-center justify-center text-white/80 mb-4 shadow-xl ${model.glowColor} opacity-60`}>
                                                 {model.icon}
                                             </div>
-                                            <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1">{model.name}</p>
-                                            <p className="text-[11px] text-neutral-400 dark:text-neutral-500 leading-relaxed max-w-[200px]">
+                                            <p className="text-sm font-semibold text-[#3A3838] dark:text-[#E2DAD2]/80 mb-1">{model.name}</p>
+                                            <p className="text-[11px] text-[#B8AFA8] dark:text-[#B8AFA8] leading-relaxed max-w-[200px]">
                                                 Awaiting prompt. This agent will provide an independent response.
                                             </p>
                                             <div className="mt-4 flex items-center gap-1">
-                                                <div className="w-8 h-[2px] rounded-full bg-neutral-200 dark:bg-neutral-800" />
+                                                <div className="w-8 h-[2px] rounded-full bg-[#E2DAD2] dark:bg-[#2A2828]" />
                                                 <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} opacity-40`} />
-                                                <div className="w-8 h-[2px] rounded-full bg-neutral-200 dark:bg-neutral-800" />
+                                                <div className="w-8 h-[2px] rounded-full bg-[#E2DAD2] dark:bg-[#2A2828]" />
                                             </div>
                                         </div>
                                     ) : (
                                         /* ── Active: Markdown content ── */
                                         <div className="px-4 py-4">
-                                            <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-p:my-2 prose-headings:my-3 prose-pre:bg-neutral-100 dark:prose-pre:bg-[#1A1A1E] prose-pre:border prose-pre:border-neutral-200/50 dark:prose-pre:border-white/[0.05] prose-pre:rounded-xl prose-pre:p-0 prose-code:text-xs">
+                                            <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-p:my-2 prose-headings:my-3 prose-pre:bg-[#EDE8E2] dark:prose-pre:bg-[#1A1A1E] prose-pre:border prose-pre:border-[#E2DAD2]/50 dark:prose-pre:border-white/[0.05] prose-pre:rounded-xl prose-pre:p-0 prose-code:text-xs">
                                                 <ReactMarkdown 
                                                     remarkPlugins={[remarkGfm]}
                                                     components={{
@@ -624,25 +624,25 @@ export default function DebateArena() {
                                                             const codeString = String(children).replace(/\n$/, '');
 
                                                             if (!isBlock) {
-                                                                return <code className={`${className} bg-neutral-200/50 dark:bg-white/10 px-1 py-0.5 rounded text-[13px] font-mono`} {...props}>{children}</code>;
+                                                                return <code className={`${className} bg-[#E2DAD2]/50 dark:bg-white/10 px-1 py-0.5 rounded text-[13px] font-mono`} {...props}>{children}</code>;
                                                             }
 
                                                             return (
-                                                                <div className="flex flex-col w-full my-4 rounded-xl overflow-hidden border border-neutral-200/50 dark:border-white/[0.1] bg-white dark:bg-[#131317]">
-                                                                    <div className="flex items-center justify-between px-4 py-2 bg-neutral-100/80 dark:bg-[#1A1A1E] border-b border-neutral-200/50 dark:border-white/[0.05]">
-                                                                        <div className="text-xs font-mono font-medium text-neutral-500 dark:text-neutral-400">
+                                                                <div className="flex flex-col w-full my-4 rounded-xl overflow-hidden border border-[#E2DAD2]/50 dark:border-white/[0.1] bg-white dark:bg-[#1E1C1C]">
+                                                                    <div className="flex items-center justify-between px-4 py-2 bg-[#EDE8E2]/80 dark:bg-[#252222] border-b border-[#E2DAD2]/50 dark:border-white/[0.05]">
+                                                                        <div className="text-xs font-mono font-medium text-[#B8AFA8] dark:text-[#B8AFA8]">
                                                                             {language || 'text'}
                                                                         </div>
                                                                         <div className="flex items-center gap-1">
-                                                                            <button onClick={() => { navigator.clipboard.writeText(codeString); setCopiedId(codeString); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                                            <button onClick={() => { navigator.clipboard.writeText(codeString); setCopiedId(codeString); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1.5 px-2 py-1 text-xs text-[#B8AFA8] hover:text-[#3A3838] dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2] transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
                                                                                 {copiedId === codeString ? <CheckCircle2 size={13} className="text-emerald-500" /> : <Copy size={13} />} Copy
                                                                             </button>
-                                                                            <button onClick={() => handleDownload(codeString, language)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                                            <button onClick={() => handleDownload(codeString, language)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-[#B8AFA8] hover:text-[#3A3838] dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2] transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
                                                                                 <Download size={13} /> Download
                                                                             </button>
                                                                             {(language === 'html' || language === 'xml' || language === 'javascript') && (
                                                                                 <>
-                                                                                    <div className="w-px h-3 bg-neutral-300 dark:bg-neutral-700 mx-1" />
+                                                                                    <div className="w-px h-3 bg-[#E2DAD2] dark:bg-[#3A3838] mx-1" />
                                                                                     <button onClick={() => handleRun(codeString)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-brand hover:text-brand-hover hover:bg-brand/10 transition-colors rounded bg-brand/5 shadow-sm">
                                                                                         <Play size={13} fill="currentColor" /> Run
                                                                                     </button>
@@ -650,7 +650,7 @@ export default function DebateArena() {
                                                                             )}
                                                                         </div>
                                                                     </div>
-                                                                    <div className="p-4 overflow-x-auto text-[13px] font-mono leading-relaxed bg-[#F8F9FA] dark:bg-[#0D0D10] text-neutral-800 dark:text-neutral-300">
+                                                                    <div className="p-4 overflow-x-auto text-[13px] font-mono leading-relaxed bg-[#F5F0EB] dark:bg-[#1A1818] text-[#3A3838] dark:text-[#E2DAD2]/80">
                                                                         <code {...props}>{children}</code>
                                                                     </div>
                                                                 </div>
@@ -673,7 +673,7 @@ export default function DebateArena() {
                                 </div>
 
                                 {/* Subtle number badge */}
-                                <div className="absolute bottom-3 right-3 text-[10px] font-mono font-bold text-neutral-300 dark:text-neutral-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute bottom-3 right-3 text-[10px] font-mono font-bold text-[#B8AFA8]/60 dark:text-[#3A3838] opacity-0 group-hover:opacity-100 transition-opacity">
                                     #{index + 1}
                                 </div>
                             </motion.div>
@@ -687,9 +687,9 @@ export default function DebateArena() {
 
             {/* ── Bottom Fixed Input Console (ChatGPT Style) ── */}
             <div className="shrink-0 px-4 pb-6 pt-2 w-full max-w-4xl mx-auto flex flex-col items-center gap-2 relative z-10">
-                <div className="w-full bg-white dark:bg-[#111118]/80 backdrop-blur-xl border border-neutral-200/80 dark:border-white/[0.08] rounded-[24px] flex flex-col shadow-xl transition-all focus-within:border-brand/50 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.1)] relative overflow-hidden">
+                <div className="w-full bg-[#F5F0EB] dark:bg-[#1E1C1C]/80 backdrop-blur-xl border border-[#E2DAD2]/80 dark:border-white/[0.08] rounded-[24px] flex flex-col shadow-xl transition-all focus-within:border-brand/50 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.1)] relative overflow-hidden">
                     <textarea
-                        className="w-full bg-transparent border-none text-neutral-900 dark:text-neutral-200 text-base resize-none px-5 py-4 min-h-[60px] max-h-[200px] overflow-y-auto custom-scrollbar focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                        className="w-full bg-transparent border-none text-[#3A3838] dark:text-[#E2DAD2] text-base resize-none px-5 py-4 min-h-[60px] max-h-[200px] overflow-y-auto custom-scrollbar focus:outline-none placeholder:text-[#B8AFA8] dark:placeholder:text-[#B8AFA8]"
                         placeholder="Message the Warroom... (Shift+Enter for new line)"
                         value={prompt}
                         onChange={(e) => {
@@ -709,7 +709,7 @@ export default function DebateArena() {
                         {hasStarted && (
                             <button
                                 onClick={handleReset}
-                                className="p-2 text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300 rounded-full hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                                className="p-2 text-[#B8AFA8] hover:text-[#3A3838] dark:text-[#B8AFA8] dark:hover:text-[#B8AFA8]/60 rounded-full hover:bg-[#EDE8E2] dark:hover:bg-white/10 transition-colors"
                                 title="Reset Discussion"
                             >
                                 <RotateCcw size={18} />
@@ -719,7 +719,7 @@ export default function DebateArena() {
                             className={`rounded-full w-9 h-9 shrink-0 flex items-center justify-center transition-all ${
                                 prompt.trim() && !isLoading 
                                     ? 'bg-brand text-white shadow-md shadow-brand/20 hover:bg-brand-hover active:scale-95' 
-                                    : 'bg-neutral-100 dark:bg-white/5 text-neutral-400 dark:text-neutral-600 cursor-not-allowed'
+                                    : 'bg-[#EDE8E2] dark:bg-white/5 text-[#B8AFA8] dark:text-[#3A3838]/80 cursor-not-allowed'
                             }`}
                             onClick={handleFight}
                             disabled={!prompt.trim() || isLoading}
@@ -728,7 +728,7 @@ export default function DebateArena() {
                         </button>
                     </div>
                 </div>
-                <div className="text-[10px] text-neutral-400 dark:text-neutral-600 font-medium">
+                <div className="text-[10px] text-[#B8AFA8] dark:text-[#3A3838]/80 font-medium">
                     Models can make mistakes. Always review the Warroom's conclusions.
                 </div>
             </div>
@@ -744,15 +744,15 @@ export default function DebateArena() {
                     >
                         <motion.div
                             initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
-                            className="bg-white dark:bg-[#111118] border border-neutral-200 dark:border-neutral-800 rounded-2xl w-full h-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+                            className="bg-[#F5F0EB] dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838] rounded-2xl w-full h-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
                         >
-                            <div className="p-4 border-b border-neutral-200/60 dark:border-white/[0.06] flex justify-between items-center bg-neutral-50 dark:bg-white/[0.02]">
+                            <div className="p-4 border-b border-[#E2DAD2]/60 dark:border-white/[0.06] flex justify-between items-center bg-[#EDE8E2] dark:bg-white/[0.02]">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center">
                                         <Play size={16} className="text-brand ml-0.5" fill="currentColor" />
                                     </div>
                                     <div>
-                                        <h2 className="text-base font-bold text-neutral-900 dark:text-white leading-tight">Live Preview</h2>
+                                        <h2 className="text-base font-bold text-[#3A3838] dark:text-[#E2DAD2] leading-tight">Live Preview</h2>
                                         <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Running securely in isolated sandbox environment</p>
                                     </div>
                                 </div>
@@ -780,17 +780,17 @@ export default function DebateArena() {
                     >
                         <motion.div
                             initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
-                            className="bg-white dark:bg-[#111118] border border-neutral-200 dark:border-neutral-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+                            className="bg-[#F5F0EB] dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838] rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="p-5 border-b border-neutral-200/60 dark:border-white/[0.06] flex justify-between items-center">
+                            <div className="p-5 border-b border-[#E2DAD2]/60 dark:border-white/[0.06] flex justify-between items-center">
                                 <div>
-                                    <h2 className="text-lg font-bold flex items-center gap-2 text-neutral-900 dark:text-white">
+                                    <h2 className="text-lg font-bold flex items-center gap-2 text-[#3A3838] dark:text-[#E2DAD2]">
                                         <Key className="text-amber-500" size={20} /> Provider Keys
                                     </h2>
-                                    <p className="text-xs text-neutral-400 mt-0.5">Configure API keys for each arena model.</p>
+                                    <p className="text-xs text-[#B8AFA8] mt-0.5">Configure API keys for each arena model.</p>
                                 </div>
-                                <button onClick={() => setShowKeyModal(false)} className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors">
+                                <button onClick={() => setShowKeyModal(false)} className="text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] p-2 rounded-xl hover:bg-[#EDE8E2] dark:hover:bg-white/10 transition-colors">
                                     <X size={18} />
                                 </button>
                             </div>
@@ -798,7 +798,7 @@ export default function DebateArena() {
                             <div className="p-5 overflow-y-auto custom-scrollbar flex flex-col gap-4">
                                 {ALL_MODELS.map(model => (
                                     <div key={model.id} className="flex flex-col gap-1.5">
-                                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-[#3A3838] dark:text-[#E2DAD2]/80 flex items-center gap-2">
                                             <span className={`w-5 h-5 rounded-md bg-gradient-to-br ${model.gradientFrom} ${model.gradientTo} flex items-center justify-center text-white`}>
                                                 {/* small icon replica */}
                                                 <span style={{ transform: 'scale(0.6)' }}>{model.icon}</span>
@@ -809,15 +809,15 @@ export default function DebateArena() {
                                             type="password"
                                             value={(keys as any)[model.id === 'gemini' ? 'gemini' : model.id] || ''}
                                             onChange={(e) => setKeys(prev => ({ ...prev, [model.id === 'gemini' ? 'gemini' : model.id]: e.target.value }))}
-                                            className="w-full bg-neutral-50 dark:bg-black/40 border border-neutral-200/80 dark:border-white/[0.08] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand/50 transition-colors font-mono"
+                                            className="w-full bg-[#EDE8E2] dark:bg-[#1E1C1C]/40 border border-[#E2DAD2]/80 dark:border-white/[0.08] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand/50 transition-colors font-mono"
                                             placeholder="sk-..."
                                         />
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="p-5 border-t border-neutral-200/60 dark:border-white/[0.06] flex justify-end gap-2">
-                                <button onClick={() => setShowKeyModal(false)} className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors">
+                            <div className="p-5 border-t border-[#E2DAD2]/60 dark:border-white/[0.06] flex justify-end gap-2">
+                                <button onClick={() => setShowKeyModal(false)} className="px-4 py-2 text-sm text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#B8AFA8]/60 rounded-xl hover:bg-[#EDE8E2] dark:hover:bg-white/10 transition-colors">
                                     Cancel
                                 </button>
                                 <button onClick={saveKeys} className="bg-brand hover:bg-brand-hover text-white px-5 py-2 rounded-xl font-medium text-sm transition-colors shadow-lg shadow-brand/20">

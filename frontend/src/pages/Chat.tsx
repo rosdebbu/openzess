@@ -523,16 +523,16 @@ export default function Chat() {
                <div className="w-[1px] h-4 bg-[#E2DAD2] dark:bg-[#3A3838] mx-1"></div>
                <div className="relative group/select">
                   <select 
-                     className="appearance-none bg-transparent hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-600 dark:text-neutral-300 text-[14px] font-medium py-2 pl-3 pr-8 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-0 max-w-[200px] outline-none"
+                     className="appearance-none bg-transparent hover:bg-[#EDE8E2] dark:hover:bg-white/5 text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[14px] font-medium py-2 pl-3 pr-8 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-0 max-w-[200px] outline-none"
                      defaultValue="gemini-3.1-flash-lite-preview-google"
                   >
-                     <option className="bg-white dark:bg-[#131314]" value="gemini-3.1-flash-lite-preview-google">Gemini 3.1 Flash</option>
-                     <option className="bg-white dark:bg-[#131314]" value="gemini-2.5-flash">Gemini 2.5</option>
-                     <option className="bg-white dark:bg-[#131314]" value="openai">OpenAI GPT-4o</option>
-                     <option className="bg-white dark:bg-[#131314]" value="deepseek">DeepSeek</option>
-                     <option className="bg-white dark:bg-[#131314]" value="qwen">Qwen</option>
+                     <option className="bg-white dark:bg-[#1A1818]" value="gemini-3.1-flash-lite-preview-google">Gemini 3.1 Flash</option>
+                     <option className="bg-white dark:bg-[#1A1818]" value="gemini-2.5-flash">Gemini 2.5</option>
+                     <option className="bg-white dark:bg-[#1A1818]" value="openai">OpenAI GPT-4o</option>
+                     <option className="bg-white dark:bg-[#1A1818]" value="deepseek">DeepSeek</option>
+                     <option className="bg-white dark:bg-[#1A1818]" value="qwen">Qwen</option>
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none group-hover/select:text-neutral-600 dark:group-hover:text-neutral-200 transition-colors" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#B8AFA8] pointer-events-none group-hover/select:text-[#3A3838]/80 dark:group-hover:text-neutral-200 transition-colors" />
                </div>
             </div>
 
@@ -547,15 +547,15 @@ export default function Chat() {
                      setSearchParams({ new: 'true' }, { replace: true });
                   }}
                   title="New Chat / Refresh" 
-                  className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                  className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-white/10 transition-colors"
                 >
                     <RotateCcw size={16} />
                 </button>
-                <div className="w-[1px] h-4 bg-neutral-200 dark:bg-neutral-800 mx-1"></div>
+                <div className="w-[1px] h-4 bg-[#E2DAD2] dark:bg-[#2A2828] mx-1"></div>
                 <button 
                   onClick={() => setShowLogs(!showLogs)}
                   title="Memory Vault / Tool Output" 
-                  className={`w-[36px] h-[36px] rounded-full transition-colors group flex items-center justify-center ${showLogs ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10'}`}
+                  className={`w-[36px] h-[36px] rounded-full transition-colors group flex items-center justify-center ${showLogs ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-white/10'}`}
                 >
                     <Brain size={16} />
                 </button>
@@ -566,14 +566,14 @@ export default function Chat() {
                      window.dispatchEvent(new CustomEvent('toggle-zen-mode', { detail: newZen }));
                   }}
                   title="Focus Mode" 
-                  className={`w-[36px] h-[36px] rounded-full transition-colors flex items-center justify-center ${zenMode ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10'}`}
+                  className={`w-[36px] h-[36px] rounded-full transition-colors flex items-center justify-center ${zenMode ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-white/10'}`}
                 >
                     <Focus size={16} />
                 </button>
                 <button 
                   onClick={() => navigate('/sessions')}
                   title="History" 
-                  className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                  className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-[#EDE8E2] dark:hover:bg-white/10 transition-colors"
                 >
                     <Clock size={16} />
                 </button>
@@ -584,32 +584,32 @@ export default function Chat() {
           <div className="flex-1 flex flex-col justify-center p-6 md:p-10 relative overflow-y-auto max-w-4xl mx-auto w-full custom-scrollbar">
              <div className="mt-auto pb-8 pt-20">
                 <h1 className="text-[44px] md:text-[52px] font-semibold bg-gradient-to-r from-[#A89080] via-[#B8AFA8] to-[#3A3838] bg-clip-text text-transparent pb-2 tracking-tight leading-tight">Hello, {PERSONAS[currentPersonaKey]?.name || 'Developer'}</h1>
-                <p className="text-[32px] md:text-[38px] font-medium text-neutral-400 dark:text-neutral-500 tracking-tight mt-1 leading-tight">How can I help you today?</p>
+                <p className="text-[32px] md:text-[38px] font-medium text-[#B8AFA8] dark:text-[#B8AFA8] tracking-tight mt-1 leading-tight">How can I help you today?</p>
              </div>
              
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full mt-auto">
                 <button onClick={() => setInput("Link and explore this Github repository: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
-                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Explore a<br/>GitHub Repository</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                    <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Explore a<br/>GitHub Repository</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
                        <Globe size={18} className="text-blue-500" />
                     </div>
                 </button>
                 <button onClick={() => setInput("Let's brainstorm ideas and analysis for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
-                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Brainstorm ideas<br/>& workflow logic</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
-                       <Brain size={18} className="text-purple-500" />
+                    <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Brainstorm ideas<br/>& workflow logic</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                       <Brain size={18} className="text-brand" />
                     </div>
                 </button>
                 <button onClick={() => setInput("Analyze the attached PDF report: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
-                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Analyze a<br/>PDF report</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                    <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Analyze a<br/>PDF report</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
                        <FileText size={18} className="text-emerald-500" />
                     </div>
                 </button>
                 <button onClick={() => setInput("Make a roadmap and workflow for: ")} className="flex flex-col gap-3 p-4 rounded-[1.5rem] bg-[#EDE8E2] hover:bg-[#E2DAD2] dark:bg-[#252222] dark:hover:bg-[#2A2828] transition-colors text-left group h-40 justify-between">
-                    <div className="font-medium text-neutral-600 dark:text-neutral-300 text-[15px] leading-snug">Make a roadmap<br/>& project workflow</div>
-                    <div className="w-10 h-10 rounded-full bg-white dark:bg-black/20 shadow-sm flex items-center justify-center shrink-0 self-end">
-                       <Code size={18} className="text-orange-500" />
+                    <div className="font-medium text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[15px] leading-snug">Make a roadmap<br/>& project workflow</div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1E1C1C]/20 shadow-sm flex items-center justify-center shrink-0 self-end">
+                       <Code size={18} className="text-brand" />
                     </div>
                 </button>
              </div>
@@ -633,10 +633,10 @@ export default function Chat() {
                          </div>
                       </div>
                       <div className="flex flex-col gap-1 w-full min-w-0 pr-10">
-                        <div className="relative group/bubble pt-1 pb-2 text-neutral-800 dark:text-neutral-100 w-full prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-neutral-50 dark:prose-pre:bg-[#1A1A1E] prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-white/5">
+                        <div className="relative group/bubble pt-1 pb-2 text-[#3A3838] dark:text-[#E2DAD2] w-full prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-[#EDE8E2] dark:prose-pre:bg-[#1A1A1E] prose-pre:border prose-pre:border-[#E2DAD2] dark:prose-pre:border-white/5">
                           <button 
                              onClick={() => handleDeleteMessage(msg.id)}
-                             className="absolute top-0 -right-10 z-10 text-neutral-400 hover:text-rose-500 p-1.5 rounded-full opacity-0 group-hover/bubble:opacity-100 transition-all bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm"
+                             className="absolute top-0 -right-10 z-10 text-[#B8AFA8] hover:text-rose-500 p-1.5 rounded-full opacity-0 group-hover/bubble:opacity-100 transition-all bg-white dark:bg-[#2A2828] border border-[#E2DAD2] dark:border-[#3A3838] shadow-sm"
                           >
                              <X size={12} />
                           </button>
@@ -654,21 +654,21 @@ export default function Chat() {
                                       }
 
                                       return (
-                                          <div className="flex flex-col w-full my-4 rounded-xl overflow-hidden border border-neutral-200/50 dark:border-white/[0.1] bg-white dark:bg-[#131317]">
-                                              <div className="flex items-center justify-between px-4 py-2 bg-neutral-100/80 dark:bg-[#1A1A1E] border-b border-neutral-200/50 dark:border-white/[0.05]">
-                                                  <div className="text-xs font-mono font-medium text-neutral-500 dark:text-neutral-400">
+                                          <div className="flex flex-col w-full my-4 rounded-xl overflow-hidden border border-[#E2DAD2]/50 dark:border-white/[0.1] bg-white dark:bg-[#1E1C1C]">
+                                              <div className="flex items-center justify-between px-4 py-2 bg-[#EDE8E2]/80 dark:bg-[#252222] border-b border-[#E2DAD2]/50 dark:border-white/[0.05]">
+                                                  <div className="text-xs font-mono font-medium text-[#B8AFA8] dark:text-[#B8AFA8]">
                                                       {language || 'text'}
                                                   </div>
                                                   <div className="flex items-center gap-1">
-                                                      <button onClick={() => { navigator.clipboard.writeText(codeString); setCopiedId(codeString); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                      <button onClick={() => { navigator.clipboard.writeText(codeString); setCopiedId(codeString); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1.5 px-2 py-1 text-xs text-[#B8AFA8] hover:text-[#3A3838] dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2] transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
                                                           {copiedId === codeString ? <CheckCircle2 size={13} className="text-emerald-500" /> : <Copy size={13} />} Copy
                                                       </button>
-                                                      <button onClick={() => handleDownload(codeString, language)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                      <button onClick={() => handleDownload(codeString, language)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-[#B8AFA8] hover:text-[#3A3838] dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2] transition-colors rounded hover:bg-black/5 dark:hover:bg-white/5">
                                                           <Download size={13} /> Download
                                                       </button>
                                                       {(language === 'html' || language === 'xml' || language === 'javascript') && (
                                                           <>
-                                                              <div className="w-px h-3 bg-neutral-300 dark:bg-neutral-700 mx-1" />
+                                                              <div className="w-px h-3 bg-[#E2DAD2] dark:bg-[#3A3838] mx-1" />
                                                               <button onClick={() => handleRun(codeString)} className="flex items-center gap-1.5 px-2 py-1 text-xs text-brand hover:text-brand-hover hover:bg-brand/10 transition-colors rounded bg-brand/5 shadow-sm">
                                                                   <Play size={13} fill="currentColor" /> Run
                                                               </button>
@@ -676,7 +676,7 @@ export default function Chat() {
                                                       )}
                                                   </div>
                                               </div>
-                                              <div className="p-4 overflow-x-auto text-[13px] font-mono leading-relaxed bg-[#F8F9FA] dark:bg-[#0D0D10] text-neutral-800 dark:text-neutral-300">
+                                              <div className="p-4 overflow-x-auto text-[13px] font-mono leading-relaxed bg-[#F5F0EB] dark:bg-[#1A1818] text-[#3A3838] dark:text-[#E2DAD2]/80">
                                                   <code {...props}>{children}</code>
                                               </div>
                                           </div>
@@ -687,13 +687,13 @@ export default function Chat() {
                               {msg.content}
                           </ReactMarkdown>
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-neutral-400 font-medium">
-                            <button onClick={() => { navigator.clipboard.writeText(msg.content); setCopiedId(msg.id); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
+                        <div className="flex items-center gap-2 text-[11px] text-[#B8AFA8] font-medium">
+                            <button onClick={() => { navigator.clipboard.writeText(msg.content); setCopiedId(msg.id); setTimeout(() => setCopiedId(null), 2000); }} className="flex items-center gap-1 hover:text-[#3A3838]/80 dark:hover:text-[#E2DAD2] transition-colors">
                                {copiedId === msg.id ? <CheckCircle2 size={13} className="text-emerald-500" /> : <Copy size={13} />}
                                {copiedId === msg.id ? 'Copied' : 'Copy'}
                             </button>
-                            <span className="px-1.5 text-neutral-300 dark:text-neutral-700">•</span>
-                            <span className="bg-neutral-100 dark:bg-white/5 px-1.5 py-0.5 rounded text-neutral-500">
+                            <span className="px-1.5 text-[#B8AFA8]/60 dark:text-[#3A3838]">•</span>
+                            <span className="bg-[#EDE8E2] dark:bg-white/5 px-1.5 py-0.5 rounded text-[#B8AFA8]">
                                {localStorage.getItem('openzess_provider') || 'Gemini'}
                             </span>
                         </div>
@@ -720,7 +720,7 @@ export default function Chat() {
                       </div>
                    </div>
                    <div className="flex flex-col gap-1 w-full min-w-0 pr-10">
-                      <div className="relative group/bubble pt-1 pb-2 text-neutral-800 dark:text-neutral-100 w-full prose dark:prose-invert max-w-none">
+                      <div className="relative group/bubble pt-1 pb-2 text-[#3A3838] dark:text-[#E2DAD2] w-full prose dark:prose-invert max-w-none">
                          <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} className="w-24 h-4 bg-gradient-to-r from-[#A89080]/20 to-[#B8AFA8]/20 rounded-[4px] my-2"></motion.div>
                       </div>
                    </div>
@@ -742,9 +742,9 @@ export default function Chat() {
                  
                  <div className="flex flex-col gap-2 mb-5 max-h-[160px] overflow-y-auto custom-scrollbar">
                     {pendingCalls.map((c, i) => (
-                       <div key={i} className="bg-white/60 dark:bg-black/40 p-3 rounded-xl text-xs font-mono border border-rose-100 dark:border-rose-900/40 text-neutral-900 dark:text-neutral-300">
+                       <div key={i} className="bg-white/60 dark:bg-[#1E1C1C]/40 p-3 rounded-xl text-xs font-mono border border-rose-100 dark:border-rose-900/40 text-[#3A3838] dark:text-[#E2DAD2]/80">
                           <span className="font-bold text-rose-600 dark:text-rose-400 mr-2">{c.name}</span>
-                          <span className="text-neutral-600 dark:text-neutral-400">{JSON.stringify(c.args)}</span>
+                          <span className="text-[#3A3838]/80 dark:text-[#B8AFA8]">{JSON.stringify(c.args)}</span>
                        </div>
                     ))}
                  </div>
@@ -772,7 +772,7 @@ export default function Chat() {
                     onClick={() => setIsPlusMenuOpen(!isPlusMenuOpen)}
                     disabled={isLoading}
                     title="Add features"
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isPlusMenuOpen ? 'bg-neutral-200 dark:bg-[#2a2b2e] text-neutral-800 dark:text-neutral-100' : 'bg-transparent text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200'}`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isPlusMenuOpen ? 'bg-[#E2DAD2] dark:bg-[#2A2828] text-[#3A3838] dark:text-[#E2DAD2]' : 'bg-transparent text-[#B8AFA8] hover:bg-[#E2DAD2]/60 dark:hover:bg-white/10 dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2]'}`}
                   >
                     <Plus size={20} className={`transition-transform duration-300 ${isPlusMenuOpen ? 'rotate-45' : 'rotate-0'}`} />
                   </button>
@@ -783,21 +783,21 @@ export default function Chat() {
                           initial={{ opacity: 0, y: 10, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          className="absolute bottom-12 left-0 w-48 bg-[#f0f4f9] dark:bg-[#1e1f20] rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-700/50 py-2 z-50 overflow-hidden"
+                          className="absolute bottom-12 left-0 w-48 bg-[#EDE8E2] dark:bg-[#252222] rounded-2xl shadow-xl border border-[#E2DAD2] dark:border-[#3A3838]/50 py-2 z-50 overflow-hidden"
                        >
                           <button 
                              onClick={() => { fileInputRef.current?.click(); setIsPlusMenuOpen(false); }}
-                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-200/60 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-200 text-[14px] font-medium transition-colors"
+                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#E2DAD2]/60 dark:hover:bg-white/5 text-[#3A3838] dark:text-[#E2DAD2] text-[14px] font-medium transition-colors"
                           >
-                             <Paperclip size={18} className="text-neutral-500 dark:text-neutral-400" />
+                             <Paperclip size={18} className="text-[#B8AFA8] dark:text-[#B8AFA8]" />
                              <span>Upload files</span>
                           </button>
                           
                           <button 
                              onClick={() => setIsPlusMenuOpen(false)}
-                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-200/60 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-200 text-[14px] font-medium transition-colors"
+                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#E2DAD2]/60 dark:hover:bg-white/5 text-[#3A3838] dark:text-[#E2DAD2] text-[14px] font-medium transition-colors"
                           >
-                             <Image size={18} className="text-neutral-500 dark:text-neutral-400" />
+                             <Image size={18} className="text-[#B8AFA8] dark:text-[#B8AFA8]" />
                              <span>Photos</span>
                           </button>
                           
@@ -806,9 +806,9 @@ export default function Chat() {
                                 setInput(prev => prev + '\n```\n// Paste your code here\n```\n');
                                 setIsPlusMenuOpen(false);
                              }}
-                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-200/60 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-200 text-[14px] font-medium transition-colors"
+                             className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#E2DAD2]/60 dark:hover:bg-white/5 text-[#3A3838] dark:text-[#E2DAD2] text-[14px] font-medium transition-colors"
                           >
-                             <Code size={18} className="text-neutral-500 dark:text-neutral-400" />
+                             <Code size={18} className="text-[#B8AFA8] dark:text-[#B8AFA8]" />
                              <span>Import code</span>
                           </button>
                        </motion.div>
@@ -816,7 +816,7 @@ export default function Chat() {
                   </AnimatePresence>
               </div>
               <textarea
-                className="flex-1 bg-transparent border-none text-neutral-800 dark:text-neutral-200 text-[15px] resize-none py-3 min-h-[48px] max-h-[200px] focus:outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400 leading-relaxed font-sans"
+                className="flex-1 bg-transparent border-none text-[#3A3838] dark:text-[#E2DAD2] text-[15px] resize-none py-3 min-h-[48px] max-h-[200px] focus:outline-none placeholder:text-[#B8AFA8] dark:placeholder:text-[#B8AFA8] leading-relaxed font-sans"
                 placeholder={`Ask ${PERSONAS[currentPersonaKey]?.name || "Developer"}...`}
                 value={input}
                 onChange={(e) => {
@@ -838,7 +838,7 @@ export default function Chat() {
                     onClick={handleToolToggle}
                     disabled={isLoading}
                     title={useTools ? "Tools: Enabled" : "Tools: Disabled"}
-                    className={`p-2.5 rounded-full transition-colors ${useTools ? 'text-brand bg-brand/10 dark:text-brand dark:bg-brand/20' : 'text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200'}`}
+                    className={`p-2.5 rounded-full transition-colors ${useTools ? 'text-brand bg-brand/10 dark:text-brand dark:bg-brand/20' : 'text-[#B8AFA8] hover:bg-[#E2DAD2]/60 dark:hover:bg-white/10 dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2]'}`}
                   >
                     <Terminal size={18} />
                   </button>
@@ -846,7 +846,7 @@ export default function Chat() {
                     onClick={toggleListen}
                     disabled={isLoading}
                     title="Speak Command"
-                    className={`p-2.5 rounded-full transition-colors ${isListening ? 'bg-rose-500/20 text-rose-500 animate-pulse' : 'text-neutral-500 hover:bg-neutral-200/60 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-200'}`}
+                    className={`p-2.5 rounded-full transition-colors ${isListening ? 'bg-rose-500/20 text-rose-500 animate-pulse' : 'text-[#B8AFA8] hover:bg-[#E2DAD2]/60 dark:hover:bg-white/10 dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2]'}`}
                   >
                     <Mic size={18} />
                   </button>
@@ -871,14 +871,14 @@ export default function Chat() {
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: "50%", opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            className="h-full bg-white dark:bg-neutral-900 flex flex-col shrink-0 overflow-hidden relative shadow-2xl z-40 border-l border-neutral-200 dark:border-neutral-800"
+            className="h-full bg-white dark:bg-[#1E1C1C] flex flex-col shrink-0 overflow-hidden relative shadow-2xl z-40 border-l border-[#E2DAD2] dark:border-[#3A3838]"
          >
-            <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-black/40 flex justify-between items-center shrink-0">
-               <div className="font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2.5 text-sm tracking-wide">
+            <div className="p-4 border-b border-[#E2DAD2] dark:border-[#3A3838] bg-[#EDE8E2] dark:bg-[#1E1C1C]/40 flex justify-between items-center shrink-0">
+               <div className="font-semibold text-[#3A3838] dark:text-[#E2DAD2] flex items-center gap-2.5 text-sm tracking-wide">
                   <MonitorPlay size={16} className="text-emerald-500" /> 
                   Active UI Environment
                </div>
-               <button onClick={() => setActiveArtifact(null)} className="text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-white dark:hover:bg-neutral-800 p-1.5 rounded-lg transition-colors border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700">
+               <button onClick={() => setActiveArtifact(null)} className="text-[#B8AFA8] hover:text-[#3A3838] dark:hover:text-[#E2DAD2] hover:bg-white dark:hover:bg-[#2A2828] p-1.5 rounded-lg transition-colors border border-transparent hover:border-[#E2DAD2] dark:hover:border-[#3A3838]">
                  <X size={16} />
                </button>
             </div>
@@ -912,13 +912,13 @@ export default function Chat() {
               <div className="font-semibold flex items-center gap-2 text-sm text-emerald-400 tracking-wide">
                 <Brain size={16} /> Advanced Tool Telemetry
               </div>
-              <button onClick={() => setShowLogs(false)} className="text-neutral-500 hover:text-white">
+              <button onClick={() => setShowLogs(false)} className="text-[#B8AFA8] hover:text-white">
                  <X size={16} />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 font-mono text-xs flex flex-col gap-3 custom-scrollbar">
               {terminalLogs.length === 0 ? (
-                 <div className="text-neutral-600 italic text-center mt-10">No tool telemetry recorded yet...</div>
+                 <div className="text-[#3A3838]/80 italic text-center mt-10">No tool telemetry recorded yet...</div>
               ) : (
                  terminalLogs.map((log, i) => (
                    <motion.div 

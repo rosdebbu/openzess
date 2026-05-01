@@ -23,7 +23,7 @@ const MARKETPLACE_PLUGINS: PluginCard[] = [
     developer: "ModelContextProtocol",
     description: "Allows the Agent to read, write, and manipulate files safely on your local hard drive natively.",
     icon: Folder,
-    iconColor: "text-neutral-900 dark:text-white",
+    iconColor: "text-[#3A3838] dark:text-[#E2DAD2]",
     command: "npx",
     args: ["-y", "@modelcontextprotocol/server-filesystem", "./"],
     bannerGradient: "from-neutral-200 to-neutral-400 dark:from-neutral-800 dark:to-neutral-900",
@@ -69,10 +69,10 @@ const MARKETPLACE_PLUGINS: PluginCard[] = [
     developer: "Heroku",
     description: "Native agent logic allowing structural modification and deployment management of your Heroku apps.",
     icon: Server,
-    iconColor: "text-indigo-500",
+    iconColor: "text-brand",
     command: "npx",
     args: ["-y", "@heroku/mcp-server"],
-    bannerGradient: "from-indigo-500/20 to-purple-500/20"
+    bannerGradient: "from-[#A89080]/20 to-[#3A3838]/20"
   }
 ];
 
@@ -117,13 +117,13 @@ export default function Marketplace() {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
-       <div className="p-8 border-b border-neutral-200 dark:border-border flex justify-between items-center bg-white/50 dark:bg-neutral-950/50 backdrop-blur-xl shrink-0">
+       <div className="p-8 border-b border-[#E2DAD2] dark:border-border flex justify-between items-center bg-white/50 dark:bg-[#1A1818]/50 backdrop-blur-xl shrink-0">
           <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3 text-neutral-900 dark:text-white">
+              <h1 className="text-3xl font-bold flex items-center gap-3 text-[#3A3838] dark:text-[#E2DAD2]">
                 <Layers className="text-brand" size={32} />
                 Infinite Ecosystem
               </h1>
-              <p className="text-neutral-500 dark:text-neutral-400 mt-2 max-w-2xl text-sm leading-relaxed">
+              <p className="text-[#B8AFA8] dark:text-[#B8AFA8] mt-2 max-w-2xl text-sm leading-relaxed">
                  Expand the capabilities of Openzess with a single click. These plugins are built using the open-source Model Context Protocol, allowing massive integrations to hot-load directly into the Agent's neural pathways natively.
               </p>
           </div>
@@ -145,11 +145,11 @@ export default function Marketplace() {
                       key={plugin.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl overflow-hidden flex flex-col shadow-lg shadow-neutral-200/50 dark:shadow-none hover:-translate-y-1 transition-transform duration-300"
+                      className="bg-white dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838] rounded-3xl overflow-hidden flex flex-col shadow-lg shadow-neutral-200/50 dark:shadow-none hover:-translate-y-1 transition-transform duration-300"
                    >
                       <div className={`h-24 bg-gradient-to-r ${plugin.bannerGradient} flex items-center p-6 relative overflow-hidden`}>
-                         <Icon size={80} className="absolute -right-4 -bottom-4 opacity-20 text-neutral-900 dark:text-white transform -rotate-12" />
-                         <div className={`w-14 h-14 bg-white dark:bg-neutral-950 rounded-2xl flex items-center justify-center shadow-lg z-10 ${plugin.iconColor}`}>
+                         <Icon size={80} className="absolute -right-4 -bottom-4 opacity-20 text-[#3A3838] dark:text-[#E2DAD2] transform -rotate-12" />
+                         <div className={`w-14 h-14 bg-white dark:bg-[#1A1818] rounded-2xl flex items-center justify-center shadow-lg z-10 ${plugin.iconColor}`}>
                             <Icon size={28} />
                          </div>
                          {plugin.popular && (
@@ -161,14 +161,14 @@ export default function Marketplace() {
                       
                       <div className="p-6 flex-1 flex flex-col">
                          <div className="mb-4">
-                            <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">{plugin.name}</h3>
-                            <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">{plugin.developer}</p>
+                            <h3 className="text-lg font-bold text-[#3A3838] dark:text-[#E2DAD2] mb-1">{plugin.name}</h3>
+                            <p className="text-xs font-semibold text-[#B8AFA8] uppercase tracking-wider">{plugin.developer}</p>
                          </div>
-                         <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed mb-6 flex-1">
+                         <p className="text-sm text-[#3A3838]/80 dark:text-[#B8AFA8] leading-relaxed mb-6 flex-1">
                             {plugin.description}
                          </p>
                          
-                         <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
+                         <div className="pt-4 border-t border-[#E2DAD2] dark:border-[#3A3838] flex justify-between items-center">
                             <button 
                                className="text-xs text-brand hover:text-brand-hover font-semibold flex items-center gap-1 transition-colors"
                                onClick={() => alert(`View Documentation for ${plugin.name} MCP Server at modelcontextprotocol.io`)}
@@ -187,10 +187,10 @@ export default function Marketplace() {
                                <button 
                                   onClick={() => handleInstall(plugin)}
                                   disabled={installing === plugin.id}
-                                  className="bg-neutral-900 hover:bg-black dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-900 px-5 py-2 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-2 transform active:scale-95 disabled:opacity-50"
+                                  className="bg-[#1E1C1C] hover:bg-black dark:bg-white dark:hover:bg-[#E2DAD2] text-white dark:text-[#3A3838] px-5 py-2 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-2 transform active:scale-95 disabled:opacity-50"
                                >
                                   {installing === plugin.id ? (
-                                     <div className="w-4 h-4 border-2 border-white/30 dark:border-neutral-900/30 border-t-white dark:border-t-neutral-900 rounded-full animate-spin"></div>
+                                     <div className="w-4 h-4 border-2 border-white/30 dark:border-[#3A3838]/30 border-t-white dark:border-t-neutral-900 rounded-full animate-spin"></div>
                                   ) : (
                                      <><PlusCircle size={16} /> Get</>
                                   )}
@@ -208,16 +208,16 @@ export default function Marketplace() {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-brand/5 border-2 border-dashed border-brand/30 rounded-3xl flex flex-col p-8 items-center justify-center text-center hover:bg-brand/10 transition-colors"
              >
-                <div className="w-16 h-16 bg-white dark:bg-neutral-900 rounded-full shadow-lg shadow-brand/20 flex items-center justify-center text-brand mb-4">
+                <div className="w-16 h-16 bg-white dark:bg-[#1E1C1C] rounded-full shadow-lg shadow-brand/20 flex items-center justify-center text-brand mb-4">
                    <Box size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">Build Custom Plugin</h3>
-                <p className="text-sm text-neutral-500 max-w-sm mb-6">
-                   Are you a developer? Drop any valid Python script into the <code className="bg-white dark:bg-neutral-900 px-1.5 py-0.5 rounded text-brand">backend/plugins/</code> directory and it will hot-load into Openzess instantly.
+                <h3 className="text-xl font-bold text-[#3A3838] dark:text-[#E2DAD2] mb-2">Build Custom Plugin</h3>
+                <p className="text-sm text-[#B8AFA8] max-w-sm mb-6">
+                   Are you a developer? Drop any valid Python script into the <code className="bg-white dark:bg-[#1E1C1C] px-1.5 py-0.5 rounded text-brand">backend/plugins/</code> directory and it will hot-load into Openzess instantly.
                 </p>
                 <button 
                    onClick={() => window.dispatchEvent(new Event('open-settings'))}
-                   className="bg-white dark:bg-neutral-900 text-brand px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-brand/10 hover:shadow-md transition-all border border-neutral-200 dark:border-neutral-800"
+                   className="bg-white dark:bg-[#1E1C1C] text-brand px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-brand/10 hover:shadow-md transition-all border border-[#E2DAD2] dark:border-[#3A3838]"
                 >
                    Learn More
                 </button>

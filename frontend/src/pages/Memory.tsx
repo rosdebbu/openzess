@@ -61,21 +61,21 @@ export default function MemoryVault() {
       <div className="max-w-6xl w-full mx-auto flex flex-col h-full">
         <header className="mb-8 flex items-end justify-between shrink-0">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3 text-neutral-900 dark:text-white mb-2 tracking-tight">
+            <h1 className="text-3xl font-bold flex items-center gap-3 text-[#3A3838] dark:text-[#E2DAD2] mb-2 tracking-tight">
               <Database className="text-brand" /> Agent Memory Vault
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400">Manage the semantic embeddings and long-term context stored by openzess.</p>
+            <p className="text-[#3A3838]/80 dark:text-[#B8AFA8]">Manage the semantic embeddings and long-term context stored by openzess.</p>
           </div>
           
           <div className="flex items-center gap-4">
              <div className="relative">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B8AFA8] dark:text-[#B8AFA8]" />
                 <input 
                   type="text" 
                   placeholder="Search memories..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-200 pl-11 pr-4 py-2.5 rounded-xl w-64 focus:outline-none focus:border-brand/40 shadow-sm dark:shadow-none transition-colors text-sm font-medium"
+                  className="bg-white dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838] text-[#3A3838] dark:text-[#E2DAD2] pl-11 pr-4 py-2.5 rounded-xl w-64 focus:outline-none focus:border-brand/40 shadow-sm dark:shadow-none transition-colors text-sm font-medium"
                 />
              </div>
              
@@ -95,13 +95,13 @@ export default function MemoryVault() {
               <div className="w-8 h-8 rounded-full border-t-2 border-brand animate-spin"></div>
             </div>
           ) : memories.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-20 bg-white dark:bg-neutral-900/40 rounded-3xl border border-neutral-200 dark:border-neutral-800/60 border-dashed mt-10 shadow-sm dark:shadow-none transition-colors">
-              <Database size={48} className="text-neutral-400 dark:text-neutral-600 mb-4" />
-              <h2 className="text-xl font-medium text-neutral-800 dark:text-neutral-300 mb-2">The Vault is Empty</h2>
-              <p className="text-neutral-500 text-center max-w-md">Your agent hasn't formed any long-term memories yet. Start interacting in the chat to build its context base.</p>
+            <div className="flex flex-col items-center justify-center p-20 bg-white dark:bg-[#1E1C1C]/40 rounded-3xl border border-[#E2DAD2] dark:border-[#3A3838]/60 border-dashed mt-10 shadow-sm dark:shadow-none transition-colors">
+              <Database size={48} className="text-[#B8AFA8] dark:text-[#3A3838]/80 mb-4" />
+              <h2 className="text-xl font-medium text-[#3A3838] dark:text-[#E2DAD2]/80 mb-2">The Vault is Empty</h2>
+              <p className="text-[#B8AFA8] text-center max-w-md">Your agent hasn't formed any long-term memories yet. Start interacting in the chat to build its context base.</p>
             </div>
           ) : filteredMemories.length === 0 ? (
-            <div className="text-center p-10 text-neutral-500">No memories match your search query.</div>
+            <div className="text-center p-10 text-[#B8AFA8]">No memories match your search query.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               <AnimatePresence>
