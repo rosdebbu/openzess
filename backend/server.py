@@ -769,6 +769,42 @@ async def swarm_squad(request: SwarmSquadRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ================================
+# WARROOM DEBATE (Multi-Round)
+# ================================
+class DebateRequest(BaseModel):
+    message: str
+    squad: List[Dict[str, Any]]
+    max_rounds: int = 3
+    judge_provider: str = "gemini"
+    judge_api_key: str = ""
+
+@app.post("/api/warroom/debate")
+async def warroom_debate(request: DebateRequest):
+    if not request.squad:
+        raise HTTPException(status_code=400, detail="Squad configuration cannot be empty")
+    
+    judge_config = None
+    if request.judge_api_key:
+        judge_config = {
+            "api_key": request.judge_api_key,
+            "provider": request.judge_provider
+        }
+    
+    try:
+        async def event_generator():
+            async for chunk in swarm_manager.debate_stream(
+                request.message,
+                request.squad,
+                max_rounds=request.max_rounds,
+                judge_config=judge_config
+            ):
+                yield f"data: {json.dumps(chunk)}\n\n"
+        
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ================================
 # KNOWLEDGE BASE (Personal Canvas)
 # ================================
 class NoteCreateRequest(BaseModel):
