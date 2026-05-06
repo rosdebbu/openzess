@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, BrainCircuit, CheckCircle2, AlertTriangle, ShieldAlert, Cpu, Settings2, Play, RefreshCw } from 'lucide-react';
+import { Bot, Send, BrainCircuit, CheckCircle2, AlertTriangle, ShieldAlert, Cpu, Settings2, Play, RefreshCw, Swords } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
