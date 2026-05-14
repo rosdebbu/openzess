@@ -169,6 +169,7 @@ export default function Chat() {
 
   const finalTranscriptRef = useRef<string>('');
   const silenceTimerRef = useRef<any>(null);
+  const lastProcessedIndexRef = useRef<number>(0);
 
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -180,42 +181,64 @@ export default function Chat() {
 
       recognition.onstart = () => {
         setIsListening(true);
-        finalTranscriptRef.current = inputRef.current ? inputRef.current + ' ' : '';
+        // Seed with whatever text is already in the input box
+        finalTranscriptRef.current = inputRef.current ? inputRef.current.trim() : '';
+        lastProcessedIndexRef.current = 0;
       };
       
       recognition.onresult = (event: any) => {
         let interimTranscript = '';
-        let sessionFinal = '';
 
-        for (let i = 0; i < event.results.length; ++i) {
+        // Only process NEW final results from lastProcessedIndex onward
+        for (let i = lastProcessedIndexRef.current; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
-            sessionFinal += event.results[i][0].transcript;
+            const transcript = event.results[i][0].transcript.trim();
+            if (transcript) {
+              finalTranscriptRef.current = (finalTranscriptRef.current + ' ' + transcript).trim();
+            }
+            lastProcessedIndexRef.current = i + 1;
           } else {
             interimTranscript += event.results[i][0].transcript;
           }
         }
         
-        const currentText = (finalTranscriptRef.current + sessionFinal + interimTranscript).trim();
-        setInput(currentText);
+        const displayText = (finalTranscriptRef.current + (interimTranscript ? ' ' + interimTranscript : '')).trim();
+        setInput(displayText);
 
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
         
-        if (sessionFinal.trim().length > 0 && interimTranscript.trim().length === 0) {
+        // Auto-send: if we just got a final result and there's no more interim speech
+        if (lastProcessedIndexRef.current > 0 && interimTranscript.trim().length === 0 && finalTranscriptRef.current.trim().length > 0) {
+            const textToSend = finalTranscriptRef.current.trim();
             silenceTimerRef.current = setTimeout(() => {
-                handleSendRef.current(currentText);
+                handleSendRef.current(textToSend);
+                // Reset state after auto-send
+                finalTranscriptRef.current = '';
+                lastProcessedIndexRef.current = 0;
                 recognition.stop();
             }, 2500);
         }
       };
 
       recognition.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error);
+        console.error('Speech recognition error:', event.error);
         setIsListening(false);
+        // Don't kill recognition on 'no-speech' — user might just be quiet for a moment
+        if (event.error === 'aborted' || event.error === 'not-allowed') {
+          finalTranscriptRef.current = '';
+          lastProcessedIndexRef.current = 0;
+        }
       };
 
       recognition.onend = () => {
          setIsListening(false);
-         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+         if (silenceTimerRef.current) {
+           clearTimeout(silenceTimerRef.current);
+           silenceTimerRef.current = null;
+         }
+         // Reset tracking for next session
+         finalTranscriptRef.current = '';
+         lastProcessedIndexRef.current = 0;
       };
 
       recognitionRef.current = recognition;
@@ -224,6 +247,11 @@ export default function Chat() {
 
   const toggleListen = () => {
     if (isListening) {
+      // Manual stop — keep whatever text is in the input
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
       recognitionRef.current?.stop();
       setIsListening(false);
     } else {
@@ -231,7 +259,10 @@ export default function Chat() {
         alert("Speech Recognition is not supported in this browser. Please use Chrome or Edge.");
         return;
       }
-      try { recognitionRef.current.start(); } catch(e) {}
+      // Reset refs before starting fresh
+      finalTranscriptRef.current = inputRef.current ? inputRef.current.trim() : '';
+      lastProcessedIndexRef.current = 0;
+      try { recognitionRef.current.start(); } catch(e) { console.warn('Recognition start failed:', e); }
     }
   };
 
