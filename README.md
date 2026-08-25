@@ -7,10 +7,12 @@
 
 <p align="center">
   <a href="https://github.com/rosdebbu/openzess"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-rosdebbu%2Fopenzess-181717?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/rosdebbu/openzess/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/rosdebbu/openzess/actions/workflows/ci.yml/badge.svg?style=for-the-badge"></a>
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-69%25-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
   <img alt="Python" src="https://img.shields.io/badge/Python-27%25-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge">
   <img alt="Version" src="https://img.shields.io/badge/Version-1.1.0-A89080?style=for-the-badge">
+  <a href="https://github.com/rosdebbu/openzess/discussions"><img alt="Discussions" src="https://img.shields.io/badge/Discussions-Welcome-8B5CF6?style=for-the-badge&logo=github"></a>
 </p>
 
 <p align="center">
