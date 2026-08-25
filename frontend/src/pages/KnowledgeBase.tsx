@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Plus, Save, Trash2, Edit3, Eye, Calendar, Tag, ChevronRight, Hash } from 'lucide-react';
+import { BookOpen, Plus, Save, Trash2, Edit3, Eye, Calendar, Tag, Hash } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useToast } from '../contexts/ToastContext';

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Users, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play, FileText, Plus, Image } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play, FileText, Plus, Image } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -26,7 +26,7 @@ export default function Chat() {
   const [terminalLogs, setTerminalLogs] = useState<ToolExecution[]>([]);
   const [pendingCalls, setPendingCalls] = useState<any[] | null>(null);
   const [useTools, setUseTools] = useState(() => localStorage.getItem('openzess_use_tools') !== 'false');
-  const [useSwarm, setUseSwarm] = useState(false);
+  const [useSwarm] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [zenMode, setZenMode] = useState(false);
   const [isPlusMenuOpen, setIsPlusMenuOpen] = useState(false);

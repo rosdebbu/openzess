@@ -1,0 +1,49 @@
+# ── Core web framework ──────────────────────────────────────────
+fastapi
+uvicorn[standard]
+pydantic
+
+# ── LLM runtime (multi-provider) ────────────────────────────────
+litellm
+
+# ── Database ────────────────────────────────────────────────────
+sqlalchemy
+psycopg2-binary          # PostgreSQL (docker-compose.yml)
+
+# ── Memory / vector store ───────────────────────────────────────
+chromadb
+
+# ── Web & search tooling ────────────────────────────────────────
+requests
+beautifulsoup4
+duckduckgo_search
+
+# ── MCP protocol ────────────────────────────────────────────────
+mcp
+
+# ── Chat bridges ────────────────────────────────────────────────
+pyTelegramBotAPI         # telegram_worker.py (imports telebot)
+discord.py               # discord_worker.py
+
+# ── Voice / TTS ─────────────────────────────────────────────────
+gtts                     # server.py text-to-speech endpoint
+
+# ── System / desktop automation ─────────────────────────────────
+psutil                   # plugins/system_health.py
+pyautogui                # PC control tools (Windows native / Linux Xvfb)
+mss                      # fast screen capture
+watchdog                 # background_workers.py file watchers
+apscheduler              # cron-style scheduled jobs
+Pillow                   # image handling (PIL)
+
+# ── Scientific & Visualization Tooling (PaperBanana) ────────────
+matplotlib
+seaborn
+
+# ── Environment config ──────────────────────────────────────────
+python-dotenv
+
+# ── Server extras ───────────────────────────────────────────────
+python-multipart         # file uploads (FastAPI UploadFile)
+websockify               # Matrix Viewer VNC bridge (WSL sandbox)
+

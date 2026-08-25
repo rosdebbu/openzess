@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { GitBranch, Circle, ArrowRight, Layers, AlertTriangle, RefreshCw, ExternalLink, Info, X } from 'lucide-react';
+import { GitBranch, Circle, ArrowRight, Layers, AlertTriangle, RefreshCw, ExternalLink, Info } from 'lucide-react';
 
 interface GraphStats {
   nodes: number;

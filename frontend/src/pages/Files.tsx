@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Folder, File as FileIcon, HardDrive, Search, ArrowUpRight, ChevronRight, FileCode2, FileImage, FileText, FileArchive, FileCog, Database } from 'lucide-react';
+import { Folder, File as FileIcon, HardDrive, Search, ChevronRight, FileCode2, FileImage, FileText, FileArchive, FileCog, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FileItem {

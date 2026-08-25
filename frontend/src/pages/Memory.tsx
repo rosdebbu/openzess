@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Database, Trash2, Search, AlertTriangle, Fingerprint } from 'lucide-react';
+import { Database, Trash2, Search, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Memory {

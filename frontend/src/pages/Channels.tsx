@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, Hash, Volume2, Shield, Bell, Send, User, Bot, Loader2, Play, Square, MessageSquare } from 'lucide-react';
+import { Radio, Hash, Volume2, Shield, Bell, Send, User, Bot, Loader2, Play, Square, MessageSquare, type LucideIcon } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useToast } from '../contexts/ToastContext';
 import { prepare, layout } from '@chenglou/pretext';
@@ -9,7 +9,7 @@ import { prepare, layout } from '@chenglou/pretext';
 interface Channel {
   id: string;
   name: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   unread: number;
   desc: string;
 }
@@ -55,12 +55,12 @@ export default function Channels() {
     // Check Telegram Status
     axios.get('http://localhost:8000/api/channels/telegram/status')
       .then(res => setIsTelegramRunning(res.data.is_running))
-      .catch(e => console.error("Could not fetch telegram status"));
+      .catch(() => console.error("Could not fetch telegram status"));
 
     // Check Discord Status
     axios.get('http://localhost:8000/api/channels/discord/status')
       .then(res => setIsDiscordRunning(res.data.is_running))
-      .catch(e => console.error("Could not fetch discord status"));
+      .catch(() => console.error("Could not fetch discord status"));
   }, []);
 
   const toggleTelegram = async () => {

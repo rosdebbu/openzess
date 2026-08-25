@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState, MouseEvent } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Monitor, Wifi, WifiOff } from 'lucide-react';
 
 export default function MatrixViewer() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');

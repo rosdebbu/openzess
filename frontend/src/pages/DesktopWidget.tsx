@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import VRMAvatar from '../components/VRMAvatar';
@@ -6,6 +6,7 @@ import VRMAvatar from '../components/VRMAvatar';
 declare global {
   interface Window {
     electronAPI?: {
+      spawnCompanion: (url: string) => void;
       onLoadVrm: (callback: (url: string) => void) => void;
       onAgentSpeak: (callback: (text: string) => void) => void;
       onGlobalMouseMove: (callback: (coords: {x: number, y: number, width: number, height: number}) => void) => void;
@@ -24,7 +25,7 @@ export default function DesktopWidget() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     document.body.style.backgroundColor = 'transparent';

@@ -264,8 +264,8 @@ start.bat
 #### Option B — One-Command Start (Linux / WSL)
 
 ```bash
-chmod +x start_wsl.sh
-./start_wsl.sh
+chmod +x scripts/start_wsl.sh
+./scripts/start_wsl.sh
 ```
 
 #### Option C — Manual Start
@@ -273,7 +273,7 @@ chmod +x start_wsl.sh
 **Terminal 1 — Backend:**
 ```bash
 cd backend
-uvicorn server:app --host 0.0.0.0 --reload --port 8000
+uvicorn app.server:app --host 0.0.0.0 --reload --port 8000
 ```
 
 **Terminal 2 — Frontend:**
@@ -339,7 +339,7 @@ You will be greeted by the boot sequence. Select a provider and enter your API k
 
 ```
 openzess/
-├── frontend/                      # React + TypeScript SPA
+├── frontend/                      # React + TypeScript web SPA (browser-based)
 │   └── src/
 │       ├── pages/                 # 22 feature pages
 │       │   ├── Chat.tsx           # Main AI chat interface
@@ -354,27 +354,34 @@ openzess/
 │       │   ├── KnowledgeBase.tsx  # Document canvas
 │       │   └── ...                # 12 more feature pages
 │       ├── components/            # Sidebar, transitions, avatars
-│       ├── context/               # Theme, toast providers
+│       ├── contexts/              # Theme & toast providers
 │       └── utils/                 # Persona definitions
 │
 ├── backend/                       # FastAPI + Python services
-│   ├── server.py                  # Main API router (1000+ lines)
-│   ├── agent.py                   # LiteLLM agent with tool calling
-│   ├── database.py                # SQLAlchemy models & queries
-│   ├── swarm_manager.py           # Multi-agent orchestration
-│   ├── mcp_manager.py             # MCP protocol handler
-│   ├── background_workers.py      # Cron & watchdog services
-│   ├── telegram_worker.py         # Telegram bot bridge
-│   ├── discord_worker.py          # Discord bot bridge
-│   ├── tavern_parser.py           # SillyTavern card importer
-│   └── plugin_loader.py           # Dynamic plugin system
+│   ├── app/                       # Application package
+│   │   ├── server.py              # Main API router (1000+ lines)
+│   │   ├── agent.py               # LiteLLM agent with tool calling
+│   │   ├── database.py            # SQLAlchemy models & queries
+│   │   ├── swarm_manager.py       # Multi-agent orchestration
+│   │   ├── mcp_manager.py         # MCP protocol handler
+│   │   ├── background_workers.py  # Cron & watchdog services
+│   │   ├── telegram_worker.py     # Telegram bot bridge
+│   │   ├── discord_worker.py      # Discord bot bridge
+│   │   ├── tavern_parser.py       # SillyTavern card importer
+│   │   ├── plugin_loader.py       # Dynamic plugin system
+│   │   └── plugins/               # Drop-in Python tool plugins
+│   ├── tools/                     # Dev utilities (DB migration, MCP test)
+│   ├── requirements.txt           # Python dependencies
+│   └── chroma_db/, chat_history.db  # Runtime data (gitignored)
 │
+├── prototype/                     # Early CLI prototypes (not part of the app)
+├── scripts/                       # Helper scripts (WSL sandbox, tests)
 ├── docs/assets/                   # Screenshots & demo videos
-├── openzess-docs/                 # Documentation site (Docusaurus)
+├── openzess-docs/                 # Documentation site (VitePress)
 ├── docker-compose.yml             # PostgreSQL container
-├── start.bat                      # Windows launch script
-├── start_wsl.sh                   # Linux/WSL launch script
+├── start.bat                      # Windows launch script (one-click)
 ├── .env.example                   # Environment template
+├── LICENSE                        # MIT
 └── README.md
 ```
 

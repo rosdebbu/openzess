@@ -25,14 +25,14 @@ import DebateArena from './pages/DebateArena';
 import Doc from './pages/Doc';
 import FAQ from './pages/FAQ';
 import Graphify from './pages/Graphify';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
 
 import { PERSONAS } from './utils/personas';
 import { useLocation } from 'react-router-dom';
 
-function AnimatedRoutes({ persona }: { persona: string }) {
+function AnimatedRoutes({ persona: _persona }: { persona: string }) {
   const location = useLocation();
   return (
     <div className="flex-1 flex overflow-hidden relative">

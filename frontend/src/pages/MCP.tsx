@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Zap, Plug, Search, ChevronRight, CheckCircle2, Loader2, Plus, Trash2, Wrench } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import AddMCPServerModal from '../components/AddMCPServerModal';
 import { useToast } from '../contexts/ToastContext';
 

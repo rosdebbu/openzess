@@ -1,4 +1,4 @@
-import { FileText, Rocket, Sparkles, Code2, ChevronRight, Star, Zap, GitBranch, ArrowUpRight } from 'lucide-react';
+import { Rocket, Sparkles, Code2, ChevronRight, GitBranch } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const changelogData = [

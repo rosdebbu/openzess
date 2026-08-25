@@ -1,13 +1,13 @@
-import { MessageSquare, Folder, Wrench, Sun, Moon, Database, Zap, SlidersHorizontal, Activity, Radio, Users, CalendarClock, Wand2, FileText, Smile, Layers, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight, ChevronDown, ExternalLink, GitBranch } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { MessageSquare, Folder, Wrench, Database, SlidersHorizontal, Radio, Users, Smile, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight, ChevronDown, ExternalLink, GitBranch } from 'lucide-react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useToast } from '../contexts/ToastContext';
 import { PERSONAS } from '../utils/personas';
 
 export default function Sidebar() {
-  const { theme, toggleTheme } = useTheme();
+  const { toggleTheme } = useTheme();
   const { showToast } = useToast();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ 'Tools': true });
@@ -32,7 +32,16 @@ export default function Sidebar() {
     };
   }, [toggleTheme]);
   
-  const navSections = [
+  interface NavItem {
+    name: string;
+    icon: ReactNode;
+    path?: string;
+    action?: () => void;
+    external?: boolean;
+    subItems?: { name: string; path: string }[];
+  }
+
+  const navSections: { title: string; items: NavItem[] }[] = [
     {
       title: 'Control',
       items: [

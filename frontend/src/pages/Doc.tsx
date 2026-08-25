@@ -1,4 +1,4 @@
-import { BookOpen, FileText, Code, ExternalLink, Rocket, Sparkles, ArrowRight, Globe, Zap, Monitor } from 'lucide-react';
+import { BookOpen, Code, ExternalLink, Rocket, Sparkles, ArrowRight, Globe, Zap, Monitor } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const docSections = [

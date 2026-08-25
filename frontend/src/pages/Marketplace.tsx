@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Layers, Folder, Database, Globe, Command, PlusCircle, Server, CheckCircle, Info, Box } from 'lucide-react';
+import { Layers, Folder, Database, Globe, PlusCircle, Server, CheckCircle, Info, Box } from 'lucide-react';
 import axios from 'axios';
 
 interface PluginCard {

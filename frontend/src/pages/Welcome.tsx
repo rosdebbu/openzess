@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Key, Sparkles, Fingerprint, Activity, Zap } from 'lucide-react';
+import { Key, Fingerprint, Activity, Zap } from 'lucide-react';
 import logoUrl from '../assets/seahorse-logo.jpg';
 
 interface WelcomeProps {

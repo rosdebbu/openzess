@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, BrainCircuit, CheckCircle2, AlertTriangle, ShieldAlert, Cpu, Settings2, Play, RefreshCw, Swords } from 'lucide-react';
+import { Bot, Send, BrainCircuit, CheckCircle2, ShieldAlert, Cpu, Settings2, RefreshCw, Swords } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -64,9 +64,9 @@ export default function DebateArena() {
     const [showSettings, setShowSettings] = useState(false);
     
     // Status tracking
-    const [currentRound, setCurrentRound] = useState(0);
+    const [_currentRound, setCurrentRound] = useState(0);
     const [currentSpeaker, setCurrentSpeaker] = useState('');
-    const [debatePhase, setDebatePhase] = useState('');
+    const [_debatePhase, setDebatePhase] = useState('');
     
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -346,7 +346,7 @@ export default function DebateArena() {
                     </div>
                 ) : (
                     <div className="max-w-3xl mx-auto py-8 px-4 flex flex-col gap-6">
-                        {messages.map((msg, i) => (
+                        {messages.map((msg) => (
                             <motion.div 
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}

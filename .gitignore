@@ -1,3 +1,35 @@
+# ── Python ──────────────────────────────────────────────
 venv/
-.env
+.venv/
 __pycache__/
+*.py[cod]
+.env
+
+# ── Node / frontend ─────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-electron/
+frontend/release/
+.turbo/
+
+# ── Runtime data (never commit) ─────────────────────────
+backend/chroma_db/
+chroma_db/
+backend/chat_history.db*
+chat_history.db*
+*.log
+*_log.txt
+*_err.txt
+uploads/
+graphify-out/
+
+# ── OS junk ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editors ─────────────────────────────────────────────
+.vscode/
+.idea/
+
+
