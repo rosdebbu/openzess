@@ -52,3 +52,7 @@ jobs:
 
       - name: Byte-compile all application modules
         run: python -m compileall app tools
+
+      - name: Run unit test suite (pytest)
+        run: pytest tests/ -v
+

@@ -330,7 +330,8 @@ def generate_statistical_plot(plot_type: str, title: str, data: dict, x_label: s
             matrix = np.array(data.get("matrix", []))
             x_ticks = data.get("x_ticks", None)
             y_ticks = data.get("y_ticks", None)
-            sns.heatmap(matrix, annot=True, fmt=".2f", cmap=color_palette, ax=ax,
+            heatmap_cmap = "crest" if color_palette in ["deep", "academic_classic"] else color_palette
+            sns.heatmap(matrix, annot=True, fmt=".2f", cmap=heatmap_cmap, ax=ax,
                         xticklabels=x_ticks if x_ticks else "auto",
                         yticklabels=y_ticks if y_ticks else "auto",
                         cbar_kws={'label': y_label if y_label else 'Magnitude'})
@@ -339,7 +340,22 @@ def generate_statistical_plot(plot_type: str, title: str, data: dict, x_label: s
             series_data = data.get("series", [])
             labels = [s.get("name", f"Group {i}") for i, s in enumerate(series_data)]
             values = [s.get("values", []) for s in series_data]
-            ax.boxplot(values, labels=labels, patch_artist=True)
+            try:
+                ax.boxplot(values, tick_labels=labels, patch_artist=True)
+            except TypeError:
+                ax.boxplot(values, labels=labels, patch_artist=True)
+
+        elif plot_type == "histogram":
+            values = data.get("values", [])
+            if not values and "series" in data:
+                for s in data.get("series", []):
+                    sns.histplot(s.get("values", []), label=s.get("name", "Series"), kde=True, ax=ax, alpha=0.6)
+                ax.legend(frameon=True, facecolor="white", edgecolor="none")
+            else:
+                bins = data.get("bins", 20)
+                sns.histplot(values, bins=bins, kde=True, ax=ax, color="#2563eb", edgecolor="black", alpha=0.7)
+
+
 
         ax.set_title(title, fontsize=14, fontweight="bold", pad=15)
         if x_label:

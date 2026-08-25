@@ -45,8 +45,7 @@ export default function MatrixViewer() {
       setIsSystemActive(false);
     };
 
-    ws.onerror = (error) => {
-      console.error("Matrix WS Error: ", error);
+    ws.onerror = () => {
       setStatus('disconnected');
       setIsSystemActive(false);
     };

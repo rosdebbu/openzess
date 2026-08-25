@@ -47,3 +47,7 @@ python-dotenv
 python-multipart         # file uploads (FastAPI UploadFile)
 websockify               # Matrix Viewer VNC bridge (WSL sandbox)
 
+# ── Testing ─────────────────────────────────────────────────────
+pytest
+
+
