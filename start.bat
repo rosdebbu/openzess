@@ -32,22 +32,20 @@ echo [2/2] Starting Web Frontend (opens in browser)...
 start "openzess Frontend" cmd /k "cd frontend && npm install && npm run dev"
 
 echo.
-REM ── OPTIONAL: launch Rust sidecar if built (see plans/hybrid-python-rust.md) ──
-if exist "%USERPROFILE%\.cargo\bin\cargo.exe" (
-    if not exist "rust-sidecar\target\release\openzess-sidecar.exe" (
-        echo [opt] Building Rust sidecar - first run only...
-        pushd rust-sidecar
-        "%USERPROFILE%\.cargo\bin\cargo.exe" build --release
-        popd
-    )
-)
+REM ── OPTIONAL: launch Rust sidecar if binary exists ──
 if exist "rust-sidecar\target\release\openzess-sidecar.exe" (
     echo [opt] Starting Rust sidecar on port 8100...
     start "openzess Sidecar" /min cmd /c "cd /d %~dp0rust-sidecar && target\release\openzess-sidecar.exe"
 )
 
-echo Both services are starting up!
-echo   Backend : http://localhost:8000
-echo   Frontend: http://localhost:5173
+echo.
 echo ==============================================
+echo   All services are launching!
+echo   Backend  : http://localhost:8000
+echo   Frontend : http://localhost:5173
+echo ==============================================
+
+REM ── Open browser to frontend ──
+ping 127.0.0.1 -n 3 >nul
+start http://localhost:5173
 
