@@ -2,415 +2,24 @@
   <img src="docs/assets/welcome-screen.png" alt="Openzess — AI Workspace" width="720" />
 </p>
 
-<h1 align="center">Openzess</h1>
-<p align="center"><strong>The open-source, multi-agent AI workspace — built for builders.</strong></p>
+<h1 align="center">🦎 Openzess</h1>
+<p align="center"><strong>The autonomous, self-growing AI workspace & cyberpunk terminal agent — built for builders.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/rosdebbu/openzess"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-rosdebbu%2Fopenzess-181717?style=for-the-badge&logo=github"></a>
-  <a href="https://github.com/rosdebbu/openzess/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/rosdebbu/openzess/actions/workflows/ci.yml/badge.svg?style=for-the-badge"></a>
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-69%25-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
-  <img alt="Python" src="https://img.shields.io/badge/Python-27%25-3776AB?style=for-the-badge&logo=python&logoColor=white">
-  <img alt="License" src="https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge">
-  <img alt="Version" src="https://img.shields.io/badge/Version-1.1.0-A89080?style=for-the-badge">
-  <a href="https://github.com/rosdebbu/openzess/discussions"><img alt="Discussions" src="https://img.shields.io/badge/Discussions-Welcome-8B5CF6?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/rosdebbu/openzess"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-rosdebbu%2Fopenzess-16a34a?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/rosdebbu/openzess/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/badge/Tests-86%2F86%20Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white"></a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-React%2019-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.12%20%2F%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img alt="Rust" src="https://img.shields.io/badge/Rust-Axum%20Sidecar-DEA584?style=for-the-badge&logo=rust&logoColor=white">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-16a34a?style=for-the-badge">
 </p>
-
-<p align="center">
-  <a href="#-demo">Demo</a> •
-  <a href="#-features">Features</a> •
-  <a href="#%EF%B8%8F-architecture">Architecture</a> •
-  <a href="#-getting-started">Getting Started</a> •
-  <a href="#-technology-stack">Tech Stack</a> •
-  <a href="#-contributing">Contributing</a>
-</p>
-
----
-
-## Overview
-
-**Openzess** is a full-stack, provider-agnostic AI workspace that gives you complete control over how AI agents operate, collaborate, and integrate into your development workflow. Unlike closed ecosystems, Openzess lets you bring **any** LLM provider — Gemini, OpenAI, Anthropic, DeepSeek, Groq, Qwen, Ollama, and more — and orchestrates them through a unified, production-grade interface.
-
-It ships with a **multi-agent debate engine**, **parallel swarm execution**, **MCP protocol support**, **Tavern-compatible persona imports**, **background task scheduling**, and a full **tool-calling runtime** — all wrapped in a polished React + FastAPI application.
-
----
-
-## 🎬 Demo
-
-### ▶️ Application Walkthrough
-
-<p align="center">
-  <img src="docs/assets/demo-walkthrough.webp" alt="Openzess — Full Application Walkthrough" width="720" />
-</p>
-
-<p align="center"><em>Dark mode walkthrough — navigating Chat, Debate Arena, Tavern, and more.</em></p>
-
-### ▶️ Login & Boot Sequence
-
-<p align="center">
-  <img src="docs/assets/demo-login.webp" alt="Openzess — Boot Sequence & Login" width="720" />
-</p>
-
-<p align="center"><em>Cinematic boot sequence with provider authentication flow.</em></p>
-
----
-
-## 📸 Screenshots
-
-<table>
-<tr>
-<td width="50%">
-
-**Chat Dashboard — Light Mode**
-<img src="docs/assets/dashboard-light.png" alt="Dashboard Light" width="100%" />
-
-</td>
-<td width="50%">
-
-**Chat Dashboard — Dark Mode**
-<img src="docs/assets/dashboard-dark.png" alt="Dashboard Dark" width="100%" />
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-**Warroom Debate — Multi-Agent Consensus**
-<img src="docs/assets/warroom-debate.png" alt="Warroom Debate" width="100%" />
-
-</td>
-<td width="50%">
-
-**CollaborationRoom — Parallel Swarm**
-<img src="docs/assets/collaboration-room.png" alt="CollaborationRoom" width="100%" />
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-**Agent Skills & Personas**
-<img src="docs/assets/agent-skills.png" alt="Agent Skills" width="100%" />
-
-</td>
-<td width="50%">
-
-**MCP Protocol Grid**
-<img src="docs/assets/mcp-grid.png" alt="MCP Grid" width="100%" />
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-**Tavern — Multi-Character Personas**
-<img src="docs/assets/tavern-personas.png" alt="Tavern Personas" width="100%" />
-
-</td>
-<td width="50%">
-
-**Debate Arena — Sequential Consensus**
-<img src="docs/assets/debate-arena.png" alt="Debate Arena" width="100%" />
-
-</td>
-</tr>
-</table>
-
----
-
-## ✨ Features
-
-### 🧠 Core Intelligence
-
-| Feature                        | Description                                                                                                 |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| **Universal Provider Support** | Gemini, OpenAI, Anthropic, Groq, DeepSeek, Qwen, GLM, Kimi, Ollama (local). Swap models at runtime.         |
-| **Tool-Calling Runtime**       | Terminal execution, file I/O, code editing, web search, URL scraping — all with human-in-the-loop approval. |
-| **Streaming Chat**             | Real-time SSE-based streaming with full Markdown rendering and syntax highlighting.                         |
-| **Session Persistence**        | SQLite-backed conversation history with session management and cross-device hydration.                      |
-
-### ⚔️ Multi-Agent Systems
-
-| Feature                | Description                                                                                                          |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Warroom Debate**     | Sequential multi-round debate engine — agents argue, critique, and reach consensus. A Judge synthesizes the verdict. |
-| **CollaborationRoom**  | Parallel swarm dispatch — up to 10 agents across different providers respond simultaneously.                         |
-| **Agent Personas**     | Pre-configured roles (Architect, Scraper, CodeGen) with full custom persona support.                                 |
-| **Tavern Card Import** | Import SillyTavern/TavernAI `.png` and `.json` character cards for multi-character roleplaying.                      |
-
-### 🔌 Extensibility & Integration
-
-| Feature                | Description                                                                                                                 |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **MCP Protocol**       | Model Context Protocol support — connect external tools (GitHub, PostgreSQL, Filesystem, etc.) via stdio or SSE transports. |
-| **Background Workers** | Cron job scheduler and filesystem watchdog for automated task execution.                                                    |
-| **Channels**           | Telegram and Discord bot bridges — extend Openzess conversations to messaging platforms.                                    |
-| **Developer API**      | OpenAI-compatible and Anthropic-compatible REST endpoints (`/v1/chat/completions`, `/v1/messages`).                         |
-
-### 🎨 Interface & Experience
-
-| Feature                     | Description                                                         |
-| --------------------------- | ------------------------------------------------------------------- |
-| **Light & Dark Themes**     | Full dual-theme support with smooth transitions.                    |
-| **Graphify**                | Visual knowledge graph renderer for relationship mapping.           |
-| **Canvas / Knowledge Base** | Structured document viewer and content workspace.                   |
-| **TTS Engine**              | Built-in text-to-speech synthesis via gTTS.                         |
-| **Matrix Viewer**           | Virtual display streaming interface for remote desktop interaction. |
-
----
-
-## 🏗️ Architecture
-
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                         FRONTEND (React + Vite)                      │
-│                                                                      │
-│  ┌───────────┐ ┌──────────┐ ┌────────────┐ ┌──────────────────────┐ │
-│  │   Chat    │ │  Debate  │ │ Collab     │ │  MCP / Skills /      │ │
-│  │ Dashboard │ │  Arena   │ │ Room       │ │  Tavern / Settings   │ │
-│  └─────┬─────┘ └────┬─────┘ └─────┬──────┘ └──────────┬───────────┘ │
-│        │             │             │                    │             │
-│        └─────────────┴─────────────┴────────────────────┘             │
-│                              │ REST + SSE                            │
-└──────────────────────────────┼───────────────────────────────────────┘
-                               │
-┌──────────────────────────────┼───────────────────────────────────────┐
-│                     BACKEND (FastAPI + Python)                        │
-│                               │                                      │
-│  ┌────────────────────────────▼──────────────────────────────────┐   │
-│  │                    server.py (API Router)                      │   │
-│  └───┬──────┬──────┬──────┬──────┬──────┬──────┬──────┬─────────┘   │
-│      │      │      │      │      │      │      │      │             │
-│  ┌───▼──┐┌──▼──┐┌──▼──┐┌──▼──┐┌──▼──┐┌──▼──┐┌──▼──┐┌──▼──────┐   │
-│  │Agent ││Swarm││MCP  ││Cron ││Tele-││Disc-││TTS  ││Database │   │
-│  │Core  ││Mgr  ││Mgr  ││Jobs ││gram ││ord  ││gTTS ││SQLite   │   │
-│  └──┬───┘└──┬──┘└──┬──┘└─────┘└─────┘└─────┘└─────┘└─────────┘   │
-│     │       │      │                                                │
-│  ┌──▼───────▼──────▼──────────────────────────────────────────┐     │
-│  │            LiteLLM Universal Provider Gateway               │     │
-│  │  Gemini │ OpenAI │ Anthropic │ DeepSeek │ Groq │ Ollama    │     │
-│  └─────────────────────────────────────────────────────────────┘     │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### Component Breakdown
-
-| Layer             | Technology                      | Responsibility                                            |
-| ----------------- | ------------------------------- | --------------------------------------------------------- |
-| **Frontend**      | React 18 + TypeScript + Vite    | UI, routing, state management, SSE streaming              |
-| **Backend**       | FastAPI + Python 3.11+          | API routing, agent orchestration, tool execution          |
-| **Agent Core**    | LiteLLM + Custom Tool Runtime   | Multi-provider LLM calls, function calling, approval flow |
-| **Swarm Manager** | Async Python                    | Parallel multi-agent dispatch and debate orchestration    |
-| **MCP Manager**   | stdio/SSE subprocess            | External tool protocol connections                        |
-| **Database**      | SQLAlchemy + SQLite             | Session storage, message history, persona management      |
-| **Channels**      | python-telegram-bot, discord.py | Cross-platform messaging bridges                          |
-| **Memory**        | ChromaDB (vector store)         | Semantic memory vault for agent context                   |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js** ≥ 18
-- **Python** ≥ 3.11
-- **Git**
-- At least one LLM API key (Gemini, OpenAI, etc.) — or use **Ollama** for fully local operation
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/rosdebbu/openzess.git
-cd openzess
-```
-
-### 2. Configure Environment
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your credentials:
-
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-DATABASE_URL=postgresql://openzess:password@localhost:5432/openzess
-```
-
-> **Note:** SQLite is used by default. PostgreSQL is optional for production deployments.
-
-### 3. Install Dependencies
-
-**Backend:**
-
-```bash
-python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # Linux/macOS
-pip install -r requirements.txt
-```
-
-**Frontend:**
-
-```bash
-cd frontend
-npm install
-cd ..
-```
-
-### 4. Run the Application
-
-#### Option A — One-Command Start (Windows)
-
-```bat
-start.bat
-```
-
-#### Option B — One-Command Start (Linux / WSL)
-
-```bash
-chmod +x scripts/start_wsl.sh
-./scripts/start_wsl.sh
-```
-
-#### Option C — Manual Start
-
-**Terminal 1 — Backend:**
-
-```bash
-cd backend
-uvicorn app.server:app --host 0.0.0.0 --reload --port 8000
-```
-
-**Terminal 2 — Frontend:**
-
-```bash
-cd frontend
-npm run dev
-```
-
-#### Option D — Docker (PostgreSQL)
-
-```bash
-docker-compose up --build
-```
-
-### 5. Access the Application
-
-Open your browser and navigate to:
-
-```
-http://localhost:5173
-```
-
-You will be greeted by the boot sequence. Select a provider and enter your API key to begin.
-
----
-
-## 🛠 Technology Stack
-
-<table>
-<tr>
-<td valign="top" width="50%">
-
-### Frontend
-
-- **React 18** — Component architecture
-- **TypeScript** — Type-safe development
-- **Vite 8** — Sub-second HMR
-- **Framer Motion** — Page transitions & micro-animations
-- **React Router** — SPA routing
-- **React Markdown** — Rich content rendering
-- **Lucide Icons** — Consistent iconography
-- **TailwindCSS** — Utility-first styling
-
-</td>
-<td valign="top" width="50%">
-
-### Backend
-
-- **FastAPI** — High-performance async API
-- **LiteLLM** — Universal LLM gateway
-- **SQLAlchemy** — ORM & migrations
-- **ChromaDB** — Vector memory store
-- **python-telegram-bot** — Telegram integration
-- **discord.py** — Discord integration
-- **gTTS** — Text-to-speech engine
-- **BeautifulSoup** — Web scraping
-
-</td>
-</tr>
-</table>
-
----
-
-## 📁 Project Structure
-
-```
-openzess/
-├── frontend/                      # React + TypeScript web SPA (browser-based)
-│   └── src/
-│       ├── pages/                 # 22 feature pages
-│       │   ├── Chat.tsx           # Main AI chat interface
-│       │   ├── DebateArena.tsx    # Sequential multi-agent debate
-│       │   ├── WarRoom.tsx        # Parallel swarm collaboration
-│       │   ├── Tavern.tsx         # Character persona imports
-│       │   ├── Skills.tsx         # Agent persona management
-│       │   ├── MCP.tsx            # Model Context Protocol grid
-│       │   ├── Channels.tsx       # Telegram & Discord bridges
-│       │   ├── CronJobs.tsx       # Background task scheduler
-│       │   ├── Graphify.tsx       # Knowledge graph viewer
-│       │   ├── KnowledgeBase.tsx  # Document canvas
-│       │   └── ...                # 12 more feature pages
-│       ├── components/            # Sidebar, transitions, avatars
-│       ├── contexts/              # Theme & toast providers
-│       └── utils/                 # Persona definitions
-│
-├── backend/                       # FastAPI + Python services
-│   ├── app/                       # Application package
-│   │   ├── server.py              # Main API router (1000+ lines)
-│   │   ├── agent.py               # LiteLLM agent with tool calling
-│   │   ├── database.py            # SQLAlchemy models & queries
-│   │   ├── swarm_manager.py       # Multi-agent orchestration
-│   │   ├── mcp_manager.py         # MCP protocol handler
-│   │   ├── background_workers.py  # Cron & watchdog services
-│   │   ├── telegram_worker.py     # Telegram bot bridge
-│   │   ├── discord_worker.py      # Discord bot bridge
-│   │   ├── tavern_parser.py       # SillyTavern card importer
-│   │   ├── plugin_loader.py       # Dynamic plugin system
-│   │   └── plugins/               # Drop-in Python tool plugins
-│   ├── tools/                     # Dev utilities (DB migration, MCP test)
-│   ├── requirements.txt           # Python dependencies
-│   └── chroma_db/, chat_history.db  # Runtime data (gitignored)
-│
-├── prototype/                     # Early CLI prototypes (not part of the app)
-├── scripts/                       # Helper scripts (WSL sandbox, tests)
-├── docs/assets/                   # Screenshots & demo videos
-├── openzess-docs/                 # Documentation site (VitePress)
-├── docker-compose.yml             # PostgreSQL container
-├── start.bat                      # Windows launch script (one-click)
-├── .env.example                   # Environment template
-├── LICENSE                        # MIT
-└── README.md
-```
-
----
-
-## 🔐 Security Considerations
-
-- **API keys** are stored client-side in `localStorage` and transmitted per-request — never persisted server-side
-- **Tool execution** requires explicit human-in-the-loop approval before any terminal command runs
-- **MCP connections** use subprocess isolation via stdio transport
-- **CORS** is configured for local development — restrict `allow_origins` in production
-- **Environment variables** isolate sensitive backend configuration
-
----
 
 ```text
          /\_/\
        >( o.o )<    OPENZESS — LIZARD MATRIX CORE
-       /  \~/  \    Hybrid AI Coding Assistant & Autonomous Engine
+       /  \~/  \    Autonomous AI Coding Assistant & Self-Growth Engine
       / /|   |\ \   70% Python + 30% Rust Architecture
-     ( ( | ~ | ) )  Native Terminal CLI + Web React Workspace
+     ( ( | ~ | ) )  Native Terminal TUI + React 19 Web Workspace
       \ \|   |/ /
        \ \_-_/ /
         `--\ \-
@@ -418,26 +27,158 @@ openzess/
              `--)
 ```
 
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-why-openzess">Why Openzess</a> •
+  <a href="#-dual-interface-terminal--web">Dual Interface</a> •
+  <a href="#-the-self-growth-loop">Self-Growth Loop</a> •
+  <a href="#-cli-commands">CLI Commands</a> •
+  <a href="#%EF%B8%8F-architecture">Architecture</a> •
+  <a href="#-roadmap">Roadmap</a>
+</p>
+
 ---
 
-## 🗺️ Openzess Product Roadmap
+## ⚡ Why Openzess?
+
+**Openzess** is a full-stack, provider-agnostic autonomous AI workspace designed to give developers total control over how AI models reason, code, remember, and execute on their machines. 
+
+Unlike closed walled-garden tools, Openzess provides:
+1. **Zero Provider Lock-in** — Connect any LLM via OpenRouter, Gemini, OpenAI, Claude, DeepSeek, Groq, Qwen, Moonshot, or local Ollama / LM Studio.
+2. **Hermes-Grade Cyberpunk Terminal TUI** — Run the full agent natively in your terminal with live token streaming, latency tracking, and rich capability boxes.
+3. **Autonomous Self-Growth Loop** — The agent learns your habits, coding preferences, and environment configurations automatically, persisting them into a long-term ChromaDB vector vault.
+4. **Multi-Agent WarRoom & Debate Arena** — Run multi-model consensus debates where distinct agents argue, critique, and synthesize decisions before writing code.
+5. **Hot-Loaded Extensibility** — Drop Python scripts into `backend/app/plugins/` or connect any MCP (Model Context Protocol) server with instant reload.
+
+---
+
+## 🚀 Quick Start
+
+### 🪟 Windows (Native PowerShell)
+```powershell
+# Launch the Cyberpunk Terminal CLI
+.\openzess.bat
+
+# Or start the Full Web Workspace (React + FastAPI)
+.\start.bat
+```
+
+### 🐧 Linux / Debian WSL2
+```bash
+# Launch the Interactive Terminal CLI
+openzess
+# or
+./openzess.sh
+
+# Or start the backend server
+uvicorn backend.app.server:app --host 0.0.0.0 --port 8000 --reload
+```
+
+---
+
+## 💻 Dual Interface: Terminal + Web
+
+Openzess is built with dual complementary interfaces:
+
+<table>
+<tr>
+<td width="50%">
+
+### 📟 Cyberpunk Terminal TUI
+Run `openzess` or `.\openzess.bat` for instant terminal-native AI power:
+- **3D ASCII Lizard Branding** in Deep/Olive Green (`#16a34a`).
+- **Live Capabilities Panel** showing available tools, skills, and memory count.
+- **Sub-Second Token Streaming** with real-time latency diagnostics.
+- **Interactive Slash Commands** (`/habits`, `/skills`, `/model`, `/memory`).
+
+</td>
+<td width="50%">
+
+### 🌐 React 19 Web Workspace
+Run `.\start.bat` and open `http://localhost:5173`:
+- **WarRoom Multi-Agent Debate Arena** with judge synthesis.
+- **Visual Matrix Sandbox** with screen-stream & mouse/keyboard injection.
+- **ChromaDB Memory Vault Inspector** with semantic search.
+- **Tavern Multi-Persona Card Importer** (PNG & JSON).
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🧠 The Self-Growth Loop
+
+Openzess implements an autonomous dialectic learning loop inspired by Honcho & Hermes Agent:
+
+```mermaid
+graph TD
+    A[User Interaction] -->|SSE Stream| B[Openzess Hybrid Core]
+    B -->|Tool Invocation| C[Debian WSL / Windows Sandbox]
+    B -->|Post-Turn Analysis| D[Habit Learner Engine]
+    D -->|Infer Preferences & Environment| E[(ChromaDB Vector Vault)]
+    E -->|Inject Adaptive Profile| F[System Prompt on Next Turn]
+```
+
+- **Zero Configuration Needed:** As you interact with Openzess, it notes whether you prefer concise code, specific languages (e.g. Rust / Python), or Debian execution paths.
+- **Persistent Across Sessions:** Habits are stored as vector embeddings in ChromaDB and automatically hydrate the agent's system prompt on subsequent launches.
+- **Inspect Anytime:** Type `/habits` in the terminal to inspect your learned profile in real time.
+
+---
+
+## ⌨️ CLI Slash Commands Reference
+
+| Command | Description |
+| :--- | :--- |
+| **`/model <provider>`** | Switch active model (`glm`, `deepseek`, `gemini`, `openai`, `anthropic`, `groq`, `ollama`, `lmstudio`) |
+| **`/habits`** | Inspect learned user habits, environment targets, and behavioral profiles |
+| **`/skills`** | List all hot-loaded Python plugins and synthesized capabilities |
+| **`/memory <query>`** | Perform a semantic similarity search across the ChromaDB vector vault |
+| **`/clear`** | Reset conversation context while retaining persistent habits and long-term memory |
+| **`/help`** | Display the interactive command guide |
+| **`/exit`** | Gracefully disconnect and exit the terminal session |
+
+---
+
+## 🏗️ Architecture & Codebase Map
+
+Openzess utilizes a hybrid engine combining Python's rich AI ecosystem with high-throughput Rust sidecars:
+
+```
+openzess/
+├── openzess.bat               # One-click Windows PowerShell CLI launcher
+├── openzess.sh                # Linux / Debian WSL2 CLI launcher
+├── start.bat                  # Web workspace launcher (FastAPI + Vite)
+├── backend/
+│   ├── app/
+│   │   ├── agent.py           # Core agent loop, LiteLLM orchestration, tool runner
+│   │   ├── cli.py             # Rich Cyberpunk Matrix TUI console
+│   │   ├── habit_learner.py   # Autonomous habit extraction & ChromaDB persistence
+│   │   ├── server.py          # FastAPI server, SSE streaming, REST & WebSocket routes
+│   │   ├── mcp_manager.py     # Model Context Protocol stdio/SSE client
+│   │   ├── plugin_loader.py   # Hot-reloading Python tool registrar
+│   │   └── plugins/           # Custom tools (paperbanana, pc_control, system_health)
+│   └── tests/                 # 86 automated unit tests (100% green)
+├── frontend/
+│   ├── src/
+│   │   ├── components/        # LizardLogo, Sidebar, VRMAvatar, Modals
+│   │   ├── pages/             # Chat, WarRoom, Tavern, MatrixViewer, Skills, Memory
+│   │   └── App.tsx            # Main router & theme provider
+│   └── package.json           # React 19 + Vite 8
+└── rust_engine/               # High-performance Axum acceleration sidecar (port 8100)
+```
+
+---
+
+## 🗺️ Product Roadmap
 
 **Legend:** ✅ Shipped & Verified · 🚧 In Active Development · 🔜 Next Up · 💡 Future Horizons
 
-### ✅ v1.0 & v1.1 — Foundation & Multi-Agent Core
-- ✅ **Multi-Provider Agent Core** — Gemini 2.5, OpenAI GPT-4o, Anthropic Claude 3.5, DeepSeek V3/R1, Groq, Qwen 2.5, Moonshot, OpenRouter & Ollama via LiteLLM.
-- ✅ **ChromaDB Semantic Memory Vault** — Persistent long-term vector memory across sessions with automatic embeddings.
-- ✅ **WarRoom Multi-Agent Debate Arena** — Structured multi-persona consensus protocols and parallel swarms.
-- ✅ **MCP Protocol Grid** — Universal Model Context Protocol servers with auto-reconnect and schema inspection.
-- ✅ **Hot-Loaded Python Plugin System** — Drop custom Python tools into `backend/app/plugins/` with zero server reboots.
-- ✅ **Channel Bridges** — Live Telegram and Discord bidirectional bots.
-- ✅ **Automation & Scheduling** — APScheduler cron jobs, watchdog file triggers, Tavern persona imports.
-
 ### ✅ v2.0 — Cyberpunk Terminal CLI & Self-Growth Engine *(Current)*
-- ✅ **Hermes-Grade Matrix Terminal CLI** — Full-featured interactive TUI (`openzess` in Debian WSL / `.\openzess.bat` on Windows) with 3D ASCII branding, slash commands (`/habits`, `/skills`, `/model`, `/memory`, `/clear`, `/help`), and turn dividers.
-- ✅ **Autonomous Habit Profiler & Self-Growth Loop** (`habit_learner.py`) — Inspired by Honcho & Hermes Agent: automatically infers user coding preferences, environment targets, and communication styles into ChromaDB vector habits.
-- ✅ **Ultra-Low Latency Streaming UI** — Instant SSE token rendering, lazy message bubble allocation, and real-time latency counter.
-- ✅ **Debian 13 (Trixie) WSL2 Sandbox Integration** — Seamless cross-platform execution with automatic Python 3.13 venv detection.
+- ✅ **Hermes-Grade Matrix Terminal CLI** — Full-featured interactive TUI (`openzess` / `openzess.bat`) with 3D ASCII branding, slash commands, and turn dividers.
+- ✅ **Autonomous Habit Profiler & Self-Growth Loop** (`habit_learner.py`) — Automatic user habit learning, coding preference detection, and ChromaDB persistence.
+- ✅ **Ultra-Low Latency Streaming UI** — Instant SSE token rendering, lazy message bubble allocation, and real-time latency diagnostics.
+- ✅ **Debian 13 (Trixie) WSL2 Sandbox Integration** — Seamless cross-platform execution with automatic Python venv detection.
 - ✅ **Lizard Matrix Brand Overhaul** — Deep/Olive Lizard Green theme (`#16a34a`), ASCII Lizard totem, and glowing Web Mascot component.
 - ✅ **100% Green Test Suite** — 86 passing pytest unit tests covering agent reasoning, streaming, plugins, and habit persistence.
 
@@ -459,50 +200,14 @@ openzess/
 
 ---
 
-## 🤝 Contributing
+## 👨‍💻 Author & Contributing
 
-Contributions are welcome from AI engineers, full-stack developers, and open-source enthusiasts.
+Built with ❤️ by **[@rosdebbu](https://github.com/rosdebbu)**.
 
-### How to Contribute
-
-1. **Fork** this repository
-2. **Create** a feature branch
-   ```bash
-   git checkout -b feat/your-feature
-   ```
-3. **Commit** changes with conventional commits
-   ```bash
-   git commit -m "feat: add your feature"
-   ```
-4. **Push** to your branch
-   ```bash
-   git push origin feat/your-feature
-   ```
-5. **Open** a Pull Request
-
-### Development Guidelines
-
-- Follow existing code style and component patterns
-- Add TypeScript types for all new props/interfaces
-- Test with at least two LLM providers before submitting
-- Update documentation for user-facing changes
-
----
-
-## 👨‍💻 Author
-
-**Built by [@rosdebbu](https://github.com/rosdebbu)**
-
-Openzess is an open-source project created to give developers full ownership over their AI workspace — no vendor lock-in, no closed ecosystems, just raw control.
+Contributions are welcome! Please open an issue or submit a PR following standard conventional commits.
 
 ---
 
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
-
-<p align="center">
-  <sub>Built with TypeScript, Python, and a lot of coffee. ☕</sub>
-</p>
