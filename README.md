@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/assets/welcome-screen.png" alt="Openzess — AI Workspace" width="720" />
-</p>
-
 <h1 align="center">🦎 Openzess</h1>
 <p align="center"><strong>The autonomous, self-growing AI workspace & cyberpunk terminal agent — built for builders.</strong></p>
 
