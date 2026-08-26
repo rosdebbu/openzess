@@ -577,7 +577,8 @@ class OpenzessAgent:
 
         if provider in PROVIDER_MODELS:
             self.model_name = PROVIDER_MODELS[provider]
-        elif "/" in provider:
+        self.provider = provider
+        if "/" in provider:
             self.model_name = provider
         else:
             self.model_name = PROVIDER_MODELS.get(provider, "openai/gpt-4o-mini")
