@@ -11,6 +11,9 @@ frontend/node_modules/
 frontend/dist/
 frontend/dist-electron/
 frontend/release/
+openzess-docs/node_modules/
+openzess-docs/docs/.vitepress/dist/
+openzess-docs/docs/.vitepress/cache/
 .turbo/
 
 # ── Runtime data (never commit) ─────────────────────────

@@ -1,5 +1,28 @@
 # Changelog
 
+## v2.0.0 (August 2026) 🦎
+
+### 📟 Hermes-Grade Cyberpunk Terminal TUI
+- Full-featured interactive terminal interface (`openzess` in Debian WSL / `.\openzess.bat` on Windows).
+- 3D ASCII Lizard Mascot branding in Deep/Olive Lizard Green (`#16a34a`).
+- Categorized live capabilities card and turn delimiters.
+- Real-time token streaming with sub-second latency tracking.
+- Interactive slash commands: `/model`, `/habits`, `/skills`, `/memory`, `/clear`, `/help`, `/exit`.
+
+### 🧠 Autonomous Habit Profiler & Self-Growth Engine
+- Created `habit_learner.py` implementing closed dialectic learning loop inspired by Honcho & Hermes Agent.
+- Automatically infers user coding preferences, environment targets, and communication styles.
+- Persists behavioral habits as vector embeddings in ChromaDB.
+- Automatically injects adaptive user profile into system prompts on subsequent sessions.
+
+### ⚡ Hybrid Architecture & Performance Optimization
+- 70% Python flexibility for agent reasoning and plugin hot-loading.
+- 30% Rust Axum sidecar (`port 8100`) for high-throughput image encoding and compute offload.
+- Instant SSE token streaming and lazy React message bubble allocation.
+- 100% green test suite (86 passing pytest unit tests).
+
+---
+
 ## v1.1.0 (April 2026)
 
 ### 🌐 Cloud Database Migration

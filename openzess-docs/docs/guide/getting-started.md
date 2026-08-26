@@ -1,93 +1,82 @@
-# Installation & Setup
+# Installation & Setup 🦎
 
-This guide walks you through setting up OpenZess from scratch on a Windows machine.
+This guide walks you through launching Openzess either in the **Cyberpunk Terminal TUI** or the **Full Web Workspace**.
 
-## Prerequisites
+---
 
-Before starting, ensure you have the following installed:
+## 🚀 Quick Launch (One-Liner)
+
+### 🪟 Windows (Native PowerShell)
+```powershell
+# 1. Interactive Terminal CLI
+.\openzess.bat
+
+# 2. Full Web Workspace (React + FastAPI)
+.\start.bat
+```
+
+### 🐧 Linux / Debian WSL2
+```bash
+# 1. Interactive Terminal CLI
+openzess
+# or
+./openzess.sh
+
+# 2. Start Backend Server
+uvicorn backend.app.server:app --host 0.0.0.0 --port 8000 --reload
+```
+
+---
+
+## 📋 Prerequisites
+
+Before starting, ensure you have:
 
 ```bash
-# Check WSL
+# 1. Python 3.12+ (Windows) or Python 3.13 (Debian WSL2)
+python --version
+
+# 2. Node.js 18+ & npm (for Web UI)
+node --version
+
+# 3. Optional: Debian WSL2 Sandbox
 wsl --status
-
-# Check Node.js
-node --version  # Should be v18+
-
-# Check Python (inside WSL)
-wsl -d Debian bash -c "python3 --version"  # Should be 3.10+
 ```
 
-::: tip
-If you don't have WSL installed, run `wsl --install -d Debian` in an elevated PowerShell terminal and restart your machine.
-:::
+---
 
-## Step 1: Clone the Repository
-
-```bash
-git clone https://github.com/rosdebbu/openzess.git
-cd openzess
-```
-
-## Step 2: Configure Environment Variables
+## 🔑 Environment Variables
 
 Create a `.env` file in the project root:
 
 ```env
-# Database (Neon PostgreSQL — get a free instance at neon.tech)
-DATABASE_URL=postgresql://neondb_owner:YOUR_PASSWORD@YOUR_HOST.neon.tech/neondb?sslmode=require
+# Primary LLM API Keys (or enter them in Web UI / CLI)
+OPENROUTER_API_KEY=sk-or-v1-...
+GEMINI_API_KEY=AIzaSy...
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
 
-# Optional: Stitch MCP API Key for design generation
-STITCH_API_KEY=YOUR_STITCH_KEY
-VITE_STITCH_API_KEY=YOUR_STITCH_KEY
+# Localhost Endpoints (optional)
+OLLAMA_API_BASE=http://localhost:11434
+LMSTUDIO_API_BASE=http://localhost:1234/v1
 ```
 
-::: warning
-Never commit your `.env` file to Git. It contains sensitive credentials.
-:::
+---
 
-## Step 3: Boot the System
+## 🤖 Supported LLM Models & Providers
 
-OpenZess provides a single startup script that handles everything:
+| Provider | Default Model | Key Type |
+|---|---|---|
+| **GLM (Zhipu / Z-AI)** | `openrouter/z-ai/glm-5.3-flash` | OpenRouter Key |
+| **DeepSeek** | `openrouter/deepseek/deepseek-chat` | DeepSeek / OpenRouter Key |
+| **Google Gemini** | `gemini/gemini-2.5-flash` | Gemini Key |
+| **OpenAI** | `openai/gpt-4o-mini` | OpenAI Key |
+| **Anthropic** | `anthropic/claude-3-5-sonnet-20241022` | Anthropic Key |
+| **Groq** | `groq/llama-3.3-70b-versatile` | Groq Key |
+| **Qwen** | `openrouter/qwen/qwen-2.5-72b-instruct` | OpenRouter Key |
+| **Ollama (Local)** | `ollama/llama3.2` | Local Endpoint |
+| **LM Studio (Local)**| `openai/local-model` | Local Endpoint |
 
-```bash
-wsl -d Debian bash
-cd /mnt/c/Users/YOUR_USER/path/to/openzess
-bash start_wsl.sh
-```
-
-### What `start_wsl.sh` does automatically:
-
-1. **Launches Xvfb** — An invisible X11 virtual display on `:100`
-2. **Starts Fluxbox** — A lightweight window manager attached to the virtual display
-3. **Installs Python dependencies** — Including `psycopg2-binary` for PostgreSQL
-4. **Boots FastAPI backend** — On `http://localhost:8000`
-5. **Installs Node modules** — If `node_modules` doesn't exist
-6. **Starts Vite frontend** — On `http://localhost:5173`
-
-## Step 4: Access OpenZess
-
-Open your browser and navigate to:
-
-```
-http://localhost:5173
-```
-
-You'll see the Welcome screen where you can select your LLM provider and enter your API key.
-
-## Supported LLM Providers
-
-| Provider | Model | API Key Format |
-|----------|-------|---------------|
-| Google Gemini | `gemini-2.5-flash` | Standard Gemini key |
-| OpenAI | `gpt-4o-mini` | `sk-...` |
-| Anthropic | `claude-3-5-sonnet` | `sk-ant-...` |
-| Groq | `llama-3.3-70b` | `gsk_...` |
-| DeepSeek | `deepseek-chat` | DeepSeek or OpenRouter key |
-| Qwen | `qwen-2.5-72b` | OpenRouter key |
-| GLM | `glm-4` | OpenRouter key |
-| Kimi | `moonshot-v1-8k` | OpenRouter key |
-| Ollama | `llama3.2` | No key needed (local) |
-
-::: info
-All providers are routed through [LiteLLM](https://docs.litellm.ai/), which normalizes the API interface. You can switch providers at any time from the Settings panel.
+::: tip Switching Models on the Fly
+In the Terminal CLI, type `/model <provider>` (e.g. `/model deepseek` or `/model gemini`) to switch active neural engines instantly.
 :::
