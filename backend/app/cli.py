@@ -8,7 +8,15 @@ import os
 import sys
 import time
 import uuid
+import logging
+import warnings
 from typing import Dict, List, Optional
+
+# Suppress background third-party warnings & LiteLLM stderr messages
+os.environ["LITELLM_LOG"] = "ERROR"
+warnings.filterwarnings("ignore")
+logging.getLogger("LiteLLM").setLevel(logging.ERROR)
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -29,19 +37,24 @@ if hasattr(sys.stdout, "reconfigure"):
 
 console = Console()
 
-# Amber & Cyberpunk Theme Color Constants
-AMBER = "\033[38;5;214m"
-GOLD = "\033[38;5;220m"
-ORANGE = "\033[38;5;208m"
-CYAN = "\033[38;5;51m"
-GREEN = "\033[38;5;82m"
-MAGENTA = "\033[38;5;201m"
+# Deep / Olive Lizard Theme Color Constants
+# Primary: text-green-600 / bg-green-600 (#16a34a) -> RGB (22, 163, 74)
+COLOR_PRIMARY_HEX = "#16a34a"
+COLOR_DEEP_HEX = "#15803d"
+COLOR_LIGHT_HEX = "#4ade80"
+
+LIZARD_PRIMARY = "\033[38;2;22;163;74m"
+LIZARD_DEEP = "\033[38;2;21;128;61m"
+LIZARD_LIGHT = "\033[38;2;74;222;128m"
+LIZARD_OLIVE = "\033[38;2;101;163;13m"
+CYAN = "\033[38;2;56;189;248m"
+AMBER = "\033[38;2;251;191;36m"
 DIM = "\033[2m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
 
-OPENZESS_ASCII_LOGO = f"""{AMBER}{BOLD}
+OPENZESS_ASCII_LOGO = f"""{LIZARD_PRIMARY}{BOLD}
  ██████╗ ██████╗ ███████╗███╗   ██╗███████╗███████╗███████╗
 ██╔═══██╗██╔══██╗██╔════╝████╗  ██║╚══███╔╝██╔════╝██╔════╝
 ██║   ██║██████╔╝█████╗  ██╔██╗ ██║  ███╔╝ █████╗  ███████╗
@@ -49,17 +62,17 @@ OPENZESS_ASCII_LOGO = f"""{AMBER}{BOLD}
 ╚██████╔╝██║     ███████╗██║ ╚████║███████╗███████╗███████║
  ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝{RESET}"""
 
-SEAHORSE_TOTEM = f"""{GOLD}
-       .---.
-      /     \\
-     | () () |
-      \\  -  /
-     /`---'\\
-    / /| |\\ \\
-   / / | | \\ \\
-  ( (  | |  ) )
-   \\ \\_|_/ /
-    `-----'{RESET}"""
+LIZARD_TOTEM = f"""{LIZARD_LIGHT}
+         /\\_/\\
+       >( o.o )<
+       /  \\~/  \\
+      / /|   |\\ \\
+     ( ( | ~ | ) )
+      \\ \\|   |/ /
+       \\ \\_-_/ /
+        `--\\ \\-
+            \\ \\_
+             `--){RESET}"""
 
 
 def render_dashboard_box(agent: OpenzessAgent, session_id: str):
@@ -70,10 +83,10 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
     memory_count = memory_collection.count() if memory_collection else 0
     
     left_text = (
-        f"{SEAHORSE_TOTEM}\n\n"
-        f" {GOLD}{BOLD}{agent.provider.upper()}{RESET} {DIM}·{RESET} {AMBER}{agent.model_name.split('/')[-1]}{RESET}\n"
+        f"{LIZARD_TOTEM}\n\n"
+        f" {LIZARD_PRIMARY}{BOLD}{agent.provider.upper()}{RESET} {DIM}·{RESET} {LIZARD_LIGHT}{agent.model_name.split('/')[-1]}{RESET}\n"
         f" {DIM}Sandbox :{RESET} {CYAN}Debian 13 WSL (rossdeb){RESET}\n"
-        f" {DIM}Engine  :{RESET} {GREEN}70% Python + 30% Rust{RESET}\n"
+        f" {DIM}Engine  :{RESET} {LIZARD_OLIVE}70% Python + 30% Rust{RESET}\n"
         f" {DIM}Session :{RESET} {DIM}{session_id}{RESET}\n"
     )
     
@@ -89,7 +102,7 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
     
     tools_str = ""
     for cat, tools in tools_by_cat.items():
-        tools_str += f"  {AMBER}{cat}:{RESET} {DIM}{tools}{RESET}\n"
+        tools_str += f"  {LIZARD_PRIMARY}{cat}:{RESET} {DIM}{tools}{RESET}\n"
     
     skills_by_cat = {
         "autonomous-coding": "codebase-inspector, test-runner, error-debugger",
@@ -100,14 +113,14 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
     
     skills_str = ""
     for cat, skills in skills_by_cat.items():
-        skills_str += f"  {AMBER}{cat}:{RESET} {DIM}{skills}{RESET}\n"
+        skills_str += f"  {LIZARD_PRIMARY}{cat}:{RESET} {DIM}{skills}{RESET}\n"
 
     right_text = (
-        f"{GOLD}{BOLD}Available Tools{RESET}\n"
+        f"{LIZARD_LIGHT}{BOLD}Available Tools{RESET}\n"
         f"{tools_str}\n"
-        f"{GOLD}{BOLD}Available Skills{RESET}\n"
+        f"{LIZARD_LIGHT}{BOLD}Available Skills{RESET}\n"
         f"{skills_str}\n"
-        f"{DIM}{len(agent.tools)} native tools  ·  {len(plugin_registry.funcs)} hot-loaded plugins  ·  {habits_count} learned habits  ·  {GREEN}/help for commands{RESET}"
+        f"{DIM}{len(agent.tools)} native tools  ·  {len(plugin_registry.funcs)} hot-loaded plugins  ·  {habits_count} learned habits  ·  {LIZARD_LIGHT}/help for commands{RESET}"
     )
 
     # Build side-by-side Table
@@ -118,8 +131,8 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
 
     panel = Panel(
         grid,
-        title=f"[bold yellow]Openzess Agent v2.5.0 (2026.8.27) · upstream hybrid · local matrix[/bold yellow]",
-        border_style="yellow",
+        title=f"[bold {COLOR_PRIMARY_HEX}]Openzess Agent v2.5.0 (2026.8.27) · upstream hybrid · local matrix[/bold {COLOR_PRIMARY_HEX}]",
+        border_style=COLOR_PRIMARY_HEX,
         box=ROUNDED,
         padding=(1, 2)
     )
@@ -130,14 +143,14 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
 
 
 def show_help_menu():
-    print(f"\n{GOLD}{BOLD}Available Slash Commands:{RESET}")
-    print(f"  {AMBER}/model <provider>{RESET}  Switch active LLM (glm, deepseek, gemini, groq, ollama, lmstudio)")
-    print(f"  {AMBER}/habits{RESET}            Inspect learned user habits & adaptive behavioral profile")
-    print(f"  {AMBER}/skills{RESET}            List all hot-loaded Python plugins & synthesized tools")
-    print(f"  {AMBER}/memory <query>{RESET}    Search ChromaDB vector memory vault semantically")
-    print(f"  {AMBER}/clear{RESET}             Reset current conversation context")
-    print(f"  {AMBER}/help{RESET}              Display this help menu")
-    print(f"  {AMBER}/exit{RESET} or {AMBER}/quit{RESET}     Exit the console cleanly\n")
+    print(f"\n{LIZARD_PRIMARY}{BOLD}Available Slash Commands:{RESET}")
+    print(f"  {LIZARD_LIGHT}/model <provider>{RESET}  Switch active LLM (glm, deepseek, gemini, groq, ollama, lmstudio)")
+    print(f"  {LIZARD_LIGHT}/habits{RESET}            Inspect learned user habits & adaptive behavioral profile")
+    print(f"  {LIZARD_LIGHT}/skills{RESET}            List all hot-loaded Python plugins & synthesized tools")
+    print(f"  {LIZARD_LIGHT}/memory <query>{RESET}    Search ChromaDB vector memory vault semantically")
+    print(f"  {LIZARD_LIGHT}/clear{RESET}             Reset current conversation context")
+    print(f"  {LIZARD_LIGHT}/help{RESET}              Display this help menu")
+    print(f"  {LIZARD_LIGHT}/exit{RESET} or {LIZARD_LIGHT}/quit{RESET}     Exit the console cleanly\n")
 
 
 def run_cli():
@@ -153,23 +166,23 @@ def run_cli():
     # Render the gorgeous full Hermes-style header box
     render_dashboard_box(agent, session_id)
     
-    print(f"{DIM}Welcome to Openzess Agent! Type your prompt or {GOLD}/help{DIM} for commands.{RESET}")
-    print(f"{AMBER}✦ Tip:{RESET} {DIM}Openzess automatically profiles your habits and persists skills to Debian WSL.{RESET}\n")
+    print(f"{DIM}Welcome to Openzess Agent! Type your prompt or {LIZARD_PRIMARY}/help{DIM} for commands.{RESET}")
+    print(f"{LIZARD_PRIMARY}✦ Tip:{RESET} {DIM}Openzess automatically profiles your habits and persists skills to Debian WSL.{RESET}\n")
 
     while True:
         try:
             # Bottom status bar line
             status_line = (
                 f"{DIM}────────────────────────────────────────────────────────────────────────────{RESET}\n"
-                f"{GOLD}⚡ {agent.provider}:{agent.model_name.split('/')[-1]}{RESET} {DIM}|{RESET} "
+                f"{LIZARD_PRIMARY}⚡ {agent.provider}:{agent.model_name.split('/')[-1]}{RESET} {DIM}|{RESET} "
                 f"{CYAN}Debian: rossdeb{RESET} {DIM}|{RESET} "
-                f"{GREEN}Rust: 8100{RESET} {DIM}|{RESET} "
-                f"{MAGENTA}Memory: {memory_collection.count() if memory_collection else 0} recs{RESET}\n"
+                f"{LIZARD_OLIVE}Rust: 8100{RESET} {DIM}|{RESET} "
+                f"{LIZARD_LIGHT}Memory: {memory_collection.count() if memory_collection else 0} recs{RESET}\n"
                 f"{DIM}💡 Enter prompt · /skills · /habits · /model · /memory · Ctrl+C cancel{RESET}"
             )
             print(status_line)
 
-            user_input = input(f"{AMBER}{BOLD}❯{RESET} ").strip()
+            user_input = input(f"{LIZARD_PRIMARY}{BOLD}❯{RESET} ").strip()
             if not user_input:
                 continue
 
@@ -180,7 +193,7 @@ def run_cli():
                 arg = parts[1].strip() if len(parts) > 1 else ""
 
                 if cmd in ("/exit", "/quit", "/q"):
-                    print(f"\n{AMBER}Shutting down Openzess CLI. Have a productive session!{RESET}\n")
+                    print(f"\n{LIZARD_PRIMARY}Shutting down Openzess CLI. Have a productive session!{RESET}\n")
                     break
 
                 elif cmd in ("/help", "/h"):
@@ -191,22 +204,22 @@ def run_cli():
                     agent.messages = []
                     profile = habit_learner.get_user_profile_prompt()
                     agent.messages.append({"role": "system", "content": f"You are openzess, a self-growing AI agent.{profile}"})
-                    print(f"\n{GREEN}✓ Conversation memory cleared.{RESET}\n")
+                    print(f"\n{LIZARD_LIGHT}✓ Conversation memory cleared.{RESET}\n")
                     continue
 
                 elif cmd == "/habits":
                     habits = habit_learner.get_all_habits()
-                    print(f"\n{MAGENTA}{BOLD}🧠 Learned User Habits & Behavioral Profile:{RESET}")
+                    print(f"\n{LIZARD_PRIMARY}{BOLD}🧠 Learned User Habits & Behavioral Profile:{RESET}")
                     if not habits:
                         print(f"  {DIM}No specific habits learned yet. As you talk, Openzess learns automatically.{RESET}")
                     else:
                         for k, v in habits.items():
-                            print(f"  {GOLD}• {k.replace('_', ' ').title()}:{RESET} {v}")
+                            print(f"  {LIZARD_LIGHT}• {k.replace('_', ' ').title()}:{RESET} {v}")
                     print()
                     continue
 
                 elif cmd == "/skills":
-                    print(f"\n{GOLD}{BOLD}🧬 Hot-Loaded Skills & Plugins:{RESET}")
+                    print(f"\n{LIZARD_PRIMARY}{BOLD}🧬 Hot-Loaded Skills & Plugins:{RESET}")
                     for schema in agent.tools:
                         fn = schema.get("function", {})
                         print(f"  {CYAN}@{fn.get('name')}{RESET}: {DIM}{fn.get('description')[:75]}...{RESET}")
@@ -215,35 +228,35 @@ def run_cli():
 
                 elif cmd == "/memory":
                     if not arg:
-                        print(f"{AMBER}Usage: /memory <search query>{RESET}")
+                        print(f"{LIZARD_PRIMARY}Usage: /memory <search query>{RESET}")
                     else:
-                        print(f"\n{MAGENTA}Querying ChromaDB Vector Vault for '{arg}'...{RESET}")
+                        print(f"\n{LIZARD_PRIMARY}Querying ChromaDB Vector Vault for '{arg}'...{RESET}")
                         if memory_collection:
                             res = memory_collection.query(query_texts=[arg], n_results=3)
                             if res and res.get("documents") and res["documents"][0]:
                                 for i, doc in enumerate(res["documents"][0]):
-                                    print(f"  {GOLD}[{i+1}]{RESET} {doc}\n")
+                                    print(f"  {LIZARD_LIGHT}[{i+1}]{RESET} {doc}\n")
                             else:
                                 print(f"  {DIM}No matching vector memories found.{RESET}\n")
                     continue
 
                 elif cmd == "/model":
                     if not arg:
-                        print(f"{AMBER}Current provider: {current_provider}. Usage: /model <glm|deepseek|gemini|groq|ollama|lmstudio>{RESET}\n")
+                        print(f"{LIZARD_PRIMARY}Current provider: {current_provider}. Usage: /model <glm|deepseek|gemini|groq|ollama|lmstudio>{RESET}\n")
                     else:
                         current_provider = arg
                         agent = OpenzessAgent(api_key=api_key, provider=current_provider)
-                        print(f"\n{GREEN}✓ Active model switched to: {agent.model_name}{RESET}\n")
+                        print(f"\n{LIZARD_LIGHT}✓ Active model switched to: {agent.model_name}{RESET}\n")
                     continue
 
                 else:
-                    print(f"{AMBER}Unknown slash command '{cmd}'. Type /help for options.{RESET}\n")
+                    print(f"{LIZARD_PRIMARY}Unknown slash command '{cmd}'. Type /help for options.{RESET}\n")
                     continue
 
-            # Turn delimiter (Golden bar + prompt header)
-            print(f"\n{GOLD}● {user_input}{RESET}")
+            # Turn delimiter (Lizard Green bar + prompt header)
+            print(f"\n{LIZARD_PRIMARY}● {user_input}{RESET}")
             print(f"{DIM}Initializing agent...{RESET}")
-            print(f"{AMBER}{BOLD}─ ⚡ Openzess ────────────────────────────────────────────────────────────{RESET}")
+            print(f"{LIZARD_PRIMARY}{BOLD}─ ⚡ Openzess ────────────────────────────────────────────────────────────{RESET}")
 
             t0 = time.time()
             first_token_time = None
