@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Key, Fingerprint, Activity, Zap } from 'lucide-react';
-import logoUrl from '../assets/seahorse-logo.jpg';
+import LizardLogo from '../components/LizardLogo';
 
 interface WelcomeProps {
     onComplete: (provider: string, apiKey: string) => void;
@@ -99,16 +99,16 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                         className="relative z-10 w-full max-w-md flex flex-col pt-10"
                     >
                         {/* Logo & Headline */}
-                        <div className="flex flex-col items-center justify-center mb-10 text-center">
+                        <div className="flex flex-col items-center justify-center mb-8 text-center">
                             <motion.div 
-                                initial={{ rotate: -90, opacity: 0 }}
-                                animate={{ rotate: 0, opacity: 1 }}
-                                className="mb-6"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                className="mb-4"
                             >
-                                <img src={logoUrl} alt="Openzess Logo" className="w-20 h-20 object-contain mix-blend-screen drop-shadow-[0_0_20px_rgba(255,100,100,0.6)]" />
+                                <LizardLogo size="lg" />
                             </motion.div>
-                            <h1 className="text-4xl font-bold tracking-tight text-white mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>openzess</h1>
-                            <p className="text-[#B8AFA8] font-medium">Initialize your AI workspace</p>
+                            <h1 className="text-4xl font-bold tracking-tight text-white mb-1" style={{ fontFamily: "'Outfit', sans-serif" }}>open<span className="text-emerald-400">zess</span></h1>
+                            <p className="text-[#B8AFA8] font-medium text-sm">Initialize your AI workspace & Lizard Matrix</p>
                         </div>
 
                         {/* Login Glass Card */}
