@@ -775,13 +775,17 @@ class OpenzessAgent:
             tool_outputs = []
             
             while True:
-                response_stream = litellm.completion(
-                    model=self.model_name,
-                    messages=self.messages,
-                    tools=self.tools if self.tools else None,
-                    stream=True,
-                    api_key=self.api_key
-                )
+                call_kwargs = {
+                    "model": self.model_name,
+                    "messages": self.messages,
+                    "tools": self.tools if self.tools else None,
+                    "stream": True,
+                    "api_key": self.api_key if self.api_key else "dummy_key"
+                }
+                if self.api_base:
+                    call_kwargs["api_base"] = self.api_base
+                
+                response_stream = litellm.completion(**call_kwargs)
                 
                 collected_content = ""
                 tool_calls = []
