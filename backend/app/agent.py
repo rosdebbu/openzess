@@ -549,6 +549,7 @@ PROVIDER_MODELS = {
     "anthropic": "anthropic/claude-3-5-sonnet-20241022",
     "groq": "groq/llama-3.3-70b-versatile",
     "ollama": "ollama/llama3.2",
+    "lmstudio": "openai/local-model",
     "deepseek": "openrouter/deepseek/deepseek-chat",
     "deepseek2": "openrouter/deepseek/deepseek-chat",
     "deepseek3": "openrouter/deepseek/deepseek-chat",
@@ -592,12 +593,16 @@ class OpenzessAgent:
         elif ("openrouter/" in self.model_name or (self.api_key and self.api_key.startswith("sk-or-"))) and self.api_key:
             os.environ["OPENROUTER_API_KEY"] = self.api_key
         
-        # Smart route Native DeepSeek API keys to their direct litellm endpoint
-        if "deepseek" in provider and self.api_key and not self.api_key.startswith("sk-or-"):
-            if provider == "deepseek3":
-                self.model_name = "deepseek/deepseek-reasoner"
-            else:
-                self.model_name = "deepseek/deepseek-chat"
+        # Configure custom localhost endpoints (Ollama / LM Studio / LocalAI / vLLM)
+        self.api_base = None
+        if provider == "ollama":
+            self.api_base = os.environ.get("OLLAMA_API_BASE", "http://localhost:11434")
+            self.model_name = os.environ.get("OLLAMA_MODEL", "ollama/llama3.2")
+        elif provider == "lmstudio":
+            self.api_base = os.environ.get("LMSTUDIO_API_BASE", "http://localhost:1234/v1")
+            self.model_name = "openai/local-model"
+            if not self.api_key:
+                self.api_key = "lm-studio"
         
         self.messages = []
         default_inst = "You are openzess, a self-growing AI agent and coding assistant. You can synthesize your own tools, write code, persist memories into your ChromaDB vector vault, and execute commands inside a secure Linux Debian WSL sandbox."
@@ -639,12 +644,16 @@ class OpenzessAgent:
         tool_outputs = []
         
         while True:
-            response = litellm.completion(
-                model=self.model_name,
-                messages=self.messages,
-                tools=self.tools if self.tools else None,
-                api_key=self.api_key
-            )
+            call_kwargs = {
+                "model": self.model_name,
+                "messages": self.messages,
+                "tools": self.tools if self.tools else None,
+                "api_key": self.api_key if self.api_key else "dummy_key"
+            }
+            if self.api_base:
+                call_kwargs["api_base"] = self.api_base
+            
+            response = litellm.completion(**call_kwargs)
             
             message = response.choices[0].message
             # Filter litellm specific attributes to keep dict clean for next chat round
