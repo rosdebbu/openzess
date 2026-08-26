@@ -1,13 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Monitor, Wifi, WifiOff } from 'lucide-react';
+import { Monitor, Wifi, WifiOff, Terminal, Sparkles, Play, Trash2, Send, Cpu, Layers } from 'lucide-react';
+
+interface TerminalLog {
+  id: string;
+  command?: string;
+  output: string;
+  timestamp: string;
+  isError?: boolean;
+}
 
 export default function MatrixViewer() {
   const imgRef = useRef<HTMLImageElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const terminalEndRef = useRef<HTMLDivElement>(null);
+
+  const [activeTab, setActiveTab] = useState<'split' | 'matrix' | 'terminal'>('split');
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
   const [isSystemActive, setIsSystemActive] = useState(false);
   const [imgSrc, setImgSrc] = useState<string>('');
-  
+  const [fpsMode, setFpsMode] = useState<30 | 60>(30);
+  const [qualityMode, setQualityMode] = useState<'eco' | 'balanced' | 'ultra'>('balanced');
+
+  // Terminal state
+  const [commandInput, setCommandInput] = useState('');
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [terminalLogs, setTerminalLogs] = useState<TerminalLog[]>([
+    {
+      id: 'welcome',
+      output: '⚡ Hermes Agent Autonomous Matrix Terminal ready.\nType any bash / shell command below or click a quick action to execute in the sandbox environment.',
+      timestamp: new Date().toLocaleTimeString(),
+    }
+  ]);
+
   // Clean up object URLs to prevent memory leaks
   useEffect(() => {
     return () => {
@@ -17,25 +41,27 @@ export default function MatrixViewer() {
 
   useEffect(() => {
     if (!isSystemActive) {
-       setStatus('disconnected');
-       return;
+      setStatus('disconnected');
+      return;
     }
 
     setStatus('connecting');
     const wsUrl = `ws://${window.location.hostname}:8000/api/matrix/stream`;
     const ws = new WebSocket(wsUrl);
-    ws.binaryType = 'blob'; // Receive fast binary data
+    ws.binaryType = 'blob';
     wsRef.current = ws;
 
     ws.onopen = () => {
       setStatus('connected');
+      // Send initial configuration
+      const quality = qualityMode === 'eco' ? 50 : qualityMode === 'balanced' ? 70 : 90;
+      ws.send(JSON.stringify({ action: 'config', fps: fpsMode, quality }));
     };
 
     ws.onmessage = (event) => {
-      // Create an ultra-fast temporary URL for the JPEG stream
       const url = URL.createObjectURL(event.data);
       setImgSrc(prevSrc => {
-        if (prevSrc) URL.revokeObjectURL(prevSrc); // Clean old frame
+        if (prevSrc) URL.revokeObjectURL(prevSrc);
         return url;
       });
     };
@@ -56,18 +82,16 @@ export default function MatrixViewer() {
       }
       wsRef.current = null;
     };
-  }, [isSystemActive]);
+  }, [isSystemActive, fpsMode, qualityMode]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
     if (!imgRef.current) return;
-    
-    // Calculate precise relative percentages for responsive scaling
+
     const rect = imgRef.current.getBoundingClientRect();
     const xPct = (e.clientX - rect.left) / rect.width;
     const yPct = (e.clientY - rect.top) / rect.height;
-    
-    // Bounds check to ensure we only click inside the screen
+
     if (xPct >= 0 && xPct <= 1 && yPct >= 0 && yPct <= 1) {
       wsRef.current.send(JSON.stringify({
         action: 'click',
@@ -77,99 +101,288 @@ export default function MatrixViewer() {
     }
   };
 
+  const handleExecuteCommand = async (cmdToRun?: string) => {
+    const cmd = (cmdToRun !== undefined ? cmdToRun : commandInput).trim();
+    if (!cmd || isExecuting) return;
+
+    setIsExecuting(true);
+    const newLogId = String(Date.now());
+    
+    // Add command entry immediately
+    setTerminalLogs(prev => [
+      ...prev,
+      {
+        id: newLogId,
+        command: cmd,
+        output: 'Executing...',
+        timestamp: new Date().toLocaleTimeString(),
+      }
+    ]);
+    setCommandInput('');
+
+    try {
+      const resp = await fetch('http://localhost:8000/api/terminal/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmd }),
+      });
+      const data = await resp.json();
+
+      setTerminalLogs(prev =>
+        prev.map(item =>
+          item.id === newLogId
+            ? { ...item, output: data.output || '(No output returned)' }
+            : item
+        )
+      );
+    } catch (err: any) {
+      setTerminalLogs(prev =>
+        prev.map(item =>
+          item.id === newLogId
+            ? { ...item, output: `Execution failed: ${err.message}`, isError: true }
+            : item
+        )
+      );
+    } finally {
+      setIsExecuting(false);
+      setTimeout(() => terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+    }
+  };
+
+  const clearTerminal = () => {
+    setTerminalLogs([]);
+  };
+
+  const quickActions = [
+    { label: 'git status', cmd: 'git status --short' },
+    { label: 'list files', cmd: 'ls -la' },
+    { label: 'sidecar health', cmd: 'curl -s http://127.0.0.1:8100/health || echo "Sidecar Offline"' },
+    { label: 'rust check', cmd: 'cd rust-sidecar && cargo check' },
+    { label: 'python tests', cmd: 'pytest backend/tests/test_hybrid_rust_sidecar.py -v' },
+  ];
+
   return (
     <div className="flex-1 flex flex-col h-full bg-[#EDE8E2] dark:bg-[#1E1C1C] overflow-hidden relative">
-      <div className="flex items-center justify-between px-6 py-4 bg-white/50 dark:bg-[#1A1818]/50 backdrop-blur-md border-b border-[#E2DAD2] dark:border-border shrink-0 z-10">
-        <h1 className="text-xl font-semibold flex items-center gap-3">
-          <Monitor size={24} className="text-brand" /> Matrix Virtual Desktop
-        </h1>
+      {/* Top Header Controls */}
+      <div className="flex items-center justify-between px-6 py-3.5 bg-white/60 dark:bg-[#1A1818]/60 backdrop-blur-md border-b border-[#E2DAD2] dark:border-border shrink-0 z-10">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-[#B8AFA8] dark:text-[#B8AFA8] ml-2">Stream Power</span>
-            <button 
-              onClick={() => setIsSystemActive(!isSystemActive)}
-              className={`w-12 h-6 rounded-full p-1 transition-colors ${isSystemActive ? 'bg-brand' : 'bg-[#E2DAD2] dark:bg-[#3A3838]'}`}
+          <h1 className="text-xl font-semibold flex items-center gap-2.5">
+            <Monitor size={22} className="text-brand" /> 
+            <span>Hermes Matrix & Terminal</span>
+          </h1>
+
+          {/* View Tabs */}
+          <div className="flex items-center bg-[#E2DAD2]/50 dark:bg-surface p-0.5 rounded-lg border border-[#E2DAD2] dark:border-[#3A3838]">
+            <button
+              onClick={() => setActiveTab('split')}
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+                activeTab === 'split' ? 'bg-brand text-white shadow-sm' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+              }`}
             >
-              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isSystemActive ? 'translate-x-6' : 'translate-x-0'}`} />
+              <Layers size={13} /> Split Console
+            </button>
+            <button
+              onClick={() => setActiveTab('matrix')}
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+                activeTab === 'matrix' ? 'bg-brand text-white shadow-sm' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+              }`}
+            >
+              <Monitor size={13} /> Matrix Only
+            </button>
+            <button
+              onClick={() => setActiveTab('terminal')}
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+                activeTab === 'terminal' ? 'bg-brand text-white shadow-sm' : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+              }`}
+            >
+              <Terminal size={13} /> Terminal Only
             </button>
           </div>
-          <div className="w-px h-6 bg-[#E2DAD2] dark:bg-border" />
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* FPS & Quality Toggle */}
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <button
+              onClick={() => setFpsMode(fpsMode === 30 ? 60 : 30)}
+              className={`px-2.5 py-1 rounded-md border text-xs font-bold transition-colors ${
+                fpsMode === 60 ? 'bg-brand/10 text-brand border-brand/40' : 'bg-surface border-border text-neutral-400'
+              }`}
+              title="Toggle target frame rate"
+            >
+              <Cpu size={12} className="inline mr-1" /> {fpsMode} FPS
+            </button>
+            <select
+              value={qualityMode}
+              onChange={(e) => setQualityMode(e.target.value as any)}
+              className="bg-surface border border-border text-xs rounded-md px-2 py-1 focus:outline-none focus:border-brand font-mono"
+            >
+              <option value="eco">Eco Quality</option>
+              <option value="balanced">Balanced</option>
+              <option value="ultra">Ultra 60FPS</option>
+            </select>
+          </div>
+
+          <div className="w-px h-5 bg-[#E2DAD2] dark:bg-border" />
+
+          {/* Stream Power Switch */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Stream</span>
+            <button
+              onClick={() => setIsSystemActive(!isSystemActive)}
+              className={`w-11 h-6 rounded-full p-0.5 transition-colors ${isSystemActive ? 'bg-brand' : 'bg-[#E2DAD2] dark:bg-[#3A3838]'}`}
+            >
+              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${isSystemActive ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
           {status === 'connected' ? (
-            <div className="text-emerald-500 flex items-center gap-2 text-sm font-medium bg-emerald-500/10 px-3 py-1 rounded-full"><Wifi size={16} /> Live Access</div>
+            <div className="text-emerald-500 flex items-center gap-1.5 text-xs font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-full">
+              <Wifi size={14} /> Live
+            </div>
           ) : status === 'connecting' ? (
-             <div className="text-amber-500 flex items-center gap-2 text-sm font-medium bg-amber-500/10 px-3 py-1 rounded-full animate-pulse"><Wifi size={16} /> Interfacing...</div>
+            <div className="text-amber-500 flex items-center gap-1.5 text-xs font-semibold bg-amber-500/10 px-2.5 py-1 rounded-full animate-pulse">
+              <Wifi size={14} /> Connecting...
+            </div>
           ) : (
-            <div className="text-red-500 flex items-center gap-2 text-sm font-medium bg-red-500/10 px-3 py-1 rounded-full"><WifiOff size={16} /> Offline</div>
+            <div className="text-neutral-400 flex items-center gap-1.5 text-xs font-semibold bg-neutral-500/10 px-2.5 py-1 rounded-full">
+              <WifiOff size={14} /> Standby
+            </div>
           )}
         </div>
       </div>
 
-      <div className="flex-1 p-6 flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Background purely aesthetic matrix glow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand/5 to-transparent pointer-events-none"></div>
+      {/* Main Content Area (Split / Single) */}
+      <div className="flex-1 p-4 grid gap-4 overflow-hidden" style={{
+        gridTemplateColumns: activeTab === 'split' ? '1fr 1fr' : '1fr'
+      }}>
         
-        <div className="w-full h-full max-w-6xl max-h-[800px] border border-[#E2DAD2] dark:border-[#3A3838] rounded-xl overflow-hidden shadow-2xl premium-shadow bg-black relative flex items-center justify-center group">
-             
-             {status !== 'connected' && (
-                 <div className="absolute inset-0 z-20 flex flex-col bg-[#1E1C1C]/90 backdrop-blur-md overflow-hidden">
-                     {/* Radar/Grid Aesthetic */}
-                     <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
-                     
-                     <div className="flex flex-col items-center justify-center flex-1 p-8 text-center relative z-10">
-                         <div className="w-24 h-24 rounded-full border-2 border-brand/30 border-dashed animate-[spin_10s_linear_infinite] flex items-center justify-center shadow-[0_0_50px_rgba(var(--brand-rgb),0.2)] mb-8">
-                             <div className="w-16 h-16 rounded-full bg-brand/10 backdrop-blur-sm flex items-center justify-center">
-                                 {status === 'connecting' ? <Wifi className="text-brand animate-ping" size={28} /> : <WifiOff className="text-[#B8AFA8]" size={28} />}
-                             </div>
-                         </div>
-                         
-                         <h2 className="text-2xl font-bold tracking-widest text-white uppercase mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                             {!isSystemActive ? 'Matrix Subsystem Offline' : status === 'connecting' ? 'Establishing VNC Handshake...' : 'Connection Failed'}
-                         </h2>
-                         
-                         <p className="text-[#B8AFA8] max-w-lg mb-8 leading-relaxed font-mono text-sm">
-                             The Matrix Viewer is a real-time visual bridge that allows you to watch the AI autonomously control a sandboxed Linux GUI desktop (Xvfb) without escaping into your host Windows machine.
-                         </p>
-                         
-                         {!isSystemActive && (
-                             <div className="bg-white/5 border border-white/10 rounded-lg p-4 font-mono text-xs text-[#B8AFA8]/60 text-left w-full max-w-md shadow-inner">
-                                 <div className="text-brand font-bold mb-2 flex items-center gap-2"><Monitor size={14} /> SYSTEM STANDBY</div>
-                                 <div className="text-[#B8AFA8] leading-relaxed">
-                                     The Matrix bridge is currently powered down to save resources. Toggle the Power switch in the header to activate the WebSocket streaming proxy and establish a live connection to the sandbox display.
-                                 </div>
-                             </div>
-                         )}
-                         {isSystemActive && status === 'disconnected' && (
-                             <div className="bg-white/5 border border-red-500/30 rounded-lg p-4 font-mono text-xs text-[#B8AFA8]/60 text-left w-full max-w-md shadow-inner">
-                                 <div className="text-amber-500 font-bold mb-2 flex items-center gap-2"><Monitor size={14} /> CONNECTION FAILED</div>
-                                 <div className="flex gap-4">
-                                     <span className="text-[#B8AFA8]">HOST:</span>
-                                     <span className="text-emerald-400">Environment Ready</span>
-                                 </div>
-                                 <div className="flex gap-4 mt-1">
-                                     <span className="text-[#B8AFA8]">SERVICE:</span>
-                                     <span className="text-red-400">Websockify / Xvfb Not Responding</span>
-                                 </div>
-                                 <div className="mt-4 pt-4 border-t border-white/10 text-brand font-bold">
-                                     {"->"} Ensure the Python Ecosystem is actively running in your sandbox!
-                                 </div>
-                             </div>
-                         )}
-                     </div>
-                 </div>
-             )}
+        {/* PANEL 1: Virtual Desktop Matrix */}
+        {(activeTab === 'split' || activeTab === 'matrix') && (
+          <div className="flex flex-col h-full bg-black border border-[#E2DAD2] dark:border-[#3A3838] rounded-xl overflow-hidden shadow-xl relative">
+            <div className="px-4 py-2 bg-[#1A1818] border-b border-white/10 flex items-center justify-between text-xs font-mono text-neutral-400 shrink-0">
+              <div className="flex items-center gap-2">
+                <Monitor size={14} className="text-brand" />
+                <span className="text-white font-medium">Virtual Display (Xvfb / Windows)</span>
+              </div>
+              <span className="text-brand text-[11px]">Click anywhere on canvas to control</span>
+            </div>
 
-             {/* The native custom JPEG WebSocket projector */}
-             {status === 'connected' && imgSrc && (
-                 <img
-                   ref={imgRef}
-                   src={imgSrc}
-                   className="w-full h-full object-contain cursor-crosshair active:scale-[99%] transition-transform duration-75"
-                   onPointerDown={handlePointerDown}
-                   alt="Matrix Stream"
-                   draggable={false}
-                 />
-             )}
-        </div>
+            <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+              {status !== 'connected' && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center bg-[#1E1C1C]/90 backdrop-blur-sm">
+                  <div className="w-16 h-16 rounded-full border border-brand/30 border-dashed animate-[spin_10s_linear_infinite] flex items-center justify-center mb-4">
+                    <Monitor className="text-brand" size={24} />
+                  </div>
+                  <h3 className="text-base font-bold text-white mb-2">Matrix Stream Standby</h3>
+                  <p className="text-neutral-400 text-xs max-w-sm mb-4 leading-relaxed font-mono">
+                    Toggle the Stream switch in the top right to start the high-speed 60FPS video bridge.
+                  </p>
+                  <button
+                    onClick={() => setIsSystemActive(true)}
+                    className="px-4 py-2 bg-brand hover:bg-brand-hover text-white text-xs font-medium rounded-lg transition-all shadow-md flex items-center gap-2"
+                  >
+                    <Play size={14} /> Launch Stream Bridge
+                  </button>
+                </div>
+              )}
+
+              {status === 'connected' && imgSrc && (
+                <img
+                  ref={imgRef}
+                  src={imgSrc}
+                  className="w-full h-full object-contain cursor-crosshair active:scale-[99.5%] transition-transform"
+                  onPointerDown={handlePointerDown}
+                  alt="Matrix Live Desktop Feed"
+                  draggable={false}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* PANEL 2: Live Hermes Terminal Console */}
+        {(activeTab === 'split' || activeTab === 'terminal') && (
+          <div className="flex flex-col h-full bg-[#121111] border border-[#E2DAD2] dark:border-[#3A3838] rounded-xl overflow-hidden shadow-xl font-mono text-xs">
+            {/* Terminal Header */}
+            <div className="px-4 py-2 bg-[#1A1818] border-b border-white/10 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 text-neutral-300 font-medium">
+                <Terminal size={14} className="text-emerald-400" />
+                <span>Hermes Live Shell</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={clearTerminal}
+                  className="px-2 py-0.5 hover:bg-white/10 text-neutral-400 hover:text-white rounded text-[11px] transition-colors flex items-center gap-1"
+                  title="Clear Terminal Output"
+                >
+                  <Trash2 size={12} /> Clear
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Action Chips */}
+            <div className="px-3 py-2 bg-[#161414] border-b border-white/5 flex flex-wrap gap-1.5 shrink-0">
+              <span className="text-[10px] text-neutral-500 py-0.5 flex items-center gap-1"><Sparkles size={10} /> Quick:</span>
+              {quickActions.map((qa) => (
+                <button
+                  key={qa.label}
+                  onClick={() => handleExecuteCommand(qa.cmd)}
+                  disabled={isExecuting}
+                  className="px-2 py-0.5 bg-white/5 hover:bg-brand/20 border border-white/10 hover:border-brand/40 text-neutral-300 hover:text-brand rounded text-[11px] transition-all disabled:opacity-50"
+                >
+                  {qa.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Terminal Output Log Feed */}
+            <div className="flex-1 p-3.5 overflow-y-auto space-y-3 custom-scrollbar text-neutral-300 leading-relaxed font-mono">
+              {terminalLogs.map((log) => (
+                <div key={log.id} className="space-y-1">
+                  {log.command && (
+                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-[11px]">
+                      <span>openzess@sandbox:~$</span>
+                      <span className="text-white">{log.command}</span>
+                      <span className="text-neutral-600 text-[10px] ml-auto">{log.timestamp}</span>
+                    </div>
+                  )}
+                  <pre className={`whitespace-pre-wrap rounded bg-black/40 p-2 border border-white/5 text-[11px] ${log.isError ? 'text-red-400' : 'text-neutral-300'}`}>
+                    {log.output}
+                  </pre>
+                </div>
+              ))}
+              <div ref={terminalEndRef} />
+            </div>
+
+            {/* Terminal Command Input Bar */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleExecuteCommand();
+              }}
+              className="p-2.5 bg-[#1A1818] border-t border-white/10 flex items-center gap-2 shrink-0"
+            >
+              <span className="text-emerald-400 font-bold pl-1">❯</span>
+              <input
+                type="text"
+                value={commandInput}
+                onChange={(e) => setCommandInput(e.target.value)}
+                placeholder="Enter shell command (e.g. ls -la, python --version, cargo check)..."
+                disabled={isExecuting}
+                className="flex-1 bg-transparent border-none text-white focus:outline-none placeholder:text-neutral-600 text-xs font-mono"
+              />
+              <button
+                type="submit"
+                disabled={!commandInput.trim() || isExecuting}
+                className="px-3 py-1.5 bg-brand hover:bg-brand-hover disabled:opacity-40 text-white rounded font-medium text-xs transition-all flex items-center gap-1.5 shadow"
+              >
+                <Send size={12} /> {isExecuting ? 'Running...' : 'Run'}
+              </button>
+            </form>
+          </div>
+        )}
+
       </div>
     </div>
   );
