@@ -1,4 +1,5 @@
 import os
+import time
 from fastapi import FastAPI, HTTPException, UploadFile, File, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -1032,95 +1033,107 @@ async def rebuild_graphify_graph():
 
 
 # ================================
-# NATIVE MATRIX STREAM (Replaces VNC)
+# NATIVE MATRIX STREAM (High-Performance 30-60FPS + Frame Diffing)
 # ================================
 @app.websocket("/api/matrix/stream")
 async def matrix_stream(websocket: WebSocket):
     await websocket.accept()
     
-    # We will run the screen capture in a loop at ~15fps
-    fps = 15
-    frame_delay = 1.0 / fps
+    current_fps = 30
+    quality = 70
     sct = mss.mss()
     
     try:
-        # Since Xvfb uses a fixed virtual monitor, we grab monitor 0 or 1
-        # Usually monitor 1 is the main display in mss if it exists
         monitor = sct.monitors[0]
+        last_frame_hash = 0
+        last_change_time = time.time()
         
         async def send_frames():
+            nonlocal current_fps, quality, last_frame_hash, last_change_time
             while True:
-                # Grab a raw screenshot from the Xvfb sandbox display
+                start_t = time.time()
                 sct_img = sct.grab(monitor)
-                # Encode OFF the event-loop thread: prefers the Rust sidecar when
-                # SIDECAR_URL is set, else pure-Pillow fallback. This also fixes
-                # the original blocking Pillow save() that stalled asyncio at 15fps.
-                jpeg_bytes, _engine = await encode_image_async(
-                    sct_img.bgra, *sct_img.size, fmt="JPEG", quality=65
-                )
+                raw_bytes = sct_img.bgra
                 
-                # Send binary data directly over websocket
-                await websocket.send_bytes(jpeg_bytes)
-                await asyncio.sleep(frame_delay)
+                # Fast sample hash across pixel strides to detect frame updates instantly
+                sample_hash = hash(raw_bytes[::4096])
+                now = time.time()
                 
-        async def receive_Input():
+                # Transmit when screen changes or heartbeat every 0.5s
+                if sample_hash != last_frame_hash or (now - last_change_time) > 0.5:
+                    last_frame_hash = sample_hash
+                    last_change_time = now
+                    
+                    jpeg_bytes, _engine = await encode_image_async(
+                        raw_bytes, *sct_img.size, fmt="JPEG", quality=quality
+                    )
+                    await websocket.send_bytes(jpeg_bytes)
+                
+                # Dynamic adaptive sleep targeting target FPS
+                elapsed = time.time() - start_t
+                target_delay = 1.0 / max(5, current_fps)
+                sleep_time = max(0.001, target_delay - elapsed)
+                await asyncio.sleep(sleep_time)
+                
+        async def receive_input():
+            nonlocal current_fps, quality
             while True:
                 data = await websocket.receive_text()
                 try:
                     payload = json.loads(data)
                     action = payload.get("action")
-                    if action == "click":
-                        # The frontend will send relative percentages (0.0 to 1.0) because 
-                        # the UI image will scale responsively. We multiply by native screen size.
+                    if action == "config":
+                        current_fps = min(60, max(5, payload.get("fps", 30)))
+                        quality = min(95, max(30, payload.get("quality", 70)))
+                    elif action == "click":
                         x_pct = payload.get("x", 0.5)
                         y_pct = payload.get("y", 0.5)
-                        
                         native_x = int(x_pct * monitor["width"])
                         native_y = int(y_pct * monitor["height"])
-                        
-                        # Use PyAutoGUI to click directly inside the invisible sandbox!
                         pag = _get_pyautogui()
                         if pag:
                             pag.click(x=native_x, y=native_y)
-                        
                     elif action == "type":
                         text = payload.get("text", "")
                         if text:
                             pag = _get_pyautogui()
                             if pag:
-                                # Use tiny intervals to be safe on Xvfb
-                                pag.write(text, interval=0.01)
-                            
+                                pag.write(text, interval=0.005)
                     elif action == "key":
                         key = payload.get("key", "")
-                        # E.g., 'enter', 'backspace'
                         if key:
                             pag = _get_pyautogui()
                             if pag:
                                 pag.press(key)
-                            
                 except Exception as e:
-                    print(f"[Matrix] Error processing input: {e}")
+                    print(f"[Matrix] Input error: {e}")
                     
-        # Run both tasks concurrently
         stream_task = asyncio.create_task(send_frames())
-        input_task = asyncio.create_task(receive_Input())
+        input_task = asyncio.create_task(receive_input())
         
-        # Wait until either one crashes/disconnects
         done, pending = await asyncio.wait(
             [stream_task, input_task],
             return_when=asyncio.FIRST_COMPLETED
         )
-        
         for task in pending:
             task.cancel()
-            
     except WebSocketDisconnect:
-        print("[Matrix] Viewer disconnected.")
+        pass
     except Exception as e:
         print(f"[Matrix] Stream Error: {e}")
-    finally:
-        pass
+
+
+# ================================
+# LIVE TERMINAL EXECUTION (Hermes Agent Style)
+# ================================
+class TerminalExecRequest(BaseModel):
+    command: str
+
+@app.post("/api/terminal/exec")
+async def terminal_exec(req: TerminalExecRequest):
+    from .agent import run_terminal_command
+    output = await asyncio.to_thread(run_terminal_command, req.command)
+    return {"output": output}
 
 # ================================
 # GRAPHIFY — Codebase Graph Report
