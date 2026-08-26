@@ -46,7 +46,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
     }, []);
 
     const handleConnect = () => {
-        if (!apiKey && provider !== 'ollama') return;
+        if (!apiKey && provider !== 'ollama' && provider !== 'lmstudio') return;
         setIsConnecting(true);
         // Simulate a tiny connection delay for a satisfying UX
         setTimeout(() => {
@@ -134,7 +134,8 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                              <option value="qwen" className="text-black">Qwen (Qwen 2.5 72B)</option>
                                              <option value="gemma" className="text-black">Gemma (Gemma 2)</option>
                                              <option value="kimi" className="text-black">Kimi (Moonshot 8k)</option>
-                                             <option value="ollama" className="text-black">Ollama (Local/Airgapped)</option>
+                                             <option value="ollama" className="text-black">Ollama Local Llama (localhost:11434)</option>
+                                             <option value="lmstudio" className="text-black">LM Studio Local (localhost:1234)</option>
                                          </select>
                                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#B8AFA8]">
                                              <Zap size={16} />
@@ -153,8 +154,8 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                              type="password"
                                              value={apiKey}
                                              onChange={(e) => setApiKey(e.target.value)}
-                                             disabled={provider === 'ollama' || isConnecting}
-                                             placeholder={provider === 'ollama' ? "Local mode - No key required" : "Enter Master API Key..."}
+                                             disabled={provider === 'ollama' || provider === 'lmstudio' || isConnecting}
+                                             placeholder={(provider === 'ollama' || provider === 'lmstudio') ? "Local mode - No API key required" : "Enter Master API Key..."}
                                              className="w-full bg-white/5 border border-white/10 text-white p-3.5 pl-11 rounded-xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/50 transition-all disabled:opacity-50 font-mono tracking-widest placeholder:tracking-normal placeholder:font-sans placeholder:text-[#3A3838]/80"
                                          />
                                      </div>
@@ -165,7 +166,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleConnect}
-                                    disabled={isConnecting || (!apiKey && provider !== 'ollama')}
+                                    disabled={isConnecting || (!apiKey && provider !== 'ollama' && provider !== 'lmstudio')}
                                     className="w-full relative overflow-hidden bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 mt-4 shadow-[0_0_30px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:cursor-not-allowed group transition-shadow hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"
                                 >
                                     <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#A89080] to-[#3A3838] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
