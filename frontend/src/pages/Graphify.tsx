@@ -69,7 +69,7 @@ export default function Graphify() {
       });
   }, []);
 
-  const graphUrl = `${BASE_URL}/graphify/graph.html`;
+  const graphUrl = '/graphify/graph.html';
 
   return (
     <div className="flex-1 flex flex-col w-full bg-[#0f0f1a] overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
