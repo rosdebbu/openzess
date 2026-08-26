@@ -8,13 +8,22 @@ Instead of requiring manual prompt engineering, Openzess automatically observes 
 
 ## 🔄 How the Learning Loop Works
 
-```mermaid
-graph TD
-    A[User Prompt] -->|Streaming SSE| B[Openzess Agent Core]
-    B -->|Tool Invocation| C[Debian WSL2 Sandbox]
-    B -->|Post-Turn Ingestion| D[habit_learner.py]
-    D -->|Semantic Extraction| E[(ChromaDB: openzess_memory)]
-    E -->|Inject Adaptive Profile| F[System Prompt on Next Launch]
+```text
+┌──────────────┐     Streaming SSE     ┌─────────────────────┐
+│ User Prompt  │ ────────────────────► │ Openzess Agent Core │
+└──────────────┘                       └──────────┬──────────┘
+                                                  │
+                                  Post-Turn Event │
+                                                  ▼
+┌──────────────────────────────┐       ┌─────────────────────┐
+│ Dynamic System Prompt Update │ ◄──── │   habit_learner.py  │
+└──────────────────────────────┘       └──────────┬──────────┘
+                                                  │
+                                 Semantic Vectors │
+                                                  ▼
+                                       ┌─────────────────────┐
+                                       │ ChromaDB Memory RAG │
+                                       └─────────────────────┘
 ```
 
 ---

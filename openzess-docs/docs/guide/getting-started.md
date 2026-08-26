@@ -49,7 +49,7 @@ wsl --status
 
 Create a `.env` file in the project root:
 
-```env
+```text
 # Primary LLM API Keys (or enter them in Web UI / CLI)
 OPENROUTER_API_KEY=sk-or-v1-...
 GEMINI_API_KEY=AIzaSy...
@@ -78,5 +78,5 @@ LMSTUDIO_API_BASE=http://localhost:1234/v1
 | **LM Studio (Local)**| `openai/local-model` | Local Endpoint |
 
 ::: tip Switching Models on the Fly
-In the Terminal CLI, type `/model <provider>` (e.g. `/model deepseek` or `/model gemini`) to switch active neural engines instantly.
+In the Terminal CLI, type `/model [provider]` (e.g. `/model deepseek` or `/model gemini`) to switch active neural engines instantly.
 :::
