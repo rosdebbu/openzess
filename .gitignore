@@ -32,4 +32,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# ── AI session notes (local only, not project docs) ─────
+CHANGES_SUMMARY.md
+CHAT_SESSION_SUMMARY.md
+plans/
+
 
