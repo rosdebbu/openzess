@@ -1,4 +1,4 @@
-import { MessageSquare, Folder, Wrench, Database, SlidersHorizontal, Radio, Users, Smile, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight, ChevronDown, ExternalLink, GitBranch } from 'lucide-react';
+import { MessageSquare, Folder, Wrench, Database, SlidersHorizontal, Radio, Users, Smile, Monitor, BookOpen, Swords, ChevronLeft, ChevronRight, ChevronDown, ExternalLink, GitBranch, Brain } from 'lucide-react';
 import { useState, useEffect, type ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -54,6 +54,7 @@ export default function Sidebar() {
       title: 'Workspace',
       items: [
         { name: 'Files', icon: <Folder size={18} />, path: '/files' },
+        { name: 'Brain & Evolution', icon: <Brain size={18} />, path: '/brain' },
         { name: 'Graphify', icon: <GitBranch size={18} />, path: '/graphify' },
         { 
           name: 'Tools', 

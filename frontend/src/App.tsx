@@ -25,6 +25,7 @@ import DebateArena from './pages/DebateArena';
 import Doc from './pages/Doc';
 import FAQ from './pages/FAQ';
 import Graphify from './pages/Graphify';
+import BrainEvolution from './pages/BrainEvolution';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -42,6 +43,8 @@ function AnimatedRoutes({ persona: _persona }: { persona: string }) {
           <Route path="/sessions" element={<PageTransition><Sessions /></PageTransition>} />
           <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
           <Route path="/tools" element={<PageTransition><Tools /></PageTransition>} />
+          <Route path="/brain" element={<PageTransition><BrainEvolution /></PageTransition>} />
+          <Route path="/evolution" element={<PageTransition><BrainEvolution /></PageTransition>} />
           
           <Route path="/channels" element={<PageTransition><Channels /></PageTransition>} />
           <Route path="/cron-jobs" element={<PageTransition><CronJobs /></PageTransition>} />
