@@ -50,9 +50,19 @@ except Exception as e:
 # ---- NATIVE TOOLS ----
 def run_terminal_command(command: str) -> str:
     try:
-        # Securely sandbox terminal execution into Debian WSL
-        result = subprocess.run(["wsl", "-d", "Debian", "bash", "-c", command], capture_output=True, text=True, timeout=15)
-        return result.stdout if result.stdout else result.stderr
+        if platform.system() == "Windows":
+            # Try default WSL first, fallback to PowerShell
+            try:
+                result = subprocess.run(["wsl", "bash", "-c", command], capture_output=True, text=True, timeout=30)
+                if result.returncode == 0 or (result.stdout and not result.stderr):
+                    return result.stdout
+            except Exception:
+                pass
+            result = subprocess.run(["powershell", "-NoProfile", "-Command", command], capture_output=True, text=True, timeout=30)
+            return result.stdout if result.stdout else result.stderr
+        else:
+            result = subprocess.run(["bash", "-c", command], capture_output=True, text=True, timeout=30)
+            return result.stdout if result.stdout else result.stderr
     except Exception as e:
         return str(e)
 
