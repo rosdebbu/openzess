@@ -25,11 +25,11 @@ if not exist .env (
 
 REM ── Start FastAPI backend on port 8000 ──
 echo [1/2] Starting FastAPI Backend on port 8000...
-start "openzess Backend" cmd /k "cd backend && ..\venv\Scripts\python -m uvicorn app.server:app --host 0.0.0.0 --reload --port 8000"
+start "openzess Backend" cmd /k "cd /d %~dp0backend && python -m uvicorn app.server:app --host 0.0.0.0 --reload --port 8000"
 
 REM ── Start React (Vite) frontend - opens in your browser ──
 echo [2/2] Starting Web Frontend (opens in browser)...
-start "openzess Frontend" cmd /k "cd frontend && npm install && npm run dev"
+start "openzess Frontend" cmd /k "cd /d %~dp0frontend && npm run dev"
 
 echo.
 REM ── OPTIONAL: launch Rust sidecar if binary exists ──
