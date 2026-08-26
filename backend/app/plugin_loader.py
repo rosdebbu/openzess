@@ -6,12 +6,18 @@ class ToolRegistrar:
         self.funcs = {}
         self.schemas = []
 
+    def clear(self):
+        self.funcs = {}
+        self.schemas = []
+
     def register(self, name: str, description: str, schema_params: dict):
         """
         Decorator to register a custom python tool into the agent native ecosystem!
         """
         def decorator(func):
             self.funcs[name] = func
+            # Ensure no duplicate schemas on hot-reload
+            self.schemas = [s for s in self.schemas if s.get("function", {}).get("name") != name]
             self.schemas.append({
                 "type": "function",
                 "function": {
@@ -32,19 +38,15 @@ plugin_registry = ToolRegistrar()
 
 def load_plugins():
     """Scans the designated plugins directory and hot-loads all valid python modules natively."""
-    # Register this module as 'plugin_loader' so plugin files can do
-    # `from plugin_loader import plugin_registry` even when loaded
-    # from inside the app package.
     import sys as _sys
     _sys.modules.setdefault("plugin_loader", _sys.modules[__name__])
 
     plugins_dir = os.path.join(os.path.dirname(__file__), "plugins")
     os.makedirs(plugins_dir, exist_ok=True)
     
-    # Optional explicitly write a readme in the folder
     readme_path = os.path.join(plugins_dir, "README.md")
     if not os.path.exists(readme_path):
-        with open(readme_path, "w") as f:
+        with open(readme_path, "w", encoding="utf-8") as f:
             f.write("# Openzess Plugin Ecosystem\n\nDrop custom python scripts here. Decorate your functions with `@plugin_registry.register` to add them dynamically to the Agent's brain!")
     
     count = 0
@@ -56,7 +58,6 @@ def load_plugins():
             if spec and spec.loader:
                 try:
                     module = importlib.util.module_from_spec(spec)
-                    # Expose the global registry natively into the module's namespace
                     module.plugin_registry = plugin_registry
                     spec.loader.exec_module(module)
                     count += 1
@@ -65,3 +66,4 @@ def load_plugins():
                     
     if count > 0:
         print(f"[Plugin System] Successfully hot-loaded {len(plugin_registry.funcs)} custom tools from {count} plugin files!")
+

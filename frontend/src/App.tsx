@@ -250,7 +250,7 @@ function App() {
                            <option value="deepseek2" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">DeepSeek 2 (Strategist)</option>
                            <option value="deepseek3" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">DeepSeek 3 (Devil's Advocate)</option>
                            <option value="qwen" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Qwen (qwen-2.5-72b-instruct)</option>
-                           <option value="glm" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">GLM (glm-4)</option>
+                           <option value="glm" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">GLM (z-ai/glm-5.3-flash)</option>
                            <option value="kimi" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Kimi (moonshot-v1-8k)</option>
                            <option value="ollama" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Local System (Ollama)</option>
                         </select>

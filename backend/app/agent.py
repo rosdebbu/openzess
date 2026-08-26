@@ -1,5 +1,11 @@
 import os
 import platform
+from dotenv import load_dotenv
+
+# Load workspace .env if present
+_env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
+if os.path.exists(_env_path):
+    load_dotenv(_env_path)
 
 # Ensure DISPLAY is set natively for Xvfb in the Linux/WSL sandbox before any GUI library loads.
 # We do NOT set this on Windows, as PyAutoGUI uses the native Win32 API there.
@@ -196,6 +202,65 @@ def send_email(to_email: str, subject: str, body: str) -> str:
     except Exception as e:
         return f"Failed to send email: {e}"
 
+def synthesize_skill(plugin_name: str, python_code: str, description: str = "") -> str:
+    """Allows Openzess to create a new reusable tool/plugin for itself and hot-load it into its active brain without restarting."""
+    try:
+        clean_name = "".join(c for c in plugin_name if c.isalnum() or c == "_").lower()
+        if not clean_name.endswith("_plugin"):
+            filename = f"{clean_name}_plugin.py"
+        else:
+            filename = f"{clean_name}.py"
+        
+        plugins_dir = os.path.join(os.path.dirname(__file__), "plugins")
+        os.makedirs(plugins_dir, exist_ok=True)
+        filepath = os.path.join(plugins_dir, filename)
+        
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(python_code)
+            
+        load_plugins()
+        native_tool_funcs.update(plugin_registry.funcs)
+        
+        return f"[SELF-EVOLUTION] Successfully synthesized and hot-loaded skill plugin '{filename}' into Openzess brain. Active plugin tools: {list(plugin_registry.funcs.keys())}"
+    except Exception as e:
+        return f"Failed to synthesize skill: {str(e)}"
+
+def save_memory(concept: str, details: str, tags: str = "general") -> str:
+    """Stores a learned concept, code pattern, or past experience into the ChromaDB Vector Vault for future recall."""
+    try:
+        if memory_collection is None:
+            return "ChromaDB memory is currently unavailable."
+        
+        doc_id = f"mem_{uuid.uuid4().hex[:8]}"
+        doc_text = f"Concept: {concept}\nDetails: {details}"
+        memory_collection.add(
+            documents=[doc_text],
+            metadatas=[{"concept": concept, "tags": tags}],
+            ids=[doc_id]
+        )
+        return f"[MEMORY STORED] Learned knowledge persisted in ChromaDB Vault: '{concept}' [ID: {doc_id}]."
+    except Exception as e:
+        return f"Failed to store memory: {str(e)}"
+
+def recall_memory(query: str, limit: int = 3) -> str:
+    """Searches the ChromaDB Vector Vault for past experiences, learned skills, or architectural notes relevant to the query."""
+    try:
+        if memory_collection is None:
+            return "ChromaDB memory is currently unavailable."
+        
+        results = memory_collection.query(query_texts=[query], n_results=min(limit, 5))
+        if not results or not results.get("documents") or not results["documents"][0]:
+            return "No relevant memories found in Vector Vault."
+        
+        recalled = []
+        for i, doc in enumerate(results["documents"][0]):
+            meta = results["metadatas"][0][i] if results.get("metadatas") else {}
+            recalled.append(f"🧠 [Memory #{i+1} | Tags: {meta.get('tags', 'none')}]:\n{doc}")
+        
+        return "\n\n---\n\n".join(recalled)
+    except Exception as e:
+        return f"Failed to recall memory: {str(e)}"
+
 native_tool_funcs = {
     "run_terminal_command": run_terminal_command,
     "search_the_web": search_the_web,
@@ -210,7 +275,10 @@ native_tool_funcs = {
     "computer_mouse_click": computer_mouse_click,
     "computer_type_text": computer_type_text,
     "computer_press_key": computer_press_key,
-    "send_email": send_email
+    "send_email": send_email,
+    "synthesize_skill": synthesize_skill,
+    "save_memory": save_memory,
+    "recall_memory": recall_memory
 }
 
 # Dynamically merge hot-loaded python plugins into the core native ecosystem!
@@ -388,6 +456,53 @@ NATIVE_TOOL_SCHEMAS = [
                 "required": ["to_email", "subject", "body"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "synthesize_skill",
+            "description": "Self-Evolution Tool: Allows Openzess to write a permanent new Python tool/plugin for itself and hot-load it into its active brain without restarting. The Python code must import plugin_registry and use @plugin_registry.register.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "plugin_name": {"type": "string", "description": "Short snake_case name for the plugin, e.g. 'github_analyzer'"},
+                    "python_code": {"type": "string", "description": "Full valid Python code containing function decorated with @plugin_registry.register"},
+                    "description": {"type": "string", "description": "What this new synthesized skill does"}
+                },
+                "required": ["plugin_name", "python_code"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "save_memory",
+            "description": "Long-Term Memory Tool: Persists a key concept, architectural decision, code pattern, or debugging solution into ChromaDB Vector Vault so the agent remembers it across future sessions.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "concept": {"type": "string", "description": "Title or concept summary"},
+                    "details": {"type": "string", "description": "Detailed explanation, code snippet, or steps learned"},
+                    "tags": {"type": "string", "description": "Comma-separated tags e.g. 'rust,python,debugging'"}
+                },
+                "required": ["concept", "details"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "recall_memory",
+            "description": "Long-Term Memory Search Tool: Queries the ChromaDB Vector Vault for past experiences, learned solutions, or project details semantically matching the query.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query for memories or past solutions"},
+                    "limit": {"type": "integer", "description": "Number of memories to recall (default 3)"}
+                },
+                "required": ["query"]
+            }
+        }
     }
 ]
 
@@ -404,34 +519,54 @@ PROVIDER_MODELS = {
     "deepseek2": "openrouter/deepseek/deepseek-chat",
     "deepseek3": "openrouter/deepseek/deepseek-chat",
     "qwen": "openrouter/qwen/qwen-2.5-72b-instruct",
-    "glm": "openrouter/zhipu/glm-4",
+    "glm": "openrouter/z-ai/glm-5.3-flash",
     "kimi": "openrouter/moonshotai/moonshot-v1-8k"
 }
 
 class OpenzessAgent:
-    def __init__(self, api_key: str, provider: str = "gemini", history: list = None, system_instruction: str = None, allowed_tools: list = None):
-        self.api_key = api_key
-        if provider == "gemini":
-            os.environ["GEMINI_API_KEY"] = api_key
-        elif provider == "openai":
-            os.environ["OPENAI_API_KEY"] = api_key
-        elif provider == "anthropic":
-            os.environ["ANTHROPIC_API_KEY"] = api_key
-        elif provider == "groq":
-            os.environ["GROQ_API_KEY"] = api_key
-        # OpenRouter keys will be passed directly into litellm.completion rather than via env vars to avoid thread conflicts
+    def __init__(self, api_key: str = "", provider: str = "gemini", history: list = None, system_instruction: str = None, allowed_tools: list = None):
+        # Fallback to environment variables if client-side api_key is empty
+        if not api_key or not str(api_key).strip():
+            if provider == "gemini":
+                self.api_key = os.environ.get("GEMINI_API_KEY", "")
+            elif provider == "openai":
+                self.api_key = os.environ.get("OPENAI_API_KEY", "")
+            elif provider == "anthropic":
+                self.api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+            elif provider == "groq":
+                self.api_key = os.environ.get("GROQ_API_KEY", "")
+            else:
+                self.api_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("DEEPSEEK_API_KEY", ""))
+        else:
+            self.api_key = api_key
 
-        self.model_name = PROVIDER_MODELS.get(provider, "openai/gpt-4o-mini")
+        if provider in PROVIDER_MODELS:
+            self.model_name = PROVIDER_MODELS[provider]
+        elif "/" in provider:
+            self.model_name = provider
+        else:
+            self.model_name = PROVIDER_MODELS.get(provider, "openai/gpt-4o-mini")
+            
+        if provider == "gemini" and self.api_key:
+            os.environ["GEMINI_API_KEY"] = self.api_key
+        elif provider == "openai" and self.api_key:
+            os.environ["OPENAI_API_KEY"] = self.api_key
+        elif provider == "anthropic" and self.api_key:
+            os.environ["ANTHROPIC_API_KEY"] = self.api_key
+        elif provider == "groq" and self.api_key:
+            os.environ["GROQ_API_KEY"] = self.api_key
+        elif ("openrouter/" in self.model_name or (self.api_key and self.api_key.startswith("sk-or-"))) and self.api_key:
+            os.environ["OPENROUTER_API_KEY"] = self.api_key
         
         # Smart route Native DeepSeek API keys to their direct litellm endpoint
-        if "deepseek" in provider and api_key and not api_key.startswith("sk-or-"):
+        if "deepseek" in provider and self.api_key and not self.api_key.startswith("sk-or-"):
             if provider == "deepseek3":
                 self.model_name = "deepseek/deepseek-reasoner"
             else:
                 self.model_name = "deepseek/deepseek-chat"
         
         self.messages = []
-        default_inst = "You are openzess, a powerful AI coding assistant. You can help the user by writing code and executing terminal commands. Your terminal executes exclusively inside a secure Linux Debian WSL sandbox. Use standard bash commands."
+        default_inst = "You are openzess, a self-growing AI agent and coding assistant. You can synthesize your own tools, write code, persist memories into your ChromaDB vector vault, and execute commands inside a secure Linux Debian WSL sandbox."
         self.messages.append({"role": "system", "content": system_instruction if system_instruction else default_inst})
         
         if history:
@@ -488,7 +623,7 @@ class OpenzessAgent:
             if not message.tool_calls:
                 return {"reply": message.content, "tools": tool_outputs, "auth_required": False}
                 
-            dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key", "send_email"]
+            dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key", "send_email", "synthesize_skill"]
             
             pending_calls = []
             for tc in message.tool_calls:
@@ -645,7 +780,7 @@ class OpenzessAgent:
                     yield {"type": "done", "auth_required": False, "reply": collected_content}
                     return
                     
-                dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key", "send_email"]
+                dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key", "send_email", "synthesize_skill"]
                 
                 pending_calls = []
                 for tc in tool_calls:

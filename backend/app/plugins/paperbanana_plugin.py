@@ -53,6 +53,36 @@ THEME_PALETTES = {
             "output": {"bg": "#450a0a", "border": "#f87171", "text": "#fca5a5"}
         }
     },
+    "vibrant": {
+        "bg": "#faf5ff",
+        "card_bg": "#ffffff",
+        "border": "#e9d5ff",
+        "title": "#4c1d95",
+        "text": "#4b5563",
+        "accent": "#7c3aed",
+        "categories": {
+            "input": {"bg": "#ede9fe", "border": "#8b5cf6", "text": "#6d28d9"},
+            "process": {"bg": "#e0e7ff", "border": "#6366f1", "text": "#4338ca"},
+            "agent": {"bg": "#fae8ff", "border": "#d946ef", "text": "#a21caf"},
+            "storage": {"bg": "#fef3c7", "border": "#f59e0b", "text": "#b45309"},
+            "output": {"bg": "#fce7f3", "border": "#ec4899", "text": "#be185d"}
+        }
+    },
+    "deep": {
+        "bg": "#0f172a",
+        "card_bg": "#1e293b",
+        "border": "#334155",
+        "title": "#5eead4",
+        "text": "#94a3b8",
+        "accent": "#14b8a6",
+        "categories": {
+            "input": {"bg": "#134e4a", "border": "#2dd4bf", "text": "#99f6e4"},
+            "process": {"bg": "#1e3a8a", "border": "#60a5fa", "text": "#bfdbfe"},
+            "agent": {"bg": "#312e81", "border": "#818cf8", "text": "#c7d2fe"},
+            "storage": {"bg": "#064e3b", "border": "#34d399", "text": "#a7f3d0"},
+            "output": {"bg": "#7c2d12", "border": "#fb923c", "text": "#fed7aa"}
+        }
+    },
     "minimal": {
         "bg": "#ffffff",
         "card_bg": "#fafafa",
@@ -105,7 +135,7 @@ THEME_PALETTES = {
             },
             "theme": {
                 "type": "string",
-                "enum": ["academic", "dark_matrix", "minimal"],
+                "enum": ["academic", "dark_matrix", "vibrant", "deep", "minimal"],
                 "description": "Visual theme style for the publication figure."
             }
         },
@@ -340,10 +370,14 @@ def generate_statistical_plot(plot_type: str, title: str, data: dict, x_label: s
             series_data = data.get("series", [])
             labels = [s.get("name", f"Group {i}") for i, s in enumerate(series_data)]
             values = [s.get("values", []) for s in series_data]
-            try:
-                ax.boxplot(values, tick_labels=labels, patch_artist=True)
-            except TypeError:
-                ax.boxplot(values, labels=labels, patch_artist=True)
+            # matplotlib >= 3.9 renamed `labels` -> `tick_labels`; resolve at runtime.
+            import inspect
+            box_kw = (
+                {"tick_labels": labels}
+                if "tick_labels" in inspect.signature(ax.boxplot).parameters
+                else {"labels": labels}
+            )
+            ax.boxplot(values, patch_artist=True, **box_kw)
 
         elif plot_type == "histogram":
             values = data.get("values", [])
@@ -362,6 +396,15 @@ def generate_statistical_plot(plot_type: str, title: str, data: dict, x_label: s
             ax.set_xlabel(x_label, fontsize=11, fontweight="medium")
         if y_label:
             ax.set_ylabel(y_label, fontsize=11, fontweight="medium")
+
+        # Publication-grade tick formatting: clean numeric ticks on both axes.
+        ax.tick_params(axis="both", which="major", labelsize=9, length=4, width=0.8)
+        ax.tick_params(axis="x", rotation=0)
+        try:
+            ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _p: f"{v:g}"))
+            ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _p: f"{v:g}"))
+        except Exception:
+            pass
 
         plt.tight_layout()
 

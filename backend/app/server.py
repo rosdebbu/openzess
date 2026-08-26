@@ -19,6 +19,9 @@ import shutil
 from . import tavern_parser
 from .swarm_manager import swarm_manager
 import mss
+# Optional Rust acceleration (plans/hybrid-python-rust.md): inert unless
+# SIDECAR_URL is set; every helper silently falls back to pure-Python/Pillow.
+from .sidecar_client import encode_image_async, aggregate_graph_via_sidecar
 # pyautogui is lazy-loaded inside the Matrix WebSocket handler to avoid
 # failing at server startup when the Xvfb display isn't ready yet.
 pyautogui = None
@@ -883,10 +886,18 @@ def get_graphify_report():
             try:
                 with open(graph_file, "r", encoding="utf-8") as f:
                     gdata = json.load(f)
-                    nodes_count = len(gdata.get("nodes", []))
-                    edges_count = len(gdata.get("links", []))
-                    communities = set(n.get("community", 1) for n in gdata.get("nodes", []))
-                    communities_count = len(communities)
+                    # Prefer the Rust sidecar when SIDECAR_URL is configured;
+                    # returns None otherwise -> identical pure-Python path below.
+                    stats = aggregate_graph_via_sidecar(gdata)
+                    if stats is not None:
+                        nodes_count = stats.get("nodes", nodes_count)
+                        edges_count = stats.get("edges", edges_count)
+                        communities_count = stats.get("communities", communities_count)
+                    else:
+                        nodes_count = len(gdata.get("nodes", []))
+                        edges_count = len(gdata.get("links", []))
+                        communities = set(n.get("community", 1) for n in gdata.get("nodes", []))
+                        communities_count = len(communities)
             except Exception:
                 pass
 
@@ -921,6 +932,106 @@ def get_graphify_report():
 
 
 # ================================
+# GRAPHIFY DYNAMIC REBUILD (Auto-scan codebase -> graph.json)
+# ================================
+GRAPHIFY_SCAN_TARGETS = [
+    ("backend/app", r"\.py$", "core"),
+    ("backend/app/plugins", r"\.py$", "plugin"),
+    ("frontend/src/pages", r"\.tsx$", "page"),
+]
+
+@app.post("/api/graphify/rebuild")
+async def rebuild_graphify_graph():
+    """
+    Dynamically rescans the codebase (backend core modules, plugins, frontend
+    pages), extracts nodes/categories/import edges, rewrites graphify-out/graph.json
+    and GRAPH_REPORT.md, then returns fresh aggregate counts.
+    """
+    try:
+        import re
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+        nodes: List[Dict[str, Any]] = []
+        links: List[Dict[str, Any]] = []
+        seen_ids = set()
+
+        def _add_node(node_id: str, label: str, category: str, community: int):
+            if node_id in seen_ids:
+                return
+            seen_ids.add(node_id)
+            nodes.append({
+                "id": node_id,
+                "label": label,
+                "category": category,
+                "community": community,
+            })
+
+        community_map = {"core": 1, "plugin": 2, "page": 3}
+        import_re = re.compile(r"^\s*(?:from|import)\s+\.?([\w\.]+)", re.MULTILINE)
+
+        for rel_dir, pattern, category in GRAPHIFY_SCAN_TARGETS:
+            scan_dir = os.path.join(root_dir, rel_dir)
+            if not os.path.isdir(scan_dir):
+                continue
+            for fname in sorted(os.listdir(scan_dir)):
+                if not re.search(pattern, fname) or fname.startswith("__"):
+                    continue
+                node_id = f"{category}:{fname}"
+                _add_node(node_id, fname, category, community_map[category])
+
+                # Extract intra-package import edges (backend modules only).
+                if category in ("core", "plugin"):
+                    try:
+                        with open(os.path.join(scan_dir, fname), "r", encoding="utf-8", errors="ignore") as fh:
+                            for m in import_re.finditer(fh.read()):
+                                target = (m.group(1) or "").split(".")[0]
+                                if not target or target in ("os", "sys", "json", "re", "io", "uuid", "time", "threading", "asyncio", "typing", "traceback", "shutil", "platform", "subprocess", "requests"):
+                                    continue
+                                target_file = f"{target}.py"
+                                target_path = os.path.join(scan_dir, target_file)
+                                if os.path.isfile(target_path) and target_file != fname:
+                                    _add_node(f"{category}:{target_file}", target_file, category, community_map[category])
+                                    links.append({"source": node_id, "target": f"{category}:{target_file}"})
+                    except Exception:
+                        pass
+
+        # Hub edges: every page hangs off the frontend router entry point.
+        _add_node("core:App.tsx", "App.tsx", "core", 1)
+        for n in list(nodes):
+            if n["category"] == "page":
+                links.append({"source": "core:App.tsx", "target": n["id"]})
+
+        communities_count = len({n["community"] for n in nodes}) or 1
+
+        graph_payload = {"nodes": nodes, "links": links}
+        os.makedirs(GRAPHIFY_DIR, exist_ok=True)
+        with open(os.path.join(GRAPHIFY_DIR, "graph.json"), "w", encoding="utf-8") as gf:
+            json.dump(graph_payload, gf, indent=2)
+
+        report_md = (
+            "# Graphify Report\n\n"
+            f"*Auto-rebuilt {uuid.uuid4().hex[:0]}{__import__('datetime').datetime.utcnow().isoformat()}Z*\n\n"
+            f"- **Nodes:** {len(nodes)}\n"
+            f"- **Edges:** {len(links)}\n"
+            f"- **Communities:** {communities_count}\n\n"
+            "## Composition\n\n"
+            f"- Core modules: {sum(1 for n in nodes if n['category'] == 'core')}\n"
+            f"- Plugins: {sum(1 for n in nodes if n['category'] == 'plugin')}\n"
+            f"- Frontend pages: {sum(1 for n in nodes if n['category'] == 'page')}\n"
+        )
+        with open(os.path.join(GRAPHIFY_DIR, "GRAPH_REPORT.md"), "w", encoding="utf-8") as rf:
+            rf.write(report_md)
+
+        return {
+            "status": "rebuilt",
+            "nodes": len(nodes),
+            "edges": len(links),
+            "communities": communities_count,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ================================
 # NATIVE MATRIX STREAM (Replaces VNC)
 # ================================
 @app.websocket("/api/matrix/stream")
@@ -941,16 +1052,15 @@ async def matrix_stream(websocket: WebSocket):
             while True:
                 # Grab a raw screenshot from the Xvfb sandbox display
                 sct_img = sct.grab(monitor)
-                # Convert raw pixels to a PIL Image (RGB format)
-                img = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
-                
-                # Compress into a fast JPEG byte buffer
-                buffer = io.BytesIO()
-                # Use medium quality and optimization for faster websocket speeds
-                img.save(buffer, format="JPEG", quality=65, optimize=True)
+                # Encode OFF the event-loop thread: prefers the Rust sidecar when
+                # SIDECAR_URL is set, else pure-Pillow fallback. This also fixes
+                # the original blocking Pillow save() that stalled asyncio at 15fps.
+                jpeg_bytes, _engine = await encode_image_async(
+                    sct_img.bgra, *sct_img.size, fmt="JPEG", quality=65
+                )
                 
                 # Send binary data directly over websocket
-                await websocket.send_bytes(buffer.getvalue())
+                await websocket.send_bytes(jpeg_bytes)
                 await asyncio.sleep(frame_delay)
                 
         async def receive_Input():

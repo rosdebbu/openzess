@@ -8,10 +8,11 @@ fallback on any failure.
 
 ## Endpoints
 
-| Endpoint        | Method | Purpose                                                                                                   |
-| --------------- | ------ | --------------------------------------------------------------------------------------------------------- |
-| `/health`       | GET    | liveness + version JSON                                                                                   |
-| `/image/encode` | POST   | raw pixels (headers: `x-width`, `x-height`, `x-layout`, `x-format`, `x-quality`) → encoded JPEG/PNG bytes |
+| Endpoint           | Method | Purpose                                                                                                   |
+| ------------------ | ------ | --------------------------------------------------------------------------------------------------------- |
+| `/health`          | GET    | liveness + version JSON                                                                                   |
+| `/image/encode`    | POST   | raw pixels (headers: `x-width`, `x-height`, `x-layout`, `x-format`, `x-quality`) → encoded JPEG/PNG bytes |
+| `/graphify/report` | POST   | graph JSON `{nodes, links}` → `{nodes, edges, communities}` counts                                        |
 
 ## Run
 

@@ -132,3 +132,37 @@ async def sidecar_healthy_async() -> bool:
             return False
 
     return await asyncio.to_thread(_probe)
+
+
+# ── Graphify JSON aggregation ──────────────────────────────────────────────
+
+def aggregate_graph_via_sidecar(gdata: dict) -> Optional[dict]:
+    """
+    Aggregate a Graphify knowledge-graph payload via the Rust sidecar.
+
+    Expects {"nodes": [...], "links": [...]} and returns
+    {"nodes": int, "edges": int, "communities": int} — or None on ANY failure
+    (disabled, unreachable, malformed response) so callers fall back to the
+    pure-Python implementation with identical output.
+    """
+    if not sidecar_enabled():
+        return None
+    try:
+        resp = requests.post(
+            f"{SIDECAR_URL}/graphify/report",
+            json=gdata,
+            timeout=SIDECAR_TIMEOUT,
+        )
+        if resp.status_code == 200:
+            stats = resp.json()
+            if isinstance(stats, dict) and "nodes" in stats:
+                return stats
+        log.warning("sidecar graphify failed (HTTP %s); using pure-Python", resp.status_code)
+    except Exception as exc:  # noqa: BLE001 — degrade silently by design
+        log.warning("sidecar unreachable (%s); using pure-Python graphify", exc)
+    return None
+
+
+async def aggregate_graph_async(gdata: dict) -> Optional[dict]:
+    """Non-blocking wrapper of aggregate_graph_via_sidecar for async call sites."""
+    return await asyncio.to_thread(aggregate_graph_via_sidecar, gdata)

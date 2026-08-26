@@ -121,40 +121,40 @@ It ships with a **multi-agent debate engine**, **parallel swarm execution**, **M
 
 ### 🧠 Core Intelligence
 
-| Feature | Description |
-|---------|-------------|
-| **Universal Provider Support** | Gemini, OpenAI, Anthropic, Groq, DeepSeek, Qwen, GLM, Kimi, Ollama (local). Swap models at runtime. |
-| **Tool-Calling Runtime** | Terminal execution, file I/O, code editing, web search, URL scraping — all with human-in-the-loop approval. |
-| **Streaming Chat** | Real-time SSE-based streaming with full Markdown rendering and syntax highlighting. |
-| **Session Persistence** | SQLite-backed conversation history with session management and cross-device hydration. |
+| Feature                        | Description                                                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| **Universal Provider Support** | Gemini, OpenAI, Anthropic, Groq, DeepSeek, Qwen, GLM, Kimi, Ollama (local). Swap models at runtime.         |
+| **Tool-Calling Runtime**       | Terminal execution, file I/O, code editing, web search, URL scraping — all with human-in-the-loop approval. |
+| **Streaming Chat**             | Real-time SSE-based streaming with full Markdown rendering and syntax highlighting.                         |
+| **Session Persistence**        | SQLite-backed conversation history with session management and cross-device hydration.                      |
 
 ### ⚔️ Multi-Agent Systems
 
-| Feature | Description |
-|---------|-------------|
-| **Warroom Debate** | Sequential multi-round debate engine — agents argue, critique, and reach consensus. A Judge synthesizes the verdict. |
-| **CollaborationRoom** | Parallel swarm dispatch — up to 10 agents across different providers respond simultaneously. |
-| **Agent Personas** | Pre-configured roles (Architect, Scraper, CodeGen) with full custom persona support. |
-| **Tavern Card Import** | Import SillyTavern/TavernAI `.png` and `.json` character cards for multi-character roleplaying. |
+| Feature                | Description                                                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Warroom Debate**     | Sequential multi-round debate engine — agents argue, critique, and reach consensus. A Judge synthesizes the verdict. |
+| **CollaborationRoom**  | Parallel swarm dispatch — up to 10 agents across different providers respond simultaneously.                         |
+| **Agent Personas**     | Pre-configured roles (Architect, Scraper, CodeGen) with full custom persona support.                                 |
+| **Tavern Card Import** | Import SillyTavern/TavernAI `.png` and `.json` character cards for multi-character roleplaying.                      |
 
 ### 🔌 Extensibility & Integration
 
-| Feature | Description |
-|---------|-------------|
-| **MCP Protocol** | Model Context Protocol support — connect external tools (GitHub, PostgreSQL, Filesystem, etc.) via stdio or SSE transports. |
-| **Background Workers** | Cron job scheduler and filesystem watchdog for automated task execution. |
-| **Channels** | Telegram and Discord bot bridges — extend Openzess conversations to messaging platforms. |
-| **Developer API** | OpenAI-compatible and Anthropic-compatible REST endpoints (`/v1/chat/completions`, `/v1/messages`). |
+| Feature                | Description                                                                                                                 |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **MCP Protocol**       | Model Context Protocol support — connect external tools (GitHub, PostgreSQL, Filesystem, etc.) via stdio or SSE transports. |
+| **Background Workers** | Cron job scheduler and filesystem watchdog for automated task execution.                                                    |
+| **Channels**           | Telegram and Discord bot bridges — extend Openzess conversations to messaging platforms.                                    |
+| **Developer API**      | OpenAI-compatible and Anthropic-compatible REST endpoints (`/v1/chat/completions`, `/v1/messages`).                         |
 
 ### 🎨 Interface & Experience
 
-| Feature | Description |
-|---------|-------------|
-| **Light & Dark Themes** | Full dual-theme support with smooth transitions. |
-| **Graphify** | Visual knowledge graph renderer for relationship mapping. |
-| **Canvas / Knowledge Base** | Structured document viewer and content workspace. |
-| **TTS Engine** | Built-in text-to-speech synthesis via gTTS. |
-| **Matrix Viewer** | Virtual display streaming interface for remote desktop interaction. |
+| Feature                     | Description                                                         |
+| --------------------------- | ------------------------------------------------------------------- |
+| **Light & Dark Themes**     | Full dual-theme support with smooth transitions.                    |
+| **Graphify**                | Visual knowledge graph renderer for relationship mapping.           |
+| **Canvas / Knowledge Base** | Structured document viewer and content workspace.                   |
+| **TTS Engine**              | Built-in text-to-speech synthesis via gTTS.                         |
+| **Matrix Viewer**           | Virtual display streaming interface for remote desktop interaction. |
 
 ---
 
@@ -194,16 +194,16 @@ It ships with a **multi-agent debate engine**, **parallel swarm execution**, **M
 
 ### Component Breakdown
 
-| Layer | Technology | Responsibility |
-|-------|-----------|----------------|
-| **Frontend** | React 18 + TypeScript + Vite | UI, routing, state management, SSE streaming |
-| **Backend** | FastAPI + Python 3.11+ | API routing, agent orchestration, tool execution |
-| **Agent Core** | LiteLLM + Custom Tool Runtime | Multi-provider LLM calls, function calling, approval flow |
-| **Swarm Manager** | Async Python | Parallel multi-agent dispatch and debate orchestration |
-| **MCP Manager** | stdio/SSE subprocess | External tool protocol connections |
-| **Database** | SQLAlchemy + SQLite | Session storage, message history, persona management |
-| **Channels** | python-telegram-bot, discord.py | Cross-platform messaging bridges |
-| **Memory** | ChromaDB (vector store) | Semantic memory vault for agent context |
+| Layer             | Technology                      | Responsibility                                            |
+| ----------------- | ------------------------------- | --------------------------------------------------------- |
+| **Frontend**      | React 18 + TypeScript + Vite    | UI, routing, state management, SSE streaming              |
+| **Backend**       | FastAPI + Python 3.11+          | API routing, agent orchestration, tool execution          |
+| **Agent Core**    | LiteLLM + Custom Tool Runtime   | Multi-provider LLM calls, function calling, approval flow |
+| **Swarm Manager** | Async Python                    | Parallel multi-agent dispatch and debate orchestration    |
+| **MCP Manager**   | stdio/SSE subprocess            | External tool protocol connections                        |
+| **Database**      | SQLAlchemy + SQLite             | Session storage, message history, persona management      |
+| **Channels**      | python-telegram-bot, discord.py | Cross-platform messaging bridges                          |
+| **Memory**        | ChromaDB (vector store)         | Semantic memory vault for agent context                   |
 
 ---
 
@@ -241,6 +241,7 @@ DATABASE_URL=postgresql://openzess:password@localhost:5432/openzess
 ### 3. Install Dependencies
 
 **Backend:**
+
 ```bash
 python -m venv venv
 venv\Scripts\activate          # Windows
@@ -249,6 +250,7 @@ pip install -r requirements.txt
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm install
@@ -273,12 +275,14 @@ chmod +x scripts/start_wsl.sh
 #### Option C — Manual Start
 
 **Terminal 1 — Backend:**
+
 ```bash
 cd backend
 uvicorn app.server:app --host 0.0.0.0 --reload --port 8000
 ```
 
 **Terminal 2 — Frontend:**
+
 ```bash
 cd frontend
 npm run dev
@@ -309,6 +313,7 @@ You will be greeted by the boot sequence. Select a provider and enter your API k
 <td valign="top" width="50%">
 
 ### Frontend
+
 - **React 18** — Component architecture
 - **TypeScript** — Type-safe development
 - **Vite 8** — Sub-second HMR
@@ -322,6 +327,7 @@ You will be greeted by the boot sequence. Select a provider and enter your API k
 <td valign="top" width="50%">
 
 ### Backend
+
 - **FastAPI** — High-performance async API
 - **LiteLLM** — Universal LLM gateway
 - **SQLAlchemy** — ORM & migrations
@@ -401,13 +407,46 @@ openzess/
 
 ## 🗺️ Roadmap
 
-- [ ] **Plugin Marketplace** — Community-contributed agent skills and MCP servers
-- [ ] **Voice Interface** — Real-time voice input/output with Whisper + TTS
-- [ ] **Cloud Deployment** — One-click Render/Vercel deployment pipeline
-- [ ] **Multi-user Auth** — Role-based access control for team environments
-- [ ] **Agent Memory** — Persistent long-term memory across sessions via ChromaDB
-- [ ] **Mobile Responsive** — Full mobile-first responsive layout
-- [ ] **Simulation Mode** — Dry-run tool execution for safe testing
+**Legend:** ✅ Shipped · 🚧 In Progress · 🔜 Planned · 💡 Exploring
+
+### ✅ v1.1 — Current Stable
+
+- ✅ **Multi-provider agent core** — Gemini, OpenAI, Anthropic, DeepSeek, Groq, Qwen, Moonshot, OpenRouter & Ollama via LiteLLM
+- ✅ **Memory Vault** — persistent long-term memory across sessions backed by ChromaDB vectors
+- ✅ **Swarm & WarRoom** — parallel agent squads plus structured multi-persona debate engine
+- ✅ **MCP registry** — Model Context Protocol servers with auto-reconnect and health tracking
+- ✅ **Plugin runtime** — hot-loaded Python tools ([paperbanana](backend/app/plugins/paperbanana_plugin.py), PC control, system health)
+- ✅ **Channel bridges** — Telegram & Discord bots with live start/stop controls
+- ✅ **Automation** — APScheduler cron jobs, watchdog file triggers, Tavern persona imports
+- ✅ **Matrix viewer** — native screen-stream with remote click/type/key injection
+
+### 🚧 v1.2 — Hybrid Performance Engine
+
+- 🚧 **Rust acceleration sidecar** — optional Axum microservice offloading CPU-bound work with silent pure-Python fallback ([design doc](plans/hybrid-python-rust.md))
+  - ✅ `/image/encode` frame compression API + Pillow fallback contract
+  - ✅ Matrix stream encoding moved off the asyncio event loop
+  - 🚧 Signed release binaries & WSL2 build path (Windows Smart App Control blocks unsigned local builds)
+- 🚧 **Graphify auto-rebuild** — `POST /api/graphify/rebuild` rescans backend modules, plugins & frontend pages into a live knowledge graph + markdown report
+- 🚧 **PaperBanana theme engine** — four publication palettes (`academic`, `dark_matrix`, `vibrant`, `deep`) at 300 DPI with formatted ticks
+- 🚧 **Test suite expansion** — sidecar client contracts, plugin registry integrity, Graphify API schema coverage
+
+### 🔜 v1.3 — Developer Experience
+
+- 🔜 **Plugin Marketplace** — community-contributed agent skills and one-click MCP installs
+- 🔜 **Simulation Mode** — dry-run tool execution for safe testing before real runs
+- 🔜 **Autonomous task planner** — multi-step checklist → execute → validate loop for complex goals
+- 🔜 **Safe Python REPL tool** — sandboxed `execute_python_code` with stdout/stderr capture
+- 🔜 **CI quality gates** — pytest + ESLint + Vite build checks on every pull request
+
+### 💡 v2.0 — Platform Horizons
+
+- 💡 **Voice interface** — real-time speech input/output (Whisper STT + streaming TTS)
+- 💡 **Cloud deployment** — one-click Render/Fly.io pipeline with managed Postgres
+- 💡 **Multi-user auth** — role-based access control for team environments
+- 💡 **Mobile-first UI** — fully responsive layout down to phone breakpoints
+- 💡 **Distributed swarms** — spread agent squads across multiple machines
+
+> 💡 Want to claim an item? Comment on or open an issue referencing the milestone — see [Contributing](#-contributing).
 
 ---
 

@@ -26,7 +26,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/health", get(health))
-        .route("/image/encode", post(encode_image));
+        .route("/image/encode", post(encode_image))
+        .route("/graphify/report", post(graphify_report));
 
     let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 8100));
     let listener = tokio::net::TcpListener::bind(addr)
@@ -117,4 +118,49 @@ fn header_str(headers: &HeaderMap, name: &str) -> Option<String> {
 
 fn bad_request(msg: &str) -> Response {
     (StatusCode::BAD_REQUEST, msg.to_string()).into_response()
+}
+
+/// POST /graphify/report — aggregate a Graphify knowledge-graph payload.
+///
+/// Body: `{ "nodes": [ { "community": 2, .. }, .. ], "links": [ .. ] }`
+/// Responds: `{ "nodes": <count>, "edges": <count>, "communities": <distinct> }`
+/// Mirrors the pure-Python fallback in server.py exactly.
+async fn graphify_report(Json(body): Json<serde_json::Value>) -> Response {
+    // Aggregation is cheap, but large graphs stay off the async reactor.
+    let result = tokio::task::spawn_blocking(move || {
+        let empty = Vec::new();
+        let nodes = body
+            .get("nodes")
+            .and_then(|v| v.as_array())
+            .unwrap_or(&empty);
+        let links = body
+            .get("links")
+            .and_then(|v| v.as_array())
+            .unwrap_or(&empty);
+
+        let mut communities = std::collections::HashSet::new();
+        for node in nodes {
+            let community = node
+                .get("community")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(1);
+            communities.insert(community);
+        }
+
+        serde_json::json!({
+            "nodes": nodes.len(),
+            "edges": links.len(),
+            "communities": communities.len(),
+        })
+    })
+    .await;
+
+    match result {
+        Ok(stats) => Json(stats).into_response(),
+        Err(join_err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("aggregation task failed: {join_err}"),
+        )
+            .into_response(),
+    }
 }

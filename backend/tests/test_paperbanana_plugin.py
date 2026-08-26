@@ -17,6 +17,7 @@ Run from the repository root::
 """
 
 import os
+import re
 
 import matplotlib
 
@@ -476,5 +477,82 @@ class TestPluginRegistry:
             assert param in properties
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Theme palette engine (v1.2 — four publication themes)
+# ─────────────────────────────────────────────────────────────────────────────
 
+class TestThemePalettes:
+    def test_four_core_themes_are_fully_defined(self):
+        for theme in ("academic", "dark_matrix", "vibrant", "deep"):
+            palette = pb.THEME_PALETTES[theme]
+            for key in ("bg", "card_bg", "border", "title", "text", "accent", "categories"):
+                assert key in palette, f"{theme} missing '{key}'"
+            # Every theme must style all five semantic node categories.
+            for category in ("input", "process", "agent", "storage", "output"):
+                cat = palette["categories"][category]
+                assert {"bg", "border", "text"} <= set(cat), f"{theme}/{category} incomplete"
 
+    def test_dark_matrix_uses_cyberpunk_slate_and_cyan(self):
+        palette = pb.THEME_PALETTES["dark_matrix"]
+        assert palette["bg"].lower() == "#0b0f17"
+        assert palette["accent"].lower() == "#00f0ff"
+
+    def test_deep_theme_uses_navy_with_teal_accent(self):
+        palette = pb.THEME_PALETTES["deep"]
+        assert palette["bg"].lower() == "#0f172a"
+        assert palette["accent"].lower() == "#14b8a6"
+
+    def test_vibrant_theme_is_purple_indigo_family(self):
+        palette = pb.THEME_PALETTES["vibrant"]
+        assert palette["accent"].lower() == "#7c3aed"
+        assert palette["categories"]["process"]["border"].lower() == "#6366f1"
+
+    def test_diagram_schema_exposes_all_five_themes(self):
+        schema = next(
+            s for s in pb.plugin_registry.schemas
+            if s["function"]["name"] == "generate_methodology_diagram"
+        )
+        enum = schema["function"]["parameters"]["properties"]["theme"]["enum"]
+        assert set(enum) >= {"academic", "dark_matrix", "vibrant", "deep"}
+
+    @pytest.mark.parametrize("theme", ["academic", "dark_matrix", "vibrant", "deep"])
+    def test_diagram_renders_under_every_theme(self, dirs, sample_nodes, sample_edges, theme):
+        result = pb.generate_methodology_diagram(
+            title=f"Theme Check — {theme}", nodes=sample_nodes, edges=sample_edges, theme=theme
+        )
+        assert result.startswith("###")
+        # Parse the FIRST artifact URL only (the footer also mentions the path).
+        match = re.search(r"/uploads/diagrams/([\w.\-]+)", result)
+        assert match, f"no diagram URL in output: {result[:200]}"
+        assert os.path.exists(os.path.join(dirs["diagrams"], match.group(1)))
+
+    @pytest.mark.parametrize(
+        "plot_type",
+        ["bar", "line", "scatter", "heatmap", "box", "histogram"],
+    )
+    def test_all_six_plot_types_render_at_300_dpi(self, dirs, plot_type):
+        data = {
+            "bar": {"labels": ["A", "B"], "values": [3, 5]},
+            "line": {"labels": [1, 2, 3], "values": [2, 4, 6]},
+            "scatter": {"x": [1, 2, 3], "y": [5, 3, 8]},
+            "heatmap": {"matrix": [[0.1, 0.9], [0.4, 0.6]], "x_ticks": ["x1", "x2"], "y_ticks": ["y1", "y2"]},
+            "box": {"series": [{"name": "G1", "values": [1, 2, 3]}, {"name": "G2", "values": [2, 3, 4]}]},
+            "histogram": {"values": [1, 2, 2, 3, 3, 3]},
+        }[plot_type]
+        result = pb.generate_statistical_plot(
+            plot_type=plot_type, title=f"DPI Check {plot_type}", data=data,
+            x_label="X", y_label="Y", palette_style="vibrant",
+        )
+        assert result.startswith("### 📈"), result
+        # Parse the FIRST artifact URL only (the footer also mentions the path).
+        match = re.search(r"/uploads/plots/([\w.\-]+)", result)
+        assert match, f"no plot URL in output: {result[:200]}"
+        from PIL import Image
+        with Image.open(os.path.join(dirs["plots"], match.group(1))) as img:
+            assert img.info.get("dpi", (0,))[0] >= 299  # 300 DPI output
+
+    def test_unknown_theme_falls_back_to_academic(self, dirs, sample_nodes, sample_edges):
+        result = pb.generate_methodology_diagram(
+            title="Fallback", nodes=sample_nodes, edges=sample_edges, theme="does_not_exist"
+        )
+        assert result.startswith("###")  # no crash -> graceful default
