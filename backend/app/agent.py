@@ -606,7 +606,15 @@ class OpenzessAgent:
         
         self.messages = []
         default_inst = "You are openzess, a self-growing AI agent and coding assistant. You can synthesize your own tools, write code, persist memories into your ChromaDB vector vault, and execute commands inside a secure Linux Debian WSL sandbox."
-        self.messages.append({"role": "system", "content": system_instruction if system_instruction else default_inst})
+        
+        try:
+            from . import habit_learner
+            profile = habit_learner.get_user_profile_prompt()
+            final_inst = (system_instruction if system_instruction else default_inst) + profile
+        except Exception:
+            final_inst = system_instruction if system_instruction else default_inst
+            
+        self.messages.append({"role": "system", "content": final_inst})
         
         if history:
             for msg in history:
@@ -743,9 +751,15 @@ class OpenzessAgent:
             
             result = self._handle_response_loop()
             
-            # --- RAG INGESTION ---
-            if not result.get("auth_required") and result.get("reply") and memory_collection is not None:
-                self._ingest_memory(self.last_prompt, result["reply"])
+            # --- RAG & HABIT INGESTION ---
+            if not result.get("auth_required") and result.get("reply"):
+                if memory_collection is not None:
+                    self._ingest_memory(self.last_prompt, result["reply"])
+                try:
+                    from . import habit_learner
+                    habit_learner.extract_and_learn_habits(self.last_prompt, result["reply"])
+                except Exception:
+                    pass
                 
             return result
         except BaseException as e:
@@ -822,8 +836,14 @@ class OpenzessAgent:
                 self.messages.append(msg_dict)
                 
                 if not tool_calls:
-                    if collected_content and memory_collection is not None:
-                        self._ingest_memory(self.last_prompt, collected_content)
+                    if collected_content:
+                        if memory_collection is not None:
+                            self._ingest_memory(self.last_prompt, collected_content)
+                        try:
+                            from . import habit_learner
+                            habit_learner.extract_and_learn_habits(self.last_prompt, collected_content)
+                        except Exception:
+                            pass
                     yield {"type": "done", "auth_required": False, "reply": collected_content}
                     return
                     
