@@ -1142,7 +1142,7 @@ async def terminal_exec(req: TerminalExecRequest):
 async def get_graphify_report():
     """Returns parsed stats from the graphify GRAPH_REPORT.md for the frontend panel."""
     import re
-    report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "graphify-out", "GRAPH_REPORT.md")
+    report_path = os.path.join(GRAPHIFY_DIR, "GRAPH_REPORT.md")
     try:
         if not os.path.exists(report_path):
             raise HTTPException(status_code=404, detail="Graph report not found. Run graphifyy first.")
