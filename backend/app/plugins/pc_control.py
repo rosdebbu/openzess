@@ -1,13 +1,14 @@
-import pyautogui
 import os
 import base64
 from plugin_loader import plugin_registry
 
-# Enforce fail-safe (abort if mouse goes to corner)
-pyautogui.FAILSAFE = True
-
-# Disable pauses for AI efficiency
-pyautogui.PAUSE = 0.1
+try:
+    import pyautogui
+    pyautogui.FAILSAFE = True
+    pyautogui.PAUSE = 0.1
+    _PYAUTOGUI_AVAILABLE = True
+except Exception:
+    _PYAUTOGUI_AVAILABLE = False
 
 @plugin_registry.register(
     name="take_screenshot",
@@ -15,16 +16,14 @@ pyautogui.PAUSE = 0.1
     schema_params={"properties": {}, "required": []}
 )
 def take_screenshot():
+    if not _PYAUTOGUI_AVAILABLE:
+        return "[SYSTEM INFO] Virtual Desktop display is not currently mounted (Xvfb offline)."
     try:
-        # Note: PyAutoGUI uses scrot natively on linux to screenshot the root X window.
         screenshot_path = os.path.join(os.getcwd(), "temp_matrix_screen.png")
         pyautogui.screenshot(screenshot_path)
-        
-        # We don't read the base64 here because the LLM standard OpenAPI tool schema doesn't allow image arrays.
-        # Instead, agent.py will detect this specific tool name and inject the image natively outside this boundary.
-        return f"[SYSTEM SUCCESS] Screenshot created at {screenshot_path}. The Neural Router will intercept this and inject it into your visual cortex immediately."
+        return f"[SYSTEM SUCCESS] Screenshot created at {screenshot_path}."
     except Exception as e:
-        return f"Screenshot failed in WSL matrix: {str(e)}"
+        return f"Screenshot failed: {str(e)}"
 
 @plugin_registry.register(
     name="mouse_click",
