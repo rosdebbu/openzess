@@ -1,0 +1,30 @@
+# Auto detect text files and normalize line endings
+* text=auto
+
+# Source code
+*.py text diff=python
+*.rs text diff=rust
+*.ts text
+*.tsx text
+*.js text
+*.json text
+*.md text
+*.yml text
+*.yaml text
+*.toml text
+*.html text
+*.css text
+
+# Windows scripts must keep CRLF
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binaries - never touch
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.db binary
+*.exe binary
+*.lock binary
