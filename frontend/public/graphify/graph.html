@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenZess Codebase Graph</title>
+  <script src="https://unpkg.com/force-graph"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0b0f17;
+      color: #e2e8f0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #graph { width: 100%; height: 100%; }
+    
+    /* Overlay HUD */
+    .hud {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px 18px;
+      z-index: 100;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      max-width: 320px;
+    }
+    .hud h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .hud p {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+    
+    /* Search Bar */
+    .search-box {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 100;
+    }
+    .search-input {
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 14px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+      width: 220px;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+      width: 260px;
+    }
+
+    /* Node Details Tooltip Card */
+    #node-card {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(17, 24, 39, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      z-index: 100;
+      display: none;
+      max-width: 340px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .card-category {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #38bdf8;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hud">
+    <h2>⚡ OpenZess Architecture</h2>
+    <p>Interactive Knowledge Graph. Click any node to inspect relationships. Drag to pan, scroll to zoom.</p>
+  </div>
+
+  <div class="search-box">
+    <input type="text" class="search-input" id="search" placeholder="Search node or module...">
+  </div>
+
+  <div id="node-card">
+    <div class="card-category" id="card-cat">CATEGORY</div>
+    <div class="card-title" id="card-name">Node Name</div>
+    <div class="card-desc" id="card-desc">Description of component...</div>
+  </div>
+
+  <div id="graph"></div>
+
+  <script>
+    const CATEGORY_COLORS = {
+      "Core Agent": "#38bdf8",
+      "Backend API": "#a855f7",
+      "Multi-Agent": "#ec4899",
+      "Memory / RAG": "#10b981",
+      "MCP Protocol": "#f59e0b",
+      "Plugins": "#f43f5e",
+      "Database": "#6366f1",
+      "System": "#06b6d4",
+      "Bridges": "#eab308",
+      "Frontend": "#3b82f6"
+    };
+
+    fetch('./graph.json')
+      .then(res => res.json())
+      .then(data => {
+        const elem = document.getElementById('graph');
+        const card = document.getElementById('node-card');
+        const cardCat = document.getElementById('card-cat');
+        const cardName = document.getElementById('card-name');
+        const cardDesc = document.getElementById('card-desc');
+
+        const Graph = ForceGraph()(elem)
+          .graphData(data)
+          .nodeId('id')
+          .nodeVal('val')
+          .nodeLabel('name')
+          .nodeColor(node => CATEGORY_COLORS[node.category] || '#94a3b8')
+          .linkColor(() => 'rgba(255, 255, 255, 0.2)')
+          .linkDirectionalArrowLength(4)
+          .linkDirectionalArrowRelPos(1)
+          .linkCurvature(0.1)
+          .backgroundColor('#0b0f17')
+          .nodeCanvasObject((node, ctx, globalScale) => {
+            const label = node.name;
+            const fontSize = 12 / globalScale;
+            ctx.font = `${fontSize}px Sans-Serif`;
+            
+            // Draw glow
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, (node.val || 8) / 2 + 2, 0, 2 * Math.PI, false);
+            ctx.fillStyle = CATEGORY_COLORS[node.category] || '#38bdf8';
+            ctx.shadowColor = CATEGORY_COLORS[node.category] || '#38bdf8';
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Draw label
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(label, node.x, node.y + (node.val || 8) / 2 + 8 / globalScale);
+          })
+          .onNodeClick(node => {
+            cardCat.textContent = node.category || 'COMPONENT';
+            cardName.textContent = node.name;
+            cardDesc.textContent = node.desc || 'OpenZess architectural module.';
+            card.style.display = 'block';
+            Graph.centerAt(node.x, node.y, 1000);
+            Graph.zoom(3, 1000);
+          })
+          .onBackgroundClick(() => {
+            card.style.display = 'none';
+          });
+
+        // Search highlight
+        document.getElementById('search').addEventListener('input', (e) => {
+          const val = e.target.value.toLowerCase().trim();
+          if (!val) return;
+          const match = data.nodes.find(n => n.name.toLowerCase().includes(val) || n.id.toLowerCase().includes(val));
+          if (match) {
+            Graph.centerAt(match.x, match.y, 800);
+            Graph.zoom(2.5, 800);
+            cardCat.textContent = match.category;
+            cardName.textContent = match.name;
+            cardDesc.textContent = match.desc || '';
+            card.style.display = 'block';
+          }
+        });
+      })
+      .catch(err => {
+        console.error("Failed to load graph data:", err);
+      });
+  </script>
+</body>
+</html>
