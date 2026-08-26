@@ -20,9 +20,9 @@ import shutil
 from . import tavern_parser
 from .swarm_manager import swarm_manager
 import mss
-# Optional Rust acceleration (plans/hybrid-python-rust.md): inert unless
-# SIDECAR_URL is set; every helper silently falls back to pure-Python/Pillow.
+from . import sidecar_client
 from .sidecar_client import encode_image_async, aggregate_graph_via_sidecar
+from .plugin_loader import plugin_registry, load_plugins
 # pyautogui is lazy-loaded inside the Matrix WebSocket handler to avoid
 # failing at server startup when the Xvfb display isn't ready yet.
 pyautogui = None
@@ -1207,6 +1207,147 @@ async def get_graphify_report():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ================================
+# BRAIN & EVOLUTION DASHBOARD
+# ================================
+_SERVER_START_TIME = time.time()
+
+class CreateMemoryRequest(BaseModel):
+    concept: str
+    details: str
+    tags: Optional[str] = "general"
+
+@app.get("/api/brain/skills")
+async def get_brain_skills():
+    """Lists all dynamically synthesized skills/plugins from backend/app/plugins/."""
+    plugins_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "plugins"))
+    skills = []
+    
+    if os.path.exists(plugins_dir):
+        for filename in sorted(os.listdir(plugins_dir)):
+            if filename.endswith(".py") and not filename.startswith("__"):
+                filepath = os.path.join(plugins_dir, filename)
+                try:
+                    with open(filepath, "r", encoding="utf-8") as f:
+                        code = f.read()
+                    
+                    # Extract registered tool names belonging to this file
+                    plugin_tools = []
+                    for schema in plugin_registry.schemas:
+                        fn_name = schema.get("function", {}).get("name", "")
+                        if f"def {fn_name}" in code or f'"{fn_name}"' in code or f"'{fn_name}'" in code:
+                            plugin_tools.append({
+                                "name": fn_name,
+                                "description": schema.get("function", {}).get("description", "")
+                            })
+                    
+                    skills.append({
+                        "filename": filename,
+                        "name": filename.replace("_plugin.py", "").replace(".py", "").replace("_", " ").title(),
+                        "code": code,
+                        "size_bytes": len(code.encode("utf-8")),
+                        "line_count": len(code.splitlines()),
+                        "tools": plugin_tools
+                    })
+                except Exception as e:
+                    print(f"Error reading plugin {filename}: {e}")
+                    
+    return {"skills": skills, "total_tools": len(plugin_registry.funcs)}
+
+@app.post("/api/brain/skills/reload")
+async def reload_brain_skills():
+    """Hot-reloads all plugins in memory."""
+    load_plugins()
+    return {
+        "status": "success",
+        "loaded_tools": len(plugin_registry.funcs),
+        "message": f"Successfully reloaded {len(plugin_registry.funcs)} custom tools."
+    }
+
+@app.get("/api/brain/memories")
+async def get_brain_memories(query: Optional[str] = None, limit: int = 30):
+    """Retrieves long-term memories from ChromaDB Vector Vault."""
+    if memory_collection is None:
+        return {"memories": [], "total": 0, "status": "unavailable"}
+    
+    try:
+        if query and query.strip():
+            results = memory_collection.query(query_texts=[query], n_results=min(limit, 50))
+            memories = []
+            if results and results.get("documents") and results["documents"][0]:
+                for i, doc in enumerate(results["documents"][0]):
+                    doc_id = results["ids"][0][i] if results.get("ids") else f"mem_{i}"
+                    meta = results["metadatas"][0][i] if results.get("metadatas") else {}
+                    memories.append({
+                        "id": doc_id,
+                        "document": doc,
+                        "concept": meta.get("concept", "Untitled Concept"),
+                        "tags": meta.get("tags", "general"),
+                        "score": results["distances"][0][i] if results.get("distances") else None
+                    })
+            return {"memories": memories, "total": len(memories), "status": "ok"}
+        else:
+            data = memory_collection.get(limit=limit)
+            memories = []
+            if data and data.get("documents"):
+                for i, doc in enumerate(data["documents"]):
+                    doc_id = data["ids"][i] if data.get("ids") else f"mem_{i}"
+                    meta = data["metadatas"][i] if data.get("metadatas") else {}
+                    memories.append({
+                        "id": doc_id,
+                        "document": doc,
+                        "concept": meta.get("concept", "Untitled Concept"),
+                        "tags": meta.get("tags", "general")
+                    })
+            return {"memories": memories, "total": len(memories), "status": "ok"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/brain/memories")
+async def create_brain_memory(req: CreateMemoryRequest):
+    """Stores a new concept into ChromaDB Vector Vault."""
+    from .agent import save_memory
+    output = save_memory(req.concept, req.details, req.tags or "general")
+    return {"message": output}
+
+@app.delete("/api/brain/memories/{doc_id}")
+async def delete_brain_memory(doc_id: str):
+    """Deletes a memory item from ChromaDB."""
+    if memory_collection is None:
+        raise HTTPException(status_code=503, detail="ChromaDB is unavailable")
+    try:
+        memory_collection.delete(ids=[doc_id])
+        return {"status": "deleted", "id": doc_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/brain/telemetry")
+async def get_brain_telemetry():
+    """Returns live telemetry of the hybrid Python + Rust acceleration engine."""
+    sidecar_ok = await sidecar_client.sidecar_healthy_async()
+    
+    total_memories = 0
+    if memory_collection is not None:
+        try:
+            total_memories = memory_collection.count()
+        except Exception:
+            total_memories = 0
+            
+    return {
+        "status": "healthy",
+        "uptime_seconds": int(time.time() - _SERVER_START_TIME),
+        "python_engine": "FastAPI + LiteLLM (Python 3.12)",
+        "rust_sidecar": {
+            "enabled": sidecar_client.sidecar_enabled(),
+            "healthy": sidecar_ok,
+            "url": sidecar_client.SIDECAR_URL or "http://127.0.0.1:8100 (auto-fallback)"
+        },
+        "memory_vault": {
+            "status": "online" if memory_collection is not None else "offline",
+            "total_documents": total_memories
+        },
+        "skills_active": len(plugin_registry.funcs)
+    }
 
 if __name__ == "__main__":
     import uvicorn
