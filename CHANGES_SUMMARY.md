@@ -101,11 +101,29 @@ All three registered in `native_tool_funcs` with full JSON schemas in `NATIVE_TO
 ## ✅ Git Result
 
 ```
-2874583 (HEAD -> main, origin/main) feat: hybrid Rust sidecar acceleration,
-                                     agent self-evolution tools, and Graphify auto-rebuild
-00226ba feat: add optional Rust sidecar acceleration scaffold and benchmark harness
+ff46a35 matrix viewer now has split view, fps toggle and a live terminal panel
+98ada1d matrix stream got frame diffing and 30-60fps, added live terminal exec endpoint
+fd2079e terminal tool works on windows now, tries wsl first then powershell
+3e70e9c tests for the new hybrid sidecar features
+663177f agent got a new tool to analyze code metrics on its own
+78d4fed python side can call the new stuff, falls back to python if rust is off
+56e82fe hooked the 3 new endpoints into the sidecar router
+62092b6 add fast code stats counter, tokens lines and bracket balance
+ab0b4c9 add cosine similarity top-k search so memory recall is faster
+75d0ce5 add bfs shortest path search for graphify graphs
 ```
 
-- Single atomic commit (no one-by-one commits)
-- Pushed successfully: `00226ba..2874583  main -> main`
-- Working tree clean — no pending changes
+- One file = one commit, natural one-line messages
+- All pushed to `origin/main`, working tree clean
+
+---
+
+## 🔁 Session 2 — Hermes Matrix & Terminal Upgrade (Aug 26, 2026)
+
+| File | Change |
+|------|--------|
+| `backend/app/agent.py` | `run_terminal_command` is now cross-platform: WSL → PowerShell fallback on Windows, native bash on Linux, timeout raised to 30s |
+| `backend/app/server.py` | Matrix stream upgraded: frame diffing (only transmit on screen change + 0.5s heartbeat), adaptive 30–60 FPS, client-side `config` action for fps/quality, new `POST /api/terminal/exec` endpoint |
+| `frontend/src/pages/MatrixViewer.tsx` | Rebranded to "Hermes Matrix & Terminal": Split/Matrix/Terminal view tabs, 30/60 FPS toggle, Eco/Balanced/Ultra quality modes, live shell panel with quick-action chips (git status, sidecar health, cargo check, pytest) and command input bar |
+| `.gitattributes` | Added — normalizes line endings, keeps `.bat`/`.ps1` CRLF, protects binaries (fixes persistent LF/CRLF warnings) |
+
