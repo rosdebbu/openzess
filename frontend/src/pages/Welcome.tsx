@@ -130,7 +130,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                              <option value="openai" className="text-black">OpenAI (gpt-4o-mini)</option>
                                              <option value="anthropic" className="text-black">Anthropic (claude-3-5-sonnet)</option>
                                              <option value="groq" className="text-black">Groq (llama-3.3)</option>
-                                             <option value="deepseek" className="text-black">DeepSeek (DeepSeek V3)</option>
+                                             <option value="deepseek" className="text-black">DeepSeek (DeepSeek V3 / R1)</option>
                                              <option value="qwen" className="text-black">Qwen (Qwen 2.5 72B)</option>
                                              <option value="gemma" className="text-black">Gemma (Gemma 2)</option>
                                              <option value="kimi" className="text-black">Kimi (Moonshot 8k)</option>
