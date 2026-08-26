@@ -373,11 +373,10 @@ export default function Chat() {
       const decoder = new TextDecoder();
       
       const responseId = Date.now().toString() + 'r';
-      setMessages(prev => [...prev, { id: responseId, role: 'agent', content: '' }]);
-
       let done = false;
       let streamedResponse = '';
       let buffer = '';
+      let messageAdded = false;
 
       while (!done) {
         const { value, done: doneReading } = await reader.read();
@@ -399,18 +398,37 @@ export default function Chat() {
                               setSearchParams({ session_id: data.session_id }, { replace: true });
                             }
                         } else if (data.type === 'content') {
+                            setIsLoading(false);
                             streamedResponse += data.content;
-                            setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                            if (!messageAdded) {
+                              messageAdded = true;
+                              setMessages(prev => [...prev, { id: responseId, role: 'agent', content: streamedResponse }]);
+                            } else {
+                              setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                            }
                         } else if (data.type === 'tool_start') {
+                            setIsLoading(false);
                             streamedResponse += `\n\n⚙️ Executing \`${data.tool}\`...\n\n`;
-                            setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                            if (!messageAdded) {
+                              messageAdded = true;
+                              setMessages(prev => [...prev, { id: responseId, role: 'agent', content: streamedResponse }]);
+                            } else {
+                              setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                            }
                         } else if (data.type === 'tool_result') {
                             setTerminalLogs(prev => [...prev, { tool: data.tool, args: data.args, output: data.output }]);
                         } else if (data.type === 'auth_required') {
+                            setIsLoading(false);
                             setPendingCalls(data.pending_calls);
                         } else if (data.type === 'error') {
+                            setIsLoading(false);
                             streamedResponse += `\n\n❌ Error: ${data.error}`;
-                            setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                            if (!messageAdded) {
+                              messageAdded = true;
+                              setMessages(prev => [...prev, { id: responseId, role: 'agent', content: streamedResponse }]);
+                            } else {
+                              setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
+                            }
                         }
                     } catch (e) {
                         console.error('Error parsing SSE data', e);
