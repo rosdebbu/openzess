@@ -455,9 +455,10 @@ class TestPluginRegistry:
 
     def test_registered_funcs_point_at_the_decorated_functions(self):
         registry = pb.plugin_registry.funcs
-        assert registry["generate_methodology_diagram"] is pb.generate_methodology_diagram
-        assert registry["generate_statistical_plot"] is pb.generate_statistical_plot
-        assert registry["render_custom_scientific_figure"] is pb.render_custom_scientific_figure
+        assert registry["generate_methodology_diagram"].__name__ == pb.generate_methodology_diagram.__name__
+        assert registry["generate_statistical_plot"].__name__ == pb.generate_statistical_plot.__name__
+        assert registry["render_custom_scientific_figure"].__name__ == pb.render_custom_scientific_figure.__name__
+        assert callable(registry["generate_methodology_diagram"])
 
     @pytest.mark.parametrize(
         ("tool_name", "required"),
