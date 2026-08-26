@@ -21,6 +21,7 @@ from .plugin_loader import plugin_registry, load_plugins
 import json
 import litellm
 from . import background_workers
+from . import sidecar_client
 import smtplib
 from email.mime.text import MIMEText
 
@@ -261,6 +262,14 @@ def recall_memory(query: str, limit: int = 3) -> str:
     except Exception as e:
         return f"Failed to recall memory: {str(e)}"
 
+def analyze_code_metrics(code_text: str) -> str:
+    """Fast Token & Code Analyzer: Evaluates character/word/line count, token approximations, and delimiter balance using the Rust hybrid accelerator."""
+    try:
+        stats, engine = sidecar_client.code_quick_stats(code_text)
+        return f"[CODE METRICS ({engine})] Lines: {stats['line_count']} ({stats['non_empty_lines']} non-empty), Est. Tokens: {stats['estimated_tokens']}, Characters: {stats['char_count']}, Syntax Delimiters Balanced: {stats['is_balanced']}"
+    except Exception as e:
+        return f"Code analysis failed: {e}"
+
 native_tool_funcs = {
     "run_terminal_command": run_terminal_command,
     "search_the_web": search_the_web,
@@ -278,7 +287,8 @@ native_tool_funcs = {
     "send_email": send_email,
     "synthesize_skill": synthesize_skill,
     "save_memory": save_memory,
-    "recall_memory": recall_memory
+    "recall_memory": recall_memory,
+    "analyze_code_metrics": analyze_code_metrics
 }
 
 # Dynamically merge hot-loaded python plugins into the core native ecosystem!
@@ -501,6 +511,20 @@ NATIVE_TOOL_SCHEMAS = [
                     "limit": {"type": "integer", "description": "Number of memories to recall (default 3)"}
                 },
                 "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "analyze_code_metrics",
+            "description": "Code Analyzer Tool: Calculates fast token approximations, line counts, non-empty code lines, and bracket/brace balance via the hybrid acceleration engine.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "code_text": {"type": "string", "description": "Source code text to analyze"}
+                },
+                "required": ["code_text"]
             }
         }
     }
