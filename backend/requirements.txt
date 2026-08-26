@@ -50,4 +50,7 @@ websockify               # Matrix Viewer VNC bridge (WSL sandbox)
 # ── Testing ─────────────────────────────────────────────────────
 pytest
 
+# ── Terminal CLI ────────────────────────────────────────────────
+rich                      # cli.py TUI panels and tables
+
 
