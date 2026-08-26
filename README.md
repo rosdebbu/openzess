@@ -405,48 +405,57 @@ openzess/
 
 ---
 
-## 🗺️ Roadmap
+```text
+         /\_/\
+       >( o.o )<    OPENZESS — LIZARD MATRIX CORE
+       /  \~/  \    Hybrid AI Coding Assistant & Autonomous Engine
+      / /|   |\ \   70% Python + 30% Rust Architecture
+     ( ( | ~ | ) )  Native Terminal CLI + Web React Workspace
+      \ \|   |/ /
+       \ \_-_/ /
+        `--\ \-
+            \ \_
+             `--)
+```
 
-**Legend:** ✅ Shipped · 🚧 In Progress · 🔜 Planned · 💡 Exploring
+---
 
-### ✅ v1.1 — Current Stable
+## 🗺️ Openzess Product Roadmap
 
-- ✅ **Multi-provider agent core** — Gemini, OpenAI, Anthropic, DeepSeek, Groq, Qwen, Moonshot, OpenRouter & Ollama via LiteLLM
-- ✅ **Memory Vault** — persistent long-term memory across sessions backed by ChromaDB vectors
-- ✅ **Swarm & WarRoom** — parallel agent squads plus structured multi-persona debate engine
-- ✅ **MCP registry** — Model Context Protocol servers with auto-reconnect and health tracking
-- ✅ **Plugin runtime** — hot-loaded Python tools ([paperbanana](backend/app/plugins/paperbanana_plugin.py), PC control, system health)
-- ✅ **Channel bridges** — Telegram & Discord bots with live start/stop controls
-- ✅ **Automation** — APScheduler cron jobs, watchdog file triggers, Tavern persona imports
-- ✅ **Matrix viewer** — native screen-stream with remote click/type/key injection
+**Legend:** ✅ Shipped & Verified · 🚧 In Active Development · 🔜 Next Up · 💡 Future Horizons
 
-### 🚧 v1.2 — Hybrid Performance Engine
+### ✅ v1.0 & v1.1 — Foundation & Multi-Agent Core
+- ✅ **Multi-Provider Agent Core** — Gemini 2.5, OpenAI GPT-4o, Anthropic Claude 3.5, DeepSeek V3/R1, Groq, Qwen 2.5, Moonshot, OpenRouter & Ollama via LiteLLM.
+- ✅ **ChromaDB Semantic Memory Vault** — Persistent long-term vector memory across sessions with automatic embeddings.
+- ✅ **WarRoom Multi-Agent Debate Arena** — Structured multi-persona consensus protocols and parallel swarms.
+- ✅ **MCP Protocol Grid** — Universal Model Context Protocol servers with auto-reconnect and schema inspection.
+- ✅ **Hot-Loaded Python Plugin System** — Drop custom Python tools into `backend/app/plugins/` with zero server reboots.
+- ✅ **Channel Bridges** — Live Telegram and Discord bidirectional bots.
+- ✅ **Automation & Scheduling** — APScheduler cron jobs, watchdog file triggers, Tavern persona imports.
 
-- 🚧 **Rust acceleration sidecar** — optional Axum microservice offloading CPU-bound work with silent pure-Python fallback ([design doc](plans/hybrid-python-rust.md))
-  - ✅ `/image/encode` frame compression API + Pillow fallback contract
-  - ✅ Matrix stream encoding moved off the asyncio event loop
-  - 🚧 Signed release binaries & WSL2 build path (Windows Smart App Control blocks unsigned local builds)
-- 🚧 **Graphify auto-rebuild** — `POST /api/graphify/rebuild` rescans backend modules, plugins & frontend pages into a live knowledge graph + markdown report
-- 🚧 **PaperBanana theme engine** — four publication palettes (`academic`, `dark_matrix`, `vibrant`, `deep`) at 300 DPI with formatted ticks
-- 🚧 **Test suite expansion** — sidecar client contracts, plugin registry integrity, Graphify API schema coverage
+### ✅ v2.0 — Cyberpunk Terminal CLI & Self-Growth Engine *(Current)*
+- ✅ **Hermes-Grade Matrix Terminal CLI** — Full-featured interactive TUI (`openzess` in Debian WSL / `.\openzess.bat` on Windows) with 3D ASCII branding, slash commands (`/habits`, `/skills`, `/model`, `/memory`, `/clear`, `/help`), and turn dividers.
+- ✅ **Autonomous Habit Profiler & Self-Growth Loop** (`habit_learner.py`) — Inspired by Honcho & Hermes Agent: automatically infers user coding preferences, environment targets, and communication styles into ChromaDB vector habits.
+- ✅ **Ultra-Low Latency Streaming UI** — Instant SSE token rendering, lazy message bubble allocation, and real-time latency counter.
+- ✅ **Debian 13 (Trixie) WSL2 Sandbox Integration** — Seamless cross-platform execution with automatic Python 3.13 venv detection.
+- ✅ **Lizard Matrix Brand Overhaul** — Deep/Olive Lizard Green theme (`#16a34a`), ASCII Lizard totem, and glowing Web Mascot component.
+- ✅ **100% Green Test Suite** — 86 passing pytest unit tests covering agent reasoning, streaming, plugins, and habit persistence.
 
-### 🔜 v1.3 — Developer Experience
+### 🚧 v2.1 — Autonomous Healing & Rust Sidecar *(In Progress)*
+- 🚧 **Auto-Healing Traceback Debugger** — Agent autonomously intercepts terminal syntax/runtime errors, inspects logs, generates diffs, and applies auto-fixes.
+- 🚧 **Rust Axum Acceleration Sidecar** (`port 8100`) — High-throughput image encoding and compute offload with pure Python fallback.
+- 🚧 **Graphify Knowledge Graph Rebuilder** (`POST /api/graphify/rebuild`) — Live codebase dependency parsing and interactive visual topology.
+- 🚧 **PaperBanana Theme Engine** — Four publication-ready figure palettes (`academic`, `dark_matrix`, `vibrant`, `deep`) at 300 DPI.
 
-- 🔜 **Plugin Marketplace** — community-contributed agent skills and one-click MCP installs
-- 🔜 **Simulation Mode** — dry-run tool execution for safe testing before real runs
-- 🔜 **Autonomous task planner** — multi-step checklist → execute → validate loop for complex goals
-- 🔜 **Safe Python REPL tool** — sandboxed `execute_python_code` with stdout/stderr capture
-- 🔜 **CI quality gates** — pytest + ESLint + Vite build checks on every pull request
+### 🔜 v2.2 — Autonomous Multi-Step Planner *(Planned)*
+- 🔜 **Goal-Driven Execution Planner** (`/goal` mode) — Multi-step task decomposition with automated milestone verification.
+- 🔜 **Simulation & Dry-Run Mode** — Safe preview of destructive file operations before applying to disk.
+- 🔜 **Community Plugin Registry** — One-click import of verified third-party agent skills.
 
-### 💡 v2.0 — Platform Horizons
-
-- 💡 **Voice interface** — real-time speech input/output (Whisper STT + streaming TTS)
-- 💡 **Cloud deployment** — one-click Render/Fly.io pipeline with managed Postgres
-- 💡 **Multi-user auth** — role-based access control for team environments
-- 💡 **Mobile-first UI** — fully responsive layout down to phone breakpoints
-- 💡 **Distributed swarms** — spread agent squads across multiple machines
-
-> 💡 Want to claim an item? Comment on or open an issue referencing the milestone — see [Contributing](#-contributing).
+### 💡 v3.0 — Ubiquitous Intelligence *(Exploring)*
+- 💡 **Real-Time Voice Matrix** — Whisper STT with sub-second streaming neural TTS.
+- 💡 **Distributed Agent Swarms** — Peer-to-peer agent node clustering across local networks.
+- 💡 **Single-Click Cloud Deployment** — Automated Docker/Render deployment workflows.
 
 ---
 
