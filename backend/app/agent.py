@@ -19,7 +19,16 @@ from duckduckgo_search import DDGS
 from .mcp_manager import mcp_registry
 from .plugin_loader import plugin_registry, load_plugins
 import json
+import logging
 import litellm
+
+# Completely silence litellm debug/stderr notices
+litellm.suppress_debug_info = True
+litellm.set_verbose = False
+litellm.drop_params = True
+os.environ["LITELLM_LOG"] = "ERROR"
+logging.getLogger("LiteLLM").setLevel(logging.ERROR)
+
 from . import background_workers
 from . import sidecar_client
 import smtplib
@@ -28,10 +37,9 @@ from email.mime.text import MIMEText
 pyautogui = None
 try:
     import pyautogui
-    # Set pyautogui fail-safe (moves mouse to corner aborts)
     pyautogui.FAILSAFE = False
-except Exception as e:
-    print(f"Warning: pyautogui failed to load (Xvfb matrix offline?): {e}")
+except Exception:
+    pass
 
 # Boot up the custom Python plugin folder dynamically:
 load_plugins()

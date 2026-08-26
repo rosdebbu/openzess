@@ -62,8 +62,9 @@ def load_plugins():
                     spec.loader.exec_module(module)
                     count += 1
                 except Exception as e:
-                    print(f"[Plugin System] Failed to load plugin {filename}: {e}")
+                    if os.environ.get("OPENZESS_DEBUG") == "1":
+                        print(f"[Plugin System] Failed to load plugin {filename}: {e}")
                     
-    if count > 0:
+    if count > 0 and os.environ.get("OPENZESS_DEBUG") == "1":
         print(f"[Plugin System] Successfully hot-loaded {len(plugin_registry.funcs)} custom tools from {count} plugin files!")
 
