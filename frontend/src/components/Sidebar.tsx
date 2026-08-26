@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useToast } from '../contexts/ToastContext';
 import { PERSONAS } from '../utils/personas';
+import LizardLogo from './LizardLogo';
 
 export default function Sidebar() {
   const { toggleTheme } = useTheme();
@@ -107,8 +108,23 @@ export default function Sidebar() {
   return (
     <div className={`bg-[#F5F0EB] dark:bg-[#1E1C1C] border-r border-[#E2DAD2] dark:border-[#3A3838] shrink-0 flex flex-col h-full transition-all duration-300 relative z-20 ${isCollapsed ? 'w-[80px]' : 'w-[260px]'}`}>
       
+      {/* Logo & Brand Header */}
+      <div className={`pt-4 px-4 pb-1 shrink-0 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} border-b border-[#E2DAD2]/50 dark:border-[#3A3838]/50`}>
+         <NavLink to="/" className="flex items-center gap-2.5 group">
+            <LizardLogo size={isCollapsed ? 'sm' : 'sm'} />
+            {!isCollapsed && (
+               <div className="flex flex-col">
+                  <span className="font-bold text-sm tracking-tight text-[#3A3838] dark:text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                     open<span className="text-emerald-500">zess</span>
+                  </span>
+                  <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-mono uppercase tracking-wider font-semibold">Lizard Matrix</span>
+               </div>
+            )}
+         </NavLink>
+      </div>
+
       {/* Current Agent Dropdown Area Inspired by QwenPaw */}
-      <div className={`p-4 border-b border-transparent shrink-0 flex flex-col justify-center relative ${isCollapsed ? 'items-center px-2' : ''}`}>
+      <div className={`p-4 pt-2 border-b border-transparent shrink-0 flex flex-col justify-center relative ${isCollapsed ? 'items-center px-2' : ''}`}>
          {!isCollapsed ? (
              <div className="flex flex-col gap-1 w-full mt-2 relative">
                  <span className="text-[11px] text-[#B8AFA8] font-medium tracking-wide uppercase px-1 mb-1">Current Agent ({Object.keys(PERSONAS).length})</span>
