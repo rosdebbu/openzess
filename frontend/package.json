@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --open",
+    "dev": "vite --config vite.config.mjs --configLoader native",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

@@ -31,6 +31,8 @@ logging.getLogger("LiteLLM").setLevel(logging.ERROR)
 
 from . import background_workers
 from . import sidecar_client
+from . import experiential_client
+import time
 import smtplib
 from email.mime.text import MIMEText
 
@@ -48,7 +50,9 @@ load_plugins()
 try:
     import chromadb
     from chromadb.config import Settings
-    chroma_client = chromadb.PersistentClient(path="./chroma_db", settings=Settings(allow_reset=True))
+    default_chroma_dir = os.path.expanduser("~/.openzess/chroma_db")
+    os.makedirs(default_chroma_dir, exist_ok=True)
+    chroma_client = chromadb.PersistentClient(path=default_chroma_dir, settings=Settings(allow_reset=True))
     # We will use the default SentenceTransformer embedding function natively provided by Chroma
     memory_collection = chroma_client.get_or_create_collection(name="openzess_memory")
 except Exception as e:
@@ -266,6 +270,9 @@ def recall_memory(query: str, limit: int = 3) -> str:
     try:
         if memory_collection is None:
             return "ChromaDB memory is currently unavailable."
+        
+        if memory_collection.count() == 0:
+            return "No relevant memories found in Vector Vault."
         
         results = memory_collection.query(query_texts=[query], n_results=min(limit, 5))
         if not results or not results.get("documents") or not results["documents"][0]:
@@ -563,14 +570,19 @@ PROVIDER_MODELS = {
     "deepseek3": "openrouter/deepseek/deepseek-chat",
     "qwen": "openrouter/qwen/qwen-2.5-72b-instruct",
     "glm": "openrouter/z-ai/glm-5.3-flash",
-    "kimi": "openrouter/moonshotai/moonshot-v1-8k"
+    "kimi": "openrouter/moonshotai/moonshot-v1-8k",
+    "experiential": "openai/default",
+    "exp": "openai/default",
+    "exp:smart": "openai/smart"
 }
 
 class OpenzessAgent:
     def __init__(self, api_key: str = "", provider: str = "gemini", history: list = None, system_instruction: str = None, allowed_tools: list = None):
         # Fallback to environment variables if client-side api_key is empty
         if not api_key or not str(api_key).strip():
-            if provider == "gemini":
+            if provider in ("experiential", "exp", "exp:smart"):
+                self.api_key = os.environ.get("EXP_GATEWAY_KEY", os.environ.get("EXPERIENTIAL_API_KEY", "xpl_gateway"))
+            elif provider == "gemini":
                 self.api_key = os.environ.get("GEMINI_API_KEY", "")
             elif provider == "openai":
                 self.api_key = os.environ.get("OPENAI_API_KEY", "")
@@ -602,7 +614,7 @@ class OpenzessAgent:
         elif ("openrouter/" in self.model_name or (self.api_key and self.api_key.startswith("sk-or-"))) and self.api_key:
             os.environ["OPENROUTER_API_KEY"] = self.api_key
         
-        # Configure custom localhost endpoints (Ollama / LM Studio / LocalAI / vLLM)
+        # Configure custom localhost endpoints (Ollama / LM Studio / LocalAI / vLLM / Experiential Gateway)
         self.api_base = None
         if provider == "ollama":
             self.api_base = os.environ.get("OLLAMA_API_BASE", "http://localhost:11434")
@@ -612,6 +624,11 @@ class OpenzessAgent:
             self.model_name = "openai/local-model"
             if not self.api_key:
                 self.api_key = "lm-studio"
+        elif provider in ("experiential", "exp", "exp:smart"):
+            self.api_base = os.environ.get("EXP_GATEWAY_BASE", experiential_client.DEFAULT_GATEWAY_BASE)
+            self.model_name = os.environ.get("EXP_MODEL", "openai/default")
+            if not self.api_key:
+                self.api_key = os.environ.get("EXP_GATEWAY_KEY", "xpl_gateway")
         
         self.messages = []
         default_inst = "You are openzess, a self-growing AI agent and coding assistant. You can synthesize your own tools, write code, persist memories into your ChromaDB vector vault, and execute commands inside a secure Linux Debian WSL sandbox."
@@ -670,7 +687,20 @@ class OpenzessAgent:
             if self.api_base:
                 call_kwargs["api_base"] = self.api_base
             
-            response = litellm.completion(**call_kwargs)
+            try:
+                response = litellm.completion(**call_kwargs)
+            except Exception as call_err:
+                # Circuit breaker: if gateway is offline/unreachable or transient connection error
+                if self.provider in ("experiential", "exp", "exp:smart") or (self.api_base and ("127.0.0.1" in self.api_base or "localhost" in self.api_base)):
+                    fallback_prov = os.environ.get("OPENZESS_FALLBACK_PROVIDER", "gemini")
+                    fallback_model = PROVIDER_MODELS.get(fallback_prov, "gemini/gemini-2.5-flash")
+                    fallback_key = os.environ.get(f"{fallback_prov.upper()}_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
+                    call_kwargs["model"] = fallback_model
+                    call_kwargs["api_key"] = fallback_key or "dummy_key"
+                    call_kwargs.pop("api_base", None)
+                    response = litellm.completion(**call_kwargs)
+                else:
+                    raise call_err
             
             message = response.choices[0].message
             # Filter litellm specific attributes to keep dict clean for next chat round
@@ -742,19 +772,27 @@ class OpenzessAgent:
         try:
             self.last_prompt = user_prompt
             
-            # --- RAG RETRIEVAL ---
+            # --- RAG RETRIEVAL (Fast-path latency optimization) ---
             rag_context = ""
-            if memory_collection is not None:
+            is_trivial = len(user_prompt.split()) <= 3 and any(w in user_prompt.lower() for w in ["hi", "hello", "hey", "help", "clear", "ping", "test", "ls", "whoami"])
+            if memory_collection is not None and not is_trivial:
                 try:
-                    results = memory_collection.query(query_texts=[user_prompt], n_results=3)
-                    if results and results.get("documents") and results["documents"] and results["documents"][0]:
-                        rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
-                        for doc in results["documents"][0]:
-                            if doc.strip():
-                                rag_context += f"- {doc}\n"
+                    if memory_collection.count() > 0:
+                        results = memory_collection.query(query_texts=[user_prompt], n_results=3)
+                        if results and results.get("documents") and results["documents"] and results["documents"][0]:
+                            rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
+                            for doc in results["documents"][0]:
+                                if doc.strip():
+                                    rag_context += f"- {doc}\n"
                 except Exception as eval_e:
                     print(f"RAG Retrieval failed: {eval_e}")
             
+            # Adaptive complexity routing for Experiential
+            if self.provider in ("exp:smart", "experiential", "exp"):
+                complexity = experiential_client.classify_task_complexity(user_prompt)
+                if self.provider == "exp:smart" or self.model_name in ("openai/default", "openai/smart"):
+                    self.model_name = experiential_client.get_model_for_complexity(complexity, self.model_name)
+
             enhanced_prompt = user_prompt + rag_context if rag_context else user_prompt
             self.messages.append({"role": "user", "content": enhanced_prompt})
             
@@ -777,21 +815,32 @@ class OpenzessAgent:
             raise e
 
     def chat_stream(self, user_prompt: str):
+        t_start = time.time()
+        used_tools = []
         try:
             self.last_prompt = user_prompt
             
+            # --- RAG RETRIEVAL (Fast-path latency optimization) ---
             rag_context = ""
-            if memory_collection is not None:
+            is_trivial = len(user_prompt.split()) <= 3 and any(w in user_prompt.lower() for w in ["hi", "hello", "hey", "help", "clear", "ping", "test", "ls", "whoami"])
+            if memory_collection is not None and not is_trivial:
                 try:
-                    results = memory_collection.query(query_texts=[user_prompt], n_results=3)
-                    if results and results.get("documents") and results["documents"] and results["documents"][0]:
-                        rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
-                        for doc in results["documents"][0]:
-                            if doc.strip():
-                                rag_context += f"- {doc}\n"
+                    if memory_collection.count() > 0:
+                        results = memory_collection.query(query_texts=[user_prompt], n_results=3)
+                        if results and results.get("documents") and results["documents"] and results["documents"][0]:
+                            rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
+                            for doc in results["documents"][0]:
+                                if doc.strip():
+                                    rag_context += f"- {doc}\n"
                 except Exception as eval_e:
                     print(f"RAG Retrieval failed: {eval_e}")
             
+            # Adaptive complexity routing for Experiential
+            if self.provider in ("exp:smart", "experiential", "exp"):
+                complexity = experiential_client.classify_task_complexity(user_prompt)
+                if self.provider == "exp:smart" or self.model_name in ("openai/default", "openai/smart"):
+                    self.model_name = experiential_client.get_model_for_complexity(complexity, self.model_name)
+
             enhanced_prompt = user_prompt + rag_context if rag_context else user_prompt
             self.messages.append({"role": "user", "content": enhanced_prompt})
             
@@ -808,7 +857,24 @@ class OpenzessAgent:
                 if self.api_base:
                     call_kwargs["api_base"] = self.api_base
                 
-                response_stream = litellm.completion(**call_kwargs)
+                try:
+                    # Circuit breaker probe: if targeting local gateway and it's unreachable, failover immediately
+                    if self.provider in ("experiential", "exp", "exp:smart") and self.api_base and ("127.0.0.1" in self.api_base or "localhost" in self.api_base):
+                        if not experiential_client.is_gateway_healthy(self.api_base):
+                            raise ConnectionError("Experiential gateway is offline")
+                    response_stream = litellm.completion(**call_kwargs)
+                except Exception as stream_err:
+                    if self.provider in ("experiential", "exp", "exp:smart") or (self.api_base and ("127.0.0.1" in self.api_base or "localhost" in self.api_base)):
+                        fallback_prov = os.environ.get("OPENZESS_FALLBACK_PROVIDER", "gemini")
+                        fallback_model = PROVIDER_MODELS.get(fallback_prov, "gemini/gemini-2.5-flash")
+                        fallback_key = os.environ.get(f"{fallback_prov.upper()}_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
+                        call_kwargs["model"] = fallback_model
+                        call_kwargs["api_key"] = fallback_key or "dummy_key"
+                        call_kwargs.pop("api_base", None)
+                        yield {"type": "content", "content": f"*[⚡ Gateway Offline/Busy → Auto-switched to {fallback_prov}]*\n\n"}
+                        response_stream = litellm.completion(**call_kwargs)
+                    else:
+                        raise stream_err
                 
                 collected_content = ""
                 tool_calls = []
@@ -853,6 +919,18 @@ class OpenzessAgent:
                             habit_learner.extract_and_learn_habits(self.last_prompt, collected_content)
                         except Exception:
                             pass
+                    
+                    # Record telemetry in Experiential OTel trace format
+                    experiential_client.record_otel_trace(
+                        session_id=getattr(self, "session_id", "default_session"),
+                        prompt=self.last_prompt,
+                        model=self.model_name,
+                        latency_seconds=time.time() - t_start,
+                        tokens=len(collected_content.split()) * 2,
+                        tools_used=used_tools,
+                        success=True
+                    )
+
                     yield {"type": "done", "auth_required": False, "reply": collected_content}
                     return
                     
@@ -882,6 +960,7 @@ class OpenzessAgent:
                     return
                     
                 for pc in pending_calls:
+                    used_tools.append(pc["name"])
                     yield {"type": "tool_start", "tool": pc["name"]}
                     output = self._run_tool(pc["name"], pc["args"])
                     tool_outputs.append({"tool": pc["name"], "args": pc["args"], "output": output})

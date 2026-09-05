@@ -23,6 +23,7 @@ import mss
 from . import sidecar_client
 from .sidecar_client import encode_image_async, aggregate_graph_via_sidecar
 from .plugin_loader import plugin_registry, load_plugins
+from . import scientific_skills
 # pyautogui is lazy-loaded inside the Matrix WebSocket handler to avoid
 # failing at server startup when the Xvfb display isn't ready yet.
 pyautogui = None
@@ -84,7 +85,7 @@ threading.Thread(target=init_active_mcps, daemon=True).start()
 
 class ChatRequest(BaseModel):
     message: str
-    api_key: str
+    api_key: Optional[str] = ""
     provider: str = 'gemini'
     session_id: Optional[str] = None
     system_instruction: Optional[str] = None
@@ -180,8 +181,28 @@ def swarm_debate_stream(request: ChatRequest, session_id: str):
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
-    if not request.api_key:
-        raise HTTPException(status_code=400, detail="API Key is required")
+    effective_key = (request.api_key or "").strip()
+    if not effective_key:
+        if request.provider == "gemini":
+            effective_key = os.environ.get("GEMINI_API_KEY", "")
+        elif request.provider == "openai":
+            effective_key = os.environ.get("OPENAI_API_KEY", "")
+        elif request.provider == "anthropic":
+            effective_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        elif request.provider == "groq":
+            effective_key = os.environ.get("GROQ_API_KEY", "")
+        elif request.provider in ("experiential", "exp", "exp:smart"):
+            effective_key = os.environ.get("EXP_GATEWAY_KEY", os.environ.get("EXPERIENTIAL_API_KEY", "xpl_gateway"))
+        elif request.provider in ("ollama", "lmstudio"):
+            effective_key = "local"
+        else:
+            effective_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("DEEPSEEK_API_KEY", ""))
+
+    if not effective_key and request.provider not in ("ollama", "lmstudio", "experiential", "exp", "exp:smart"):
+        raise HTTPException(
+            status_code=400, 
+            detail="API Key is required. Please enter an API key in Settings (gear icon) or set GEMINI_API_KEY in your .env / terminal environment."
+        )
         
     session_id = request.session_id
     if not session_id:
@@ -191,8 +212,14 @@ async def chat(request: ChatRequest):
     need_instantiation = False
     if session_id not in sessions:
         need_instantiation = True
-    elif request.system_instruction or request.allowed_tools is not None:
-        need_instantiation = True
+    else:
+        existing_agent = sessions[session_id]
+        if getattr(existing_agent, "provider", None) != request.provider:
+            need_instantiation = True
+        elif request.system_instruction and getattr(existing_agent, "system_instruction", None) != request.system_instruction:
+            need_instantiation = True
+        elif request.allowed_tools is not None and getattr(existing_agent, "raw_allowed_tools", None) != request.allowed_tools:
+            need_instantiation = True
         
     if need_instantiation:
         # Hydrate from DB
@@ -217,13 +244,16 @@ async def chat(request: ChatRequest):
             role = "user" if msg["role"] == "user" else "model"
             history.append({"role": role, "parts": [msg["content"]]})
         
-        sessions[session_id] = OpenzessAgent(
-            api_key=request.api_key, 
+        new_agent = OpenzessAgent(
+            api_key=effective_key, 
             provider=request.provider,
             history=history,
             system_instruction=request.system_instruction,
             allowed_tools=request.allowed_tools
         )
+        new_agent.raw_allowed_tools = request.allowed_tools
+        new_agent.system_instruction = request.system_instruction
+        sessions[session_id] = new_agent
         
     agent = sessions[session_id]
     
@@ -541,7 +571,7 @@ def delete_persona(persona_id: str):
 
 class TavernChatRequest(BaseModel):
     message: str
-    api_key: str
+    api_key: Optional[str] = ""
     provider: str = 'gemini'
     session_id: str
     target_persona_id: str
@@ -1264,6 +1294,41 @@ async def reload_brain_skills():
         "message": f"Successfully reloaded {len(plugin_registry.funcs)} custom tools."
     }
 
+class InstallSkillRequest(BaseModel):
+    skill_id: str
+
+@app.get("/api/skills/scientific")
+async def get_scientific_skills():
+    """Returns the full categorized catalog of 180+ K-Dense-AI scientific agent skills."""
+    skills = scientific_skills.list_scientific_skills()
+    root_dir = scientific_skills.get_skills_root_dir()
+    return {
+        "skills": skills,
+        "total": len(skills),
+        "root_dir": root_dir,
+        "categories": list(scientific_skills.CATEGORY_MAP.keys())
+    }
+
+@app.get("/api/skills/scientific/{skill_id}")
+async def get_scientific_skill_detail(skill_id: str):
+    """Retrieves full documentation, guidelines, and scripts for a scientific skill."""
+    detail = scientific_skills.get_skill_content(skill_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail=f"Scientific skill '{skill_id}' not found.")
+    return detail
+
+@app.post("/api/skills/scientific/install")
+async def install_scientific_skill(req: InstallSkillRequest):
+    """Generates an OpenZess Swarm Persona from a scientific skill."""
+    persona = scientific_skills.build_swarm_persona(req.skill_id)
+    if not persona:
+        raise HTTPException(status_code=404, detail=f"Cannot generate persona for skill '{req.skill_id}'.")
+    return {
+        "status": "success",
+        "persona": persona,
+        "message": f"Successfully prepared Swarm Persona @{persona['key']}"
+    }
+
 @app.get("/api/brain/memories")
 async def get_brain_memories(query: Optional[str] = None, limit: int = 30):
     """Retrieves long-term memories from ChromaDB Vector Vault."""
@@ -1272,6 +1337,8 @@ async def get_brain_memories(query: Optional[str] = None, limit: int = 30):
     
     try:
         if query and query.strip():
+            if memory_collection.count() == 0:
+                return {"memories": [], "total": 0, "status": "ok"}
             results = memory_collection.query(query_texts=[query], n_results=min(limit, 50))
             memories = []
             if results and results.get("documents") and results["documents"][0]:

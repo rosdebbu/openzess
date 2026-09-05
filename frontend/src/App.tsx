@@ -37,7 +37,7 @@ function AnimatedRoutes({ persona: _persona }: { persona: string }) {
   const location = useLocation();
   return (
     <div className="flex-1 flex overflow-hidden relative">
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Chat /></PageTransition>} />
           <Route path="/sessions" element={<PageTransition><Sessions /></PageTransition>} />
@@ -73,7 +73,6 @@ function App() {
   const [provider, setProvider] = useState(() => localStorage.getItem('openzess_provider') || 'gemini');
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('openzess_api_key') || '');
   
-  const [isSystemInitialized, setIsSystemInitialized] = useState(() => !!apiKey || provider === 'ollama');
   const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'persona'>('general');
 
@@ -147,17 +146,6 @@ function App() {
     setShowSettings(false);
   };
 
-  const handleInitialGatewayAuth = (newProvider: string, newApiKey: string) => {
-      setProvider(newProvider);
-      setApiKey(newApiKey);
-      localStorage.setItem('openzess_provider', newProvider);
-      localStorage.setItem('openzess_api_key', newApiKey);
-      setIsSystemInitialized(true);
-  };
-
-  if (!isSystemInitialized) {
-      return <Welcome onComplete={handleInitialGatewayAuth} />;
-  }
 
   return (
     <ThemeProvider>
@@ -255,12 +243,13 @@ function App() {
                            <option value="qwen" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Qwen (qwen-2.5-72b-instruct)</option>
                            <option value="glm" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">GLM (z-ai/glm-5.3-flash)</option>
                            <option value="kimi" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Kimi (moonshot-v1-8k)</option>
+                           <option value="experiential" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Experiential Gateway (Dual-Engine / Multi-Agent)</option>
                            <option value="ollama" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Local System (Ollama)</option>
                         </select>
                         
                         <input 
                           type="password"
-                          placeholder={provider === 'ollama' ? "Local model - API Key not required" : "sk-..."}
+                          placeholder={provider === 'ollama' || provider === 'experiential' ? "Local / Gateway - API Key not required" : "API Key (optional if configured in .env or terminal)"}
                           value={apiKey}
                           onChange={(e) => setApiKey(e.target.value)}
                           disabled={provider === 'ollama'}
@@ -376,9 +365,8 @@ function App() {
                 
                 <div className="p-6 border-t border-[#E2DAD2] dark:border-[#3A3838] bg-[#EDE8E2] dark:bg-[#252222] shrink-0">
                   <button 
-                    className="w-full py-3.5 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.98]"
+                    className="w-full py-3.5 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition-all shadow-md transform active:scale-[0.98]"
                     onClick={saveConfig}
-                    disabled={!apiKey && provider !== 'ollama'}
                   >
                     Save Configuration
                   </button>

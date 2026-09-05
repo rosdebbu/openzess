@@ -11,9 +11,15 @@ from fastapi import HTTPException
 # Enforce override to bust the cache when restarting WSL
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"), override=True)
 
-# Use Postgres connection string from ENV
-# Fallback to sqlite if postgres is not provided (for local testing without docker)
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./chat_history.db")
+# Use local home dir if default sqlite to avoid OneDrive cloud sync disk I/O locks on Windows
+default_db_dir = os.path.expanduser("~/.openzess")
+os.makedirs(default_db_dir, exist_ok=True)
+default_db_path = os.path.join(default_db_dir, "chat_history.db").replace("\\", "/")
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL or DATABASE_URL in ("sqlite:///./chat_history.db", "sqlite:///chat_history.db"):
+    DATABASE_URL = f"sqlite:///{default_db_path}"
+
 # SQLAlchemy postgresql+psycopg2 expects this prefix: 
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -38,9 +44,18 @@ engine = create_engine(
 def set_sqlite_pragma(dbapi_connection, connection_record):
     if "sqlite" in DATABASE_URL:
         cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA journal_mode=WAL")
-        cursor.execute("PRAGMA synchronous=NORMAL")
-        cursor.execute("PRAGMA cache_size=-64000")
+        try:
+            cursor.execute("PRAGMA journal_mode=WAL")
+        except Exception:
+            try:
+                cursor.execute("PRAGMA journal_mode=DELETE")
+            except Exception:
+                pass
+        try:
+            cursor.execute("PRAGMA synchronous=NORMAL")
+            cursor.execute("PRAGMA cache_size=-64000")
+        except Exception:
+            pass
         cursor.close()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -26,6 +26,7 @@ from rich.box import ROUNDED, HEAVY, DOUBLE
 from .agent import OpenzessAgent, PROVIDER_MODELS, memory_collection
 from .plugin_loader import plugin_registry, load_plugins
 from . import habit_learner
+from . import experiential_client
 
 
 # Reconfigure stdout for UTF-8 on Windows
@@ -144,7 +145,8 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
 
 def show_help_menu():
     print(f"\n{LIZARD_PRIMARY}{BOLD}Available Slash Commands:{RESET}")
-    print(f"  {LIZARD_LIGHT}/model <provider>{RESET}  Switch active LLM (glm, deepseek, gemini, groq, ollama, lmstudio)")
+    print(f"  {LIZARD_LIGHT}/model <provider>{RESET}  Switch active LLM (glm, deepseek, gemini, groq, ollama, lmstudio, experiential, exp:smart)")
+    print(f"  {LIZARD_LIGHT}/exp{RESET}              Inspect Experiential Gateway health, OTel traces & diagnostics")
     print(f"  {LIZARD_LIGHT}/habits{RESET}            Inspect learned user habits & adaptive behavioral profile")
     print(f"  {LIZARD_LIGHT}/skills{RESET}            List all hot-loaded Python plugins & synthesized tools")
     print(f"  {LIZARD_LIGHT}/memory <query>{RESET}    Search ChromaDB vector memory vault semantically")
@@ -171,14 +173,22 @@ def run_cli():
 
     while True:
         try:
+            # Gateway badge if experiential is selected
+            gw_status = ""
+            if agent.provider in ("experiential", "exp", "exp:smart"):
+                is_up = experiential_client.is_gateway_healthy(agent.api_base)
+                gw_badge = f"{LIZARD_LIGHT}[ONLINE]{RESET}" if is_up else f"{AMBER}[OFFLINE/FALLBACK]{RESET}"
+                gw_status = f"{DIM}|{RESET} {LIZARD_PRIMARY}Exp: {gw_badge}{RESET} "
+
             # Bottom status bar line
             status_line = (
                 f"{DIM}────────────────────────────────────────────────────────────────────────────{RESET}\n"
                 f"{LIZARD_PRIMARY}⚡ {agent.provider}:{agent.model_name.split('/')[-1]}{RESET} {DIM}|{RESET} "
                 f"{CYAN}Debian: rossdeb{RESET} {DIM}|{RESET} "
-                f"{LIZARD_OLIVE}Rust: 8100{RESET} {DIM}|{RESET} "
+                f"{LIZARD_OLIVE}Rust: 8100{RESET} "
+                f"{gw_status}{DIM}|{RESET} "
                 f"{LIZARD_LIGHT}Memory: {memory_collection.count() if memory_collection else 0} recs{RESET}\n"
-                f"{DIM}💡 Enter prompt · /skills · /habits · /model · /memory · Ctrl+C cancel{RESET}"
+                f"{DIM}💡 Enter prompt · /skills · /habits · /model · /exp · /memory · Ctrl+C cancel{RESET}"
             )
             print(status_line)
 
@@ -240,9 +250,29 @@ def run_cli():
                                 print(f"  {DIM}No matching vector memories found.{RESET}\n")
                     continue
 
+                elif cmd == "/exp":
+                    print(f"\n{LIZARD_PRIMARY}{BOLD}⚡ Experiential Adaptive Gateway Diagnostics:{RESET}")
+                    exp_base = getattr(agent, "api_base", None) or experiential_client.DEFAULT_GATEWAY_BASE
+                    is_up = experiential_client.is_gateway_healthy(exp_base)
+                    status_text = f"{LIZARD_LIGHT}ONLINE (Port reachable){RESET}" if is_up else f"{AMBER}OFFLINE (Auto-circuit fallback active){RESET}"
+                    print(f"  {LIZARD_LIGHT}• Gateway Base:{RESET}  {exp_base}")
+                    print(f"  {LIZARD_LIGHT}• Status:{RESET}        {status_text}")
+                    print(f"  {LIZARD_LIGHT}• Provider:{RESET}      {agent.provider}")
+                    print(f"  {LIZARD_LIGHT}• Active Model:{RESET}  {agent.model_name}")
+                    
+                    # Inspect trace count
+                    trace_path = os.path.join(os.getcwd(), ".exp", "traces.otel.jsonl")
+                    trace_count = 0
+                    if os.path.exists(trace_path):
+                        with open(trace_path, "r", encoding="utf-8") as tf:
+                            trace_count = sum(1 for _ in tf)
+                    trace_link = experiential_client.format_terminal_link(trace_path, trace_path)
+                    print(f"  {LIZARD_LIGHT}• OTel Traces:{RESET}   {trace_count} logged entries in {trace_link}\n")
+                    continue
+
                 elif cmd == "/model":
                     if not arg:
-                        print(f"{LIZARD_PRIMARY}Current provider: {current_provider}. Usage: /model <glm|deepseek|gemini|groq|ollama|lmstudio>{RESET}\n")
+                        print(f"{LIZARD_PRIMARY}Current provider: {current_provider}. Usage: /model <glm|deepseek|gemini|groq|ollama|lmstudio|experiential|exp:smart>{RESET}\n")
                     else:
                         current_provider = arg
                         agent = OpenzessAgent(api_key=api_key, provider=current_provider)
@@ -275,8 +305,21 @@ def run_cli():
                     sys.stdout.write(f"\n\n{CYAN}⚙️  Executing @{chunk.get('tool')}...{RESET}\n")
                     sys.stdout.flush()
                 elif ctype == "tool_result":
+                    tool_name = chunk.get("tool", "")
+                    tool_args = chunk.get("args", {})
                     output = chunk.get("output", "")
                     preview = str(output)[:140] + ("..." if len(str(output)) > 140 else "")
+                    
+                    # Clickable file/link enhancement for VS Code & Windows Terminal
+                    if tool_name in ("create_file", "edit_code", "read_file") and "filepath" in tool_args:
+                        fp = tool_args["filepath"]
+                        link = experiential_client.format_terminal_link(fp, fp)
+                        sys.stdout.write(f"{DIM}   ↳ File: {link}{RESET}\n")
+                    elif tool_name in ("search_the_web", "read_web_page") and "url" in tool_args:
+                        u = tool_args["url"]
+                        link = experiential_client.format_terminal_link(u, u)
+                        sys.stdout.write(f"{DIM}   ↳ Link: {link}{RESET}\n")
+                        
                     sys.stdout.write(f"{DIM}   ↳ Result: {preview}{RESET}\n\n")
                     sys.stdout.flush()
                 elif ctype == "error":

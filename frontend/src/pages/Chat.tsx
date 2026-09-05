@@ -141,7 +141,7 @@ export default function Chat() {
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: isStreamingRef.current ? 'auto' : 'smooth' });
     
     // Live UI Artifact Scanner
     const reversedMessages = [...messages].reverse();
@@ -271,11 +271,7 @@ export default function Chat() {
     const textToSend = suggestedText ?? input;
     if (!textToSend.trim()) return;
 
-    const apiKey = localStorage.getItem('openzess_api_key');
-    if (!apiKey) {
-      window.dispatchEvent(new Event('open-settings'));
-      return;
-    }
+    const apiKey = localStorage.getItem('openzess_api_key') || '';
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: textToSend };
     setMessages(prev => [...prev, userMessage]);
