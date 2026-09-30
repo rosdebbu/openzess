@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-<<<<<<< Updated upstream
-import { Bot, Plus, X, Terminal, Globe, Code, FilePlus, Eye, Save, Trash2, Wand2, Search, BookOpen, ExternalLink, Check, Sparkles, Filter, FileText } from 'lucide-react';
-=======
 import { Bot, Plus, X, Terminal, Globe, Code, FilePlus, Eye, Save, Trash2, Wand2, Search, BookOpen, Check, Sparkles, FileText } from 'lucide-react';
->>>>>>> Stashed changes
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
@@ -475,11 +471,7 @@ export default function Skills() {
       
       {/* Skill Guide Viewer Modal */}
       <AnimatePresence>
-<<<<<<< Updated upstream
-        {selectedDetail && (
-=======
         {(selectedDetail || isLoadingDetail) && (
->>>>>>> Stashed changes
           <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <motion.div 
               initial={{ opacity: 0 }} 
@@ -496,13 +488,6 @@ export default function Skills() {
             >
               <div className="p-6 border-b border-[#E2DAD2] dark:border-[#3A3838] flex justify-between items-center bg-[#EDE8E2] dark:bg-[#252222] shrink-0">
                 <div>
-<<<<<<< Updated upstream
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-brand">{selectedDetail.category}</span>
-                  <h2 className="text-xl font-bold text-[#3A3838] dark:text-[#E2DAD2] flex items-center gap-2">
-                    <BookOpen size={20} className="text-brand"/> {selectedDetail.name}
-                  </h2>
-                  <div className="text-xs font-mono font-bold text-brand mt-0.5">@{selectedDetail.keyword}</div>
-=======
                   {selectedDetail ? (
                     <>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-brand">{selectedDetail.category}</span>
@@ -516,7 +501,6 @@ export default function Skills() {
                       <BookOpen size={20} className="text-brand animate-pulse"/> Loading skill manual…
                     </h2>
                   )}
->>>>>>> Stashed changes
                 </div>
                 <button 
                   onClick={() => setSelectedDetail(null)} 
@@ -527,11 +511,6 @@ export default function Skills() {
               </div>
 
               <div className="p-8 overflow-y-auto custom-scrollbar flex-1 prose prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
-<<<<<<< Updated upstream
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {selectedDetail.body}
-                </ReactMarkdown>
-=======
                 {isLoadingDetail || !selectedDetail ? (
                   <div className="flex flex-col items-center justify-center h-64 text-[#B8AFA8]">
                     <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin mb-3"></div>
@@ -542,23 +521,10 @@ export default function Skills() {
                     {selectedDetail.body}
                   </ReactMarkdown>
                 )}
->>>>>>> Stashed changes
               </div>
 
               <div className="p-5 border-t border-[#E2DAD2] dark:border-[#3A3838] bg-[#EDE8E2] dark:bg-[#252222] shrink-0 flex items-center justify-between">
                 <span className="text-xs text-[#B8AFA8]">Author: K-Dense Inc. • Open Agent Skills Standard</span>
-<<<<<<< Updated upstream
-                <button
-                  onClick={() => {
-                    const found = scientificSkills.find(s => s.id === selectedDetail.id);
-                    if (found) handleInstallScientificSkill(found);
-                    setSelectedDetail(null);
-                  }}
-                  className="bg-brand hover:bg-brand-hover text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-1.5"
-                >
-                  <Plus size={14} /> Add to Swarm (@{selectedDetail.keyword})
-                </button>
-=======
                 {selectedDetail && (
                   <button
                     onClick={() => {
@@ -571,7 +537,6 @@ export default function Skills() {
                     <Plus size={14} /> Add to Swarm (@{selectedDetail.keyword})
                   </button>
                 )}
->>>>>>> Stashed changes
               </div>
             </motion.div>
           </div>
