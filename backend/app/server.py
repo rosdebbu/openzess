@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 from typing import Optional, List, Dict, Any
-from .agent import OpenzessAgent, memory_collection
+from .agent import OpenzessAgent, PROVIDER_MODELS, memory_collection
 from . import database
 from .mcp_manager import mcp_registry
 from . import background_workers
@@ -17,6 +17,9 @@ from gtts import gTTS
 import io
 import uuid
 import shutil
+import threading
+import asyncio
+import litellm
 from . import tavern_parser
 from .swarm_manager import swarm_manager
 import mss
@@ -39,8 +42,6 @@ def _get_pyautogui():
         except Exception as e:
             print(f"Warning: pyautogui failed to load: {e}", flush=True)
     return pyautogui
-from PIL import Image
-import asyncio
 
 app = FastAPI()
 
@@ -55,19 +56,41 @@ GRAPHIFY_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__fi
 os.makedirs(GRAPHIFY_DIR, exist_ok=True)
 app.mount("/graphify", StaticFiles(directory=GRAPHIFY_DIR, html=True), name="graphify")
 
+# ── CORS ──────────────────────────────────────────────────────────
+# Localhost origins are allowed by default. For non-local deployments set
+# OPENZESS_CORS_ORIGINS (comma-separated) in the environment. A wildcard
+# ("*") with allow_credentials=True is unsafe — any website could make
+# credentialed requests to this backend — so wildcard mode forces
+# credentials off (browsers reject that combination anyway).
+_cors_env = os.environ.get("OPENZESS_CORS_ORIGINS", "").strip()
+if _cors_env == "*":
+    _cors_origins = ["*"]
+    _cors_credentials = False
+elif _cors_env:
+    _cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()]
+    _cors_credentials = True
+else:
+    _cors_origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+    _cors_credentials = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$",
+    allow_credentials=_cors_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Initialize database
-import asyncio
 database.init_db()
-
-import threading
 
 # Auto-reconnect active MCP servers
 def init_active_mcps():
@@ -99,9 +122,6 @@ class ChatRequest(BaseModel):
 sessions: Dict[str, OpenzessAgent] = {}
 
 def swarm_debate_stream(request: ChatRequest, session_id: str):
-    import json
-    import litellm
-    from .agent import PROVIDER_MODELS, OpenzessAgent
     
     yield f"data: {json.dumps({'type': 'session', 'session_id': session_id})}\n\n"
     yield f"data: {json.dumps({'type': 'content', 'content': '\n\n🚀 **[SWARM DEBATE INITIATED]**\n\n'})}\n\n"
@@ -244,8 +264,11 @@ async def chat(request: ChatRequest):
             role = "user" if msg["role"] == "user" else "model"
             history.append({"role": role, "parts": [msg["content"]]})
         
-        new_agent = OpenzessAgent(
-            api_key=effective_key, 
+        # LiteLLM init + ChromaDB habit-profile fetch are blocking — run the
+        # constructor in a worker thread so the event loop stays responsive.
+        new_agent = await asyncio.to_thread(
+            OpenzessAgent,
+            api_key=effective_key,
             provider=request.provider,
             history=history,
             system_instruction=request.system_instruction,
@@ -276,7 +299,9 @@ async def chat(request: ChatRequest):
                         database.add_message(session_id, db_role, chunk.get("reply"))
             return StreamingResponse(event_generator(), media_type="text/event-stream")
         else:
-            response = agent.chat(request.message)
+            # agent.chat() runs a blocking LLM + tool loop (can take minutes) —
+            # offload to a thread so the event loop can serve other requests.
+            response = await asyncio.to_thread(agent.chat, request.message)
             if not response.get("auth_required") and response.get("reply"):
                 db_role = f"agent:{request.agent_name}" if request.agent_name else "agent"
                 database.add_message(session_id, db_role, response.get("reply"))
@@ -307,7 +332,9 @@ async def chat_approve(request: ApprovalRequest):
                         database.add_message(request.session_id, "agent", chunk.get("reply"))
             return StreamingResponse(event_generator(), media_type="text/event-stream")
         else:
-            response = agent.execute_pending_tools(request.pending_calls, request.approved)
+            # Tool execution can block for a long time (30s terminal timeouts) —
+            # offload to a thread to keep the event loop responsive.
+            response = await asyncio.to_thread(agent.execute_pending_tools, request.pending_calls, request.approved)
             if not response.get("auth_required") and response.get("reply"):
                 database.add_message(request.session_id, "agent", response.get("reply"))
                 
@@ -1416,6 +1443,14 @@ async def get_brain_telemetry():
         "skills_active": len(plugin_registry.funcs)
     }
 
+# ── Serve Built React Frontend (Cloud Run & Docker Single-Port Deployment) ──
+FRONTEND_DIST = os.environ.get("FRONTEND_DIST") or os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "frontend", "dist")
+)
+if os.path.isdir(FRONTEND_DIST):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

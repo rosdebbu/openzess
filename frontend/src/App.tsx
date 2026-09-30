@@ -19,7 +19,6 @@ import Tavern from './pages/Tavern';
 import Marketplace from './pages/Marketplace';
 import MatrixViewer from './pages/MatrixViewer';
 import WarRoom from './pages/WarRoom';
-import Welcome from './pages/Welcome';
 import KnowledgeBase from './pages/KnowledgeBase';
 import DebateArena from './pages/DebateArena';
 import Doc from './pages/Doc';

@@ -1,0 +1,16 @@
+.git
+.github
+.agents
+.venv
+venv
+frontend/node_modules
+frontend/dist
+.pytest_cache
+*.pyc
+__pycache__
+*.log
+credentials.json
+*.secret.json
+uploads/*
+!uploads/.gitkeep
+graphify-out/*

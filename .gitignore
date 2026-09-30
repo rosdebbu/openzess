@@ -35,8 +35,16 @@ Thumbs.db
 .vscode/
 .idea/
 
+# ── Secrets ────────────────────────────────────────────────
+credentials.json
+*.secret.json
+
 # ── AI session notes (local only, not project docs) ─────
 CHANGES_SUMMARY.md
+CHAT_HISTORY.md
+CHAT_SESSION_SUMMARY.md
 plans/
+.kilo/
+.pytest_cache/
 
 

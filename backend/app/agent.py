@@ -14,6 +14,7 @@ if platform.system() == "Linux":
 import subprocess
 import requests
 import uuid
+import threading
 from bs4 import BeautifulSoup
 from duckduckgo_search import DDGS
 from .mcp_manager import mcp_registry
@@ -767,6 +768,22 @@ class OpenzessAgent:
             )
         except Exception as e:
             print(f"Failed to ingest memory: {e}")
+
+    def _defer_learning(self, prompt: str, reply: str):
+        """Fire-and-forget background ingestion (RAG memory + habit learning).
+
+        Keeps the reply path fast: ChromaDB embedding writes and habit
+        extraction run in a daemon thread instead of blocking the response.
+        """
+        def _worker():
+            try:
+                if memory_collection is not None:
+                    self._ingest_memory(prompt, reply)
+                from . import habit_learner
+                habit_learner.extract_and_learn_habits(prompt, reply)
+            except Exception:
+                pass
+        threading.Thread(target=_worker, daemon=True, name="openzess-learning").start()
 
     def chat(self, user_prompt: str):
         try:

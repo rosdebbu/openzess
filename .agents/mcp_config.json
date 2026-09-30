@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "colab": {
+      "command": "google-colab-mcp",
+      "args": []
+    }
+  }
+}
