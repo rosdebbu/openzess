@@ -47,4 +47,7 @@ plans/
 .kilo/
 .pytest_cache/
 
-
+# ── Remote Tablet & Tunnel Tools ──
+scripts/cloudflared.exe
+TABLET_LINK.txt
+cloudflared.log
