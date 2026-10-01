@@ -1,17 +1,42 @@
-version: '3.8'
+# ── Openzess local stack ─────────────────────────────────
+# Credentials come from a .env file next to this compose file
+# (see .env.example). Never hardcode them here.
 
 services:
   db:
     image: postgres:15-alpine
     container_name: openzess_postgres
     environment:
-      POSTGRES_USER: openzess
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: openzess
+      POSTGRES_USER: ${POSTGRES_USER:-openzess}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-openzess}
+    # Bind to localhost only — do not expose Postgres to the network.
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-openzess} -d $${POSTGRES_DB:-openzess}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openzess_app
+    environment:
+      PORT: 8080
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openzess}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-openzess}
+      OPENZESS_CORS_ORIGINS: ${OPENZESS_CORS_ORIGINS:-http://localhost:5173}
+      SIDECAR_URL: http://127.0.0.1:8100
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
