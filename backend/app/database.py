@@ -1,6 +1,7 @@
 import os
 import uuid
 from datetime import datetime
+from typing import Optional
 import json
 from contextlib import contextmanager
 from dotenv import load_dotenv
@@ -65,6 +66,7 @@ class Session(Base):
     __tablename__ = "sessions"
     id = Column(String, primary_key=True, index=True)
     title = Column(String, index=True)
+    user_id = Column(String, index=True, nullable=True)  # owner (NULL = legacy/shared)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     messages = relationship("Message", back_populates="session", cascade="all, delete-orphan")
 
@@ -72,6 +74,7 @@ class Message(Base):
     __tablename__ = "messages"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     session_id = Column(String, ForeignKey("sessions.id"), index=True)
+    user_id = Column(String, index=True, nullable=True)  # owner (NULL = legacy/shared)
     role = Column(String) # 'user' or 'agent'
     content = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
@@ -96,6 +99,7 @@ class Persona(Base):
     first_mes = Column(String)
     mes_example = Column(String)
     avatar_base64 = Column(String)
+    user_id = Column(String, index=True, nullable=True)  # owner (NULL = legacy/shared)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Note(Base):
@@ -104,11 +108,59 @@ class Note(Base):
     title = Column(String, index=True)
     content = Column(String)
     category = Column(String, default="General")
+    user_id = Column(String, index=True, nullable=True)  # owner (NULL = legacy/shared)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
 
+def _auto_migrate():
+    """Lightweight auto-migration: add user_id columns to existing tables.
+
+    Runs before create_all so pre-existing SQLite/Postgres databases from
+    older versions gain the ownership columns without manual steps.
+    (For full versioned migrations use Alembic; this keeps upgrades turnkey.)
+    """
+    from sqlalchemy import text as sql_text
+    targets = {
+        "sessions": "user_id",
+        "messages": "user_id",
+        "notes": "user_id",
+        "personas": "user_id",
+    }
+    with engine.connect() as conn:
+        for table, col in targets.items():
+            try:
+                if IS_POSTGRES:
+                    check = conn.execute(sql_text(
+                        "SELECT 1 FROM information_schema.columns "
+                        "WHERE table_name=:t AND column_name=:c"
+                    ), {"t": table, "c": col}).fetchone()
+                    if not check:
+                        conn.execute(sql_text(f'ALTER TABLE "{table}" ADD COLUMN {col} VARCHAR'))
+                        conn.execute(sql_text(f'CREATE INDEX IF NOT EXISTS ix_{table}_{col} ON "{table}" ({col})'))
+                else:
+                    cols = [row[1] for row in conn.execute(sql_text(f"PRAGMA table_info({table})")).fetchall()]
+                    if cols and col not in cols:
+                        conn.execute(sql_text(f"ALTER TABLE {table} ADD COLUMN {col} VARCHAR"))
+                conn.commit()
+            except Exception as e:
+                print(f"Auto-migrate: skipped {table}.{col} ({e})", flush=True)
+
+
 def init_db():
+    _auto_migrate()
     Base.metadata.create_all(bind=engine)
+    try:
+        from sqlalchemy import inspect, text
+        inspector = inspect(engine)
+        existing_tables = inspector.get_table_names()
+        with engine.begin() as conn:
+            for tbl in ["sessions", "messages", "notes", "personas"]:
+                if tbl in existing_tables:
+                    cols = [c["name"] for c in inspector.get_columns(tbl)]
+                    if "user_id" not in cols:
+                        conn.execute(text(f"ALTER TABLE {tbl} ADD COLUMN user_id VARCHAR"))
+    except Exception:
+        pass
 
 def get_db():
     db = SessionLocal()
@@ -130,22 +182,25 @@ def _session():
     finally:
         db.close()
 
-def create_session(title: str = "New Chat") -> str:
+def create_session(title: str = "New Chat", user_id: Optional[str] = None) -> str:
     with _session() as db:
         session_id = str(uuid.uuid4())
-        new_session = Session(id=session_id, title=title)
+        new_session = Session(id=session_id, title=title, user_id=user_id)
         db.add(new_session)
         return session_id
 
-def add_message(session_id: str, role: str, content: str):
+def add_message(session_id: str, role: str, content: str, user_id: Optional[str] = None):
     with _session() as db:
-        new_msg = Message(session_id=session_id, role=role, content=content)
+        new_msg = Message(session_id=session_id, role=role, content=content, user_id=user_id)
         db.add(new_msg)
 
-def get_all_sessions():
+def get_all_sessions(user_id: Optional[str] = None):
     with _session() as db:
-        results = db.query(Session).order_by(Session.created_at.desc()).limit(20).all()
-        return [{"id": s.id, "title": s.title, "created_at": s.created_at.isoformat()} for s in results]
+        q = db.query(Session)
+        if user_id is not None:
+            q = q.filter(Session.user_id == user_id)
+        results = q.order_by(Session.created_at.desc()).limit(50).all()
+        return [{"id": s.id, "title": s.title, "user_id": getattr(s, "user_id", None), "created_at": s.created_at.isoformat()} for s in results]
 
 def update_session_title(session_id: str, title: str) -> bool:
     """Rename a chat session."""
@@ -173,6 +228,23 @@ def get_session_messages(session_id: str):
             
         results = db.query(Message).filter(Message.session_id == session_id).order_by(Message.created_at.asc()).all()
         return [{"id": m.id, "role": m.role, "content": m.content, "created_at": m.created_at.isoformat()} for m in results]
+
+def get_recent_activity(limit: int = 50):
+    with _session() as db:
+        results = db.query(Message).order_by(Message.created_at.desc()).limit(limit).all()
+        results = list(reversed(results))
+        error_count = sum(1 for m in results if "error" in (m.content or "").lower() and m.role != "user")
+        feed = [
+            {
+                "id": m.id,
+                "session_id": m.session_id,
+                "role": m.role,
+                "content": m.content,
+                "created_at": m.created_at.isoformat() if m.created_at else None
+            }
+            for m in results
+        ]
+        return {"feed": feed, "error_count": error_count}
 
 def add_or_update_mcp_server(server_id: str, name: str, command: str, args: list, is_active: bool = True):
     args_str = json.dumps(args)
@@ -290,26 +362,31 @@ def delete_persona(persona_id: str):
             db.delete(p)
 
 # --- NOTES (Personal Canvas) ---
-def create_note(title: str, content: str, category: str = "General") -> str:
+def create_note(title: str, content: str, category: str = "General", user_id: Optional[str] = None) -> str:
     with _session() as db:
         note_id = str(uuid.uuid4())
         new_note = Note(
             id=note_id,
             title=title,
             content=content,
-            category=category
+            category=category,
+            user_id=user_id
         )
         db.add(new_note)
         return note_id
 
-def get_all_notes():
+def get_all_notes(user_id: Optional[str] = None):
     with _session() as db:
-        results = db.query(Note).order_by(Note.updated_at.desc()).all()
+        q = db.query(Note)
+        if user_id is not None:
+            q = q.filter(Note.user_id == user_id)
+        results = q.order_by(Note.updated_at.desc()).all()
         return [{
             "id": n.id,
             "title": n.title,
             "content": n.content,
             "category": n.category,
+            "user_id": getattr(n, "user_id", None),
             "created_at": n.created_at.isoformat() if n.created_at else None,
             "updated_at": n.updated_at.isoformat() if n.updated_at else None
         } for n in results]
