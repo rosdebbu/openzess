@@ -1,0 +1,32 @@
+﻿# ── Pre-commit hooks: catch issues before they reach CI ──────────
+# Install once:  pip install pre-commit && pre-commit install
+# Run on demand: pre-commit run --all-files
+
+repos:
+  # Block large and secret-ish files from ever being committed
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: detect-private-key
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+
+  # Secret scanning (covers API keys, tokens, etc.)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+
+  # Python lint + format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.2
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/
