@@ -26,6 +26,7 @@ chat_history.db*
 *_err.txt
 uploads/
 graphify-out/
+.exp/
 
 # ── OS junk ─────────────────────────────────────────────
 .DS_Store
