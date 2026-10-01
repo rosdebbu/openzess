@@ -1,13 +1,13 @@
 import os
 import time
 from fastapi import FastAPI, HTTPException, UploadFile, File, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 from typing import Optional, List, Dict, Any
-from .agent import OpenzessAgent, PROVIDER_MODELS, memory_collection
+from .agent import OpenzessAgent, PROVIDER_MODELS, memory_collection, refresh_plugin_tools
 from . import database
 from .mcp_manager import mcp_registry
 from . import background_workers
@@ -27,6 +27,17 @@ from . import sidecar_client
 from .sidecar_client import encode_image_async, aggregate_graph_via_sidecar
 from .plugin_loader import plugin_registry, load_plugins
 from . import scientific_skills
+from . import auth as auth_module
+from .auth import (
+    get_current_user,
+    get_current_admin,
+    User,
+    ensure_admin_bootstrap,
+)
+from .rate_limit import check_rate_limit
+from . import metrics as metrics_module
+from fastapi import Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 # pyautogui is lazy-loaded inside the Matrix WebSocket handler to avoid
 # failing at server startup when the Xvfb display isn't ready yet.
 pyautogui = None
@@ -45,11 +56,13 @@ def _get_pyautogui():
 
 app = FastAPI()
 
-# Ensure uploads directory and PaperBanana artifact directories exist
-os.makedirs("uploads", exist_ok=True)
-os.makedirs(os.path.join("uploads", "diagrams"), exist_ok=True)
-os.makedirs(os.path.join("uploads", "plots"), exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# Ensure uploads directory and PaperBanana artifact directories exist.
+# Anchored to this file (not the CWD) so the served folder is identical no
+# matter how the server is launched (start.bat, openzess.bat, uvicorn, Docker).
+UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "uploads"))
+os.makedirs(os.path.join(UPLOADS_DIR, "diagrams"), exist_ok=True)
+os.makedirs(os.path.join(UPLOADS_DIR, "plots"), exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 # Serve graphify output (graph.html, graph.json) as static files
 GRAPHIFY_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "graphify-out"))
@@ -89,6 +102,53 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── Optional API authentication ──────────────────────────────────
+# Set OPENZESS_AUTH_TOKEN to require a bearer token on every /api request.
+# When unset (default) the server stays open — convenient for local
+# development. Use it for ANY non-local or hosted deployment: this API
+# exposes terminal execution and the filesystem. WebSocket clients pass
+# ?token=<token> in the URL (checked inside the ws handlers).
+_OPENZESS_AUTH_TOKEN = os.environ.get("OPENZESS_AUTH_TOKEN", "").strip()
+
+@app.middleware("http")
+async def _auth_middleware(request: Request, call_next):
+    if _OPENZESS_AUTH_TOKEN:
+        path = request.url.path
+        if (path.startswith("/api") or path.startswith("/ws")) and request.method != "OPTIONS":
+            header = request.headers.get("authorization", "")
+            token = header[7:].strip() if header.lower().startswith("bearer ") else ""
+            if not token:
+                token = request.query_params.get("token", "")
+            if token != _OPENZESS_AUTH_TOKEN:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "Unauthorized: set the Authorization header to 'Bearer <OPENZESS_AUTH_TOKEN>'."},
+                )
+    return await call_next(request)
+
+# ── Rate limiting (global, sliding-window) ────────────────────────
+@app.middleware("http")
+async def _rate_limit_middleware(request: Request, call_next):
+    try:
+        check_rate_limit(request)
+    except HTTPException as e:
+        metrics_module.record_rate_limited()
+        return JSONResponse(status_code=e.status_code, content={"detail": e.detail}, headers=getattr(e, "headers", None))
+    response = await call_next(request)
+    return response
+
+# ── Metrics collection middleware ─────────────────────────────────
+@app.middleware("http")
+async def _metrics_middleware(request: Request, call_next):
+    start = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        metrics_module.record_request(request.method, request.url.path, 500, time.perf_counter() - start)
+        raise
+    metrics_module.record_request(request.method, request.url.path, response.status_code, time.perf_counter() - start)
+    return response
+
 # Initialize database
 database.init_db()
 
@@ -106,6 +166,66 @@ def init_active_mcps():
 # Run the initialization in the background so it doesn't block server startup
 threading.Thread(target=init_active_mcps, daemon=True).start()
 
+# Create the bootstrap admin account when OPENZESS_ADMIN_* env vars are set
+ensure_admin_bootstrap()
+
+# ── Metrics endpoint (Prometheus text format) ─────────────────────
+@app.get("/metrics")
+def get_prometheus_metrics():
+    from . import agent as _agent_mod
+    return Response(
+        content=metrics_module.render_metrics(active_sessions=len(sessions) or len(getattr(_agent_mod, "_live_sessions", []))),
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+    )
+
+# ── Rate limit status (exempt from limiting) ──────────────────────
+@app.get("/api/rate-limit/status")
+def get_rate_limit_status():
+    import os as _os
+    return {
+        "enabled": _os.environ.get("OPENZESS_RATE_LIMIT", "240") != "0",
+        "default_limit_per_minute": int(_os.environ.get("OPENZESS_RATE_LIMIT", "240") or "240"),
+    }
+
+# ── JWT AUTH (per-user accounts) ──────────────────────────────────
+_bearer = HTTPBearer(auto_error=False)
+
+class RegisterRequest(BaseModel):
+    email: str
+    username: str
+    password: str
+
+class LoginRequest(BaseModel):
+    identifier: str
+    password: str
+
+@app.post("/api/auth/register")
+def api_register(request: RegisterRequest):
+    try:
+        return auth_module.register_user(request.email, request.username, request.password)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/auth/login")
+def api_login(request: LoginRequest):
+    try:
+        return auth_module.authenticate_user(request.identifier, request.password)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/auth/me")
+def api_me(credentials: HTTPAuthorizationCredentials = Security(_bearer)):
+    user = get_current_user(credentials)
+    return {"user": {"id": user.id, "email": user.email, "username": user.username, "is_admin": bool(user.is_admin)}}
+
+@app.get("/api/auth/admin/ping")
+def api_admin_ping(admin_user: User = Security(get_current_admin)):
+    return {"status": "ok", "admin": admin_user.username}
+
 class ChatRequest(BaseModel):
     message: str
     api_key: Optional[str] = ""
@@ -121,6 +241,17 @@ class ChatRequest(BaseModel):
 # Store session agents locally for speed, hydrate from DB on restart
 sessions: Dict[str, OpenzessAgent] = {}
 
+# Cap the in-memory agent cache so long uptimes don't leak memory.
+MAX_CACHED_SESSIONS = 50
+
+# Serializes session first-builds (web + bridge hitting the same session).
+_sessions_lock = threading.Lock()
+
+def _evict_stale_sessions():
+    """Evict the oldest cached agents once the cache exceeds MAX_CACHED_SESSIONS."""
+    while len(sessions) > MAX_CACHED_SESSIONS:
+        sessions.pop(next(iter(sessions)), None)
+
 def swarm_debate_stream(request: ChatRequest, session_id: str):
     
     yield f"data: {json.dumps({'type': 'session', 'session_id': session_id})}\n\n"
@@ -130,7 +261,8 @@ def swarm_debate_stream(request: ChatRequest, session_id: str):
     if request.matrix_keys:
         if request.matrix_keys.get('deepseek2'): agents.append({"role": "Strategist", "provider": "deepseek2", "key": request.matrix_keys['deepseek2']})
         if request.matrix_keys.get('deepseek3'): agents.append({"role": "Critic", "provider": "deepseek3", "key": request.matrix_keys['deepseek3']})
-        if request.matrix_keys.get('glm'): agents.append({"role": "Optimizer", "provider": "glm", "key": request.matrix_keys['glm']})
+        if request.matrix_keys.get('nvidia'): agents.append({"role": "Optimizer", "provider": "nvidia", "key": request.matrix_keys['nvidia']})
+        elif request.matrix_keys.get('glm'): agents.append({"role": "Optimizer", "provider": "glm", "key": request.matrix_keys['glm']})
         
     if not agents:
         yield f"data: {json.dumps({'type': 'error', 'error': 'No Swarm API keys configured! Please add them in the War Room Matrix.'})}\n\n"
@@ -155,7 +287,8 @@ def swarm_debate_stream(request: ChatRequest, session_id: str):
                     model=model_name,
                     messages=[{"role": "system", "content": system_inst}, {"role": "user", "content": request.message}],
                     stream=True,
-                    api_key=agent_def["key"]
+                    api_key=agent_def["key"],
+                    num_retries=2
                 )
                 
                 agent_text = ""
@@ -201,27 +334,56 @@ def swarm_debate_stream(request: ChatRequest, session_id: str):
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
+    req_provider = request.provider
     effective_key = (request.api_key or "").strip()
-    if not effective_key:
-        if request.provider == "gemini":
+    
+    # Auto-detect provider from api_key format if provided
+    if effective_key:
+        if effective_key.startswith("nvapi-"):
+            req_provider = "nvidia"
+        elif effective_key.startswith("sk-or-"):
+            req_provider = "glm"
+        elif effective_key.startswith("AIza"):
+            req_provider = "gemini"
+    else:
+        if req_provider in ("nvidia", "nvidia-glm", "nvidia_glm"):
+            effective_key = os.environ.get("NVIDIA_API_KEY", "")
+        elif req_provider == "gemini":
             effective_key = os.environ.get("GEMINI_API_KEY", "")
-        elif request.provider == "openai":
+        elif req_provider == "openai":
             effective_key = os.environ.get("OPENAI_API_KEY", "")
-        elif request.provider == "anthropic":
+        elif req_provider == "anthropic":
             effective_key = os.environ.get("ANTHROPIC_API_KEY", "")
-        elif request.provider == "groq":
+        elif req_provider == "groq":
             effective_key = os.environ.get("GROQ_API_KEY", "")
-        elif request.provider in ("experiential", "exp", "exp:smart"):
+        elif req_provider in ("experiential", "exp", "exp:smart"):
             effective_key = os.environ.get("EXP_GATEWAY_KEY", os.environ.get("EXPERIENTIAL_API_KEY", "xpl_gateway"))
-        elif request.provider in ("ollama", "lmstudio"):
+        elif req_provider in ("ollama", "lmstudio"):
             effective_key = "local"
         else:
-            effective_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("DEEPSEEK_API_KEY", ""))
+            effective_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("DEEPSEEK_API_KEY", os.environ.get("NVIDIA_API_KEY", "")))
+            
+    # Auto-fallback: if requested provider is gemini without a valid AIza key, fallback to working OpenRouter GLM or NVIDIA
+    if req_provider == "gemini" and not effective_key.startswith("AIza"):
+        if os.environ.get("NVIDIA_API_KEY"):
+            req_provider = "nvidia"
+            effective_key = os.environ.get("NVIDIA_API_KEY")
+        elif os.environ.get("OPENROUTER_API_KEY"):
+            req_provider = "glm"
+            effective_key = os.environ.get("OPENROUTER_API_KEY")
+
+    # If requested provider is nvidia without a key, fallback to OpenRouter GLM
+    if req_provider in ("nvidia", "nvidia-glm", "nvidia_glm") and not effective_key:
+        if os.environ.get("OPENROUTER_API_KEY"):
+            req_provider = "glm"
+            effective_key = os.environ.get("OPENROUTER_API_KEY")
+
+    request.provider = req_provider
 
     if not effective_key and request.provider not in ("ollama", "lmstudio", "experiential", "exp", "exp:smart"):
         raise HTTPException(
             status_code=400, 
-            detail="API Key is required. Please enter an API key in Settings (gear icon) or set GEMINI_API_KEY in your .env / terminal environment."
+            detail="API Key is required. Please enter an API key in Settings (gear icon) or set NVIDIA_API_KEY / OPENROUTER_API_KEY in your .env or terminal environment."
         )
         
     session_id = request.session_id
@@ -276,7 +438,14 @@ async def chat(request: ChatRequest):
         )
         new_agent.raw_allowed_tools = request.allowed_tools
         new_agent.system_instruction = request.system_instruction
-        sessions[session_id] = new_agent
+        # Enables tool-log persistence in OpenzessAgent._run_tool so the agent
+        # remembers executed commands/files after a server restart.
+        new_agent.session_id = session_id
+        with _sessions_lock:
+            # Both racing agents carry identical config, so last-writer-wins
+            # is safe; the lock only prevents torn concurrent dict writes.
+            sessions[session_id] = new_agent
+        _evict_stale_sessions()
         
     agent = sessions[session_id]
     
@@ -347,6 +516,13 @@ async def chat_approve(request: ApprovalRequest):
 def list_sessions():
     try:
         return {"sessions": database.get_all_sessions()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/activity")
+def get_activity():
+    try:
+        return database.get_recent_activity(limit=50)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -556,6 +732,45 @@ def get_watchdogs():
 @app.delete("/api/watchdog/{watch_id}")
 def delete_watchdog(watch_id: str):
     background_workers.watch_manager.remove_watchdog(watch_id)
+    return {"status": "deleted"}
+
+# ================================
+# REPO SENTRY (Autonomous Watcher)
+# ================================
+class RepoSentryCreateRequest(BaseModel):
+    path: str
+    test_cmd: Optional[str] = "pytest"
+    auto_commit: Optional[bool] = False
+    interval_minutes: Optional[int] = 30
+
+@app.post("/api/repo-sentry/watch")
+def create_repo_sentry(request: RepoSentryCreateRequest):
+    try:
+        repo_id = background_workers.repo_sentry.add_repo(
+            path=request.path,
+            test_cmd=request.test_cmd or "pytest",
+            auto_commit=bool(request.auto_commit),
+            interval_minutes=request.interval_minutes or 30
+        )
+        return {"status": "watching", "repo_id": repo_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/repo-sentry/list")
+def list_repo_sentries():
+    return {"repos": background_workers.repo_sentry.get_repos()}
+
+@app.post("/api/repo-sentry/{repo_id}/scan")
+def trigger_repo_sentry_scan(repo_id: str):
+    try:
+        res = background_workers.repo_sentry.scan_repo(repo_id)
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/repo-sentry/{repo_id}")
+def delete_repo_sentry(repo_id: str):
+    background_workers.repo_sentry.remove_repo(repo_id)
     return {"status": "deleted"}
 
 # ================================
@@ -934,6 +1149,57 @@ def upload_note_image(file: UploadFile = File(...)):
 # ================================
 @app.get("/api/graphify/report")
 def get_graphify_report():
+    import re
+    report_path = os.path.join(GRAPHIFY_DIR, "GRAPH_REPORT.md")
+    if os.path.exists(report_path):
+        try:
+            with open(report_path, "r", encoding="utf-8") as f:
+                text = f.read()
+            summary_match = re.search(r"(\d+) nodes.*?(\d+) edges.*?(\d+) communities", text)
+            nodes = int(summary_match.group(1)) if summary_match else 305
+            edges = int(summary_match.group(2)) if summary_match else 409
+            communities = int(summary_match.group(3)) if summary_match else 19
+            ext_match = re.search(r"Extraction: (.+?)$", text, re.MULTILINE)
+            extraction = ext_match.group(1).strip() if ext_match else "81% EXTRACTED · 19% INFERRED"
+            god_nodes = []
+            god_section = re.search(r"## God Nodes.*?\n((?:.*\n)*?)(?=\n##)", text)
+            if god_section:
+                for line in god_section.group(1).strip().split("\n"):
+                    m = re.match(r"\d+\. `(.+?)` - (\d+) edges", line.strip())
+                    if m:
+                        god_nodes.append({"name": m.group(1), "edges": int(m.group(2))})
+            gaps = []
+            gap_section = re.search(r"## Knowledge Gaps(.*?)(?=\n## |\Z)", text, re.DOTALL)
+            if gap_section:
+                for line in gap_section.group(1).strip().split("\n"):
+                    line = line.strip()
+                    if line.startswith("- **"):
+                        clean = re.sub(r"\*\*|`", "", line[2:]).strip()
+                        gaps.append(clean[:80])
+                        if len(gaps) >= 5:
+                            break
+            surprises = []
+            surp_section = re.search(r"## Surprising Connections.*?\n((?:.*\n)*?)(?=\n##)", text)
+            if surp_section:
+                for line in surp_section.group(1).strip().split("\n"):
+                    line = line.strip()
+                    if line.startswith("-") and "--" in line:
+                        clean = re.sub(r"`|\[INFERRED\]|\[EXTRACTED\]", "", line[1:]).strip()[:70]
+                        surprises.append(clean + " [INFERRED]" if "INFERRED" in line else clean)
+                        if len(surprises) >= 3:
+                            break
+            return {
+                "nodes": nodes,
+                "edges": edges,
+                "communities": communities,
+                "extraction": extraction,
+                "god_nodes": god_nodes[:5],
+                "gaps": gaps[:5],
+                "surprises": surprises[:3],
+            }
+        except Exception:
+            pass
+
     try:
         graph_file = os.path.join(GRAPHIFY_DIR, "graph.json")
         nodes_count = 19
@@ -944,8 +1210,6 @@ def get_graphify_report():
             try:
                 with open(graph_file, "r", encoding="utf-8") as f:
                     gdata = json.load(f)
-                    # Prefer the Rust sidecar when SIDECAR_URL is configured;
-                    # returns None otherwise -> identical pure-Python path below.
                     stats = aggregate_graph_via_sidecar(gdata)
                     if stats is not None:
                         nodes_count = stats.get("nodes", nodes_count)
@@ -1101,30 +1365,50 @@ async def matrix_stream(websocket: WebSocket):
     sct = mss.mss()
     
     try:
-        monitor = sct.monitors[0]
+        monitor = sct.monitors[1] if len(sct.monitors) > 1 else sct.monitors[0]
         last_frame_hash = 0
         last_change_time = time.time()
+        fallback_frame = None
         
         async def send_frames():
-            nonlocal current_fps, quality, last_frame_hash, last_change_time
+            nonlocal current_fps, quality, last_frame_hash, last_change_time, fallback_frame
             while True:
                 start_t = time.time()
-                sct_img = sct.grab(monitor)
-                raw_bytes = sct_img.bgra
+                raw_bytes = None
+                img_size = (1280, 720)
                 
-                # Fast sample hash across pixel strides to detect frame updates instantly
-                sample_hash = hash(raw_bytes[::4096])
+                try:
+                    sct_img = sct.grab(monitor)
+                    raw_bytes = sct_img.bgra
+                    img_size = sct_img.size
+                except Exception:
+                    if fallback_frame is None:
+                        try:
+                            from PIL import Image, ImageDraw
+                            fimg = Image.new("RGB", (1280, 720), color=(15, 23, 42))
+                            draw = ImageDraw.Draw(fimg)
+                            draw.rectangle([10, 10, 1270, 710], outline=(34, 197, 94), width=2)
+                            draw.text((430, 330), "HERMES VIRTUAL MATRIX DISPLAY [CONNECTED]", fill=(34, 197, 94))
+                            draw.text((455, 370), "Interactive screen bridge standby", fill=(148, 163, 184))
+                            buf = io.BytesIO()
+                            fimg.save(buf, format="JPEG", quality=75)
+                            fallback_frame = buf.getvalue()
+                        except Exception:
+                            pass
+                
                 now = time.time()
-                
-                # Transmit when screen changes or heartbeat every 0.5s
-                if sample_hash != last_frame_hash or (now - last_change_time) > 0.5:
-                    last_frame_hash = sample_hash
+                if raw_bytes is not None:
+                    sample_hash = hash(raw_bytes[::4096])
+                    if sample_hash != last_frame_hash or (now - last_change_time) > 0.5:
+                        last_frame_hash = sample_hash
+                        last_change_time = now
+                        jpeg_bytes, _engine = await encode_image_async(
+                            raw_bytes, *img_size, fmt="JPEG", quality=quality
+                        )
+                        await websocket.send_bytes(jpeg_bytes)
+                elif fallback_frame is not None and (now - last_change_time) > 1.0:
                     last_change_time = now
-                    
-                    jpeg_bytes, _engine = await encode_image_async(
-                        raw_bytes, *sct_img.size, fmt="JPEG", quality=quality
-                    )
-                    await websocket.send_bytes(jpeg_bytes)
+                    await websocket.send_bytes(fallback_frame)
                 
                 # Dynamic adaptive sleep targeting target FPS
                 elapsed = time.time() - start_t
@@ -1135,7 +1419,10 @@ async def matrix_stream(websocket: WebSocket):
         async def receive_input():
             nonlocal current_fps, quality
             while True:
-                data = await websocket.receive_text()
+                try:
+                    data = await websocket.receive_text()
+                except (WebSocketDisconnect, asyncio.CancelledError):
+                    break
                 try:
                     payload = json.loads(data)
                     action = payload.get("action")
@@ -1192,77 +1479,6 @@ async def terminal_exec(req: TerminalExecRequest):
     output = await asyncio.to_thread(run_terminal_command, req.command)
     return {"output": output}
 
-# ================================
-# GRAPHIFY — Codebase Graph Report
-# ================================
-@app.get("/api/graphify/report")
-async def get_graphify_report():
-    """Returns parsed stats from the graphify GRAPH_REPORT.md for the frontend panel."""
-    import re
-    report_path = os.path.join(GRAPHIFY_DIR, "GRAPH_REPORT.md")
-    try:
-        if not os.path.exists(report_path):
-            raise HTTPException(status_code=404, detail="Graph report not found. Run graphifyy first.")
-        
-        with open(report_path, "r", encoding="utf-8") as f:
-            text = f.read()
-        
-        # Parse nodes/edges/communities
-        summary_match = re.search(r"(\d+) nodes.*?(\d+) edges.*?(\d+) communities", text)
-        nodes = int(summary_match.group(1)) if summary_match else 305
-        edges = int(summary_match.group(2)) if summary_match else 409
-        communities = int(summary_match.group(3)) if summary_match else 19
-        
-        # Parse extraction line
-        ext_match = re.search(r"Extraction: (.+?)$", text, re.MULTILINE)
-        extraction = ext_match.group(1).strip() if ext_match else "81% EXTRACTED · 19% INFERRED"
-        
-        # Parse God Nodes (top 5)
-        god_nodes = []
-        god_section = re.search(r"## God Nodes.*?\n((?:.*\n)*?)(?=\n##)", text)
-        if god_section:
-            for line in god_section.group(1).strip().split("\n"):
-                m = re.match(r"\d+\. `(.+?)` - (\d+) edges", line.strip())
-                if m:
-                    god_nodes.append({"name": m.group(1), "edges": int(m.group(2))})
-        
-        # Parse Knowledge Gaps (first 5)
-        gaps = []
-        gap_section = re.search(r"## Knowledge Gaps(.*?)(?=\n## |\Z)", text, re.DOTALL)
-        if gap_section:
-            for line in gap_section.group(1).strip().split("\n"):
-                line = line.strip()
-                if line.startswith("- **"):
-                    clean = re.sub(r"\*\*|`", "", line[2:]).strip()
-                    gaps.append(clean[:80])
-                    if len(gaps) >= 5:
-                        break
-        
-        # Parse Surprising Connections (first 3)
-        surprises = []
-        surp_section = re.search(r"## Surprising Connections.*?\n((?:.*\n)*?)(?=\n##)", text)
-        if surp_section:
-            for line in surp_section.group(1).strip().split("\n"):
-                line = line.strip()
-                if line.startswith("-") and "--" in line:
-                    clean = re.sub(r"`|\[INFERRED\]|\[EXTRACTED\]", "", line[1:]).strip()[:70]
-                    surprises.append(clean + " [INFERRED]" if "INFERRED" in line else clean)
-                    if len(surprises) >= 3:
-                        break
-        
-        return {
-            "nodes": nodes,
-            "edges": edges,
-            "communities": communities,
-            "extraction": extraction,
-            "god_nodes": god_nodes[:5],
-            "gaps": gaps[:5],
-            "surprises": surprises[:3],
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 # ================================
 # BRAIN & EVOLUTION DASHBOARD
@@ -1315,6 +1531,9 @@ async def get_brain_skills():
 async def reload_brain_skills():
     """Hot-reloads all plugins in memory."""
     load_plugins()
+    # Re-merge plugin functions AND schemas into the agent dispatch tables so
+    # runtime-loaded tools are callable by live agents without a restart.
+    refresh_plugin_tools()
     return {
         "status": "success",
         "loaded_tools": len(plugin_registry.funcs),
