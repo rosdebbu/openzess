@@ -1,4 +1,4 @@
-﻿name: Deploy (CD)
+name: Deploy (CD)
 
 # Build & push the production image to GHCR on every merge to main,
 # then deploy to Google Cloud Run. Deploy step requires environment approval.
@@ -46,7 +46,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build & push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
