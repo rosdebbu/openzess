@@ -4,13 +4,13 @@ Features 3D ASCII branding, categorized capabilities box, turn dividers,
 real-time token streaming, habit profiling, and bottom status line.
 """
 
+import json
 import os
 import sys
 import time
 import uuid
 import logging
 import warnings
-from typing import Dict, List, Optional
 
 # Suppress background third-party warnings & LiteLLM stderr messages
 os.environ["LITELLM_LOG"] = "ERROR"
@@ -21,9 +21,9 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.box import ROUNDED, HEAVY, DOUBLE
+from rich.box import ROUNDED
 
-from .agent import OpenzessAgent, PROVIDER_MODELS, memory_collection
+from .agent import OpenzessAgent, memory_collection
 from .plugin_loader import plugin_registry, load_plugins
 from . import habit_learner
 from . import experiential_client
@@ -81,8 +81,7 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
     
     # Left column content
     habits_count = len(habit_learner.get_all_habits())
-    memory_count = memory_collection.count() if memory_collection else 0
-    
+
     left_text = (
         f"{LIZARD_TOTEM}\n\n"
         f" {LIZARD_PRIMARY}{BOLD}{agent.provider.upper()}{RESET} {DIM}·{RESET} {LIZARD_LIGHT}{agent.model_name.split('/')[-1]}{RESET}\n"
@@ -145,7 +144,7 @@ def render_dashboard_box(agent: OpenzessAgent, session_id: str):
 
 def show_help_menu():
     print(f"\n{LIZARD_PRIMARY}{BOLD}Available Slash Commands:{RESET}")
-    print(f"  {LIZARD_LIGHT}/model <provider>{RESET}  Switch active LLM (glm, deepseek, gemini, groq, ollama, lmstudio, experiential, exp:smart)")
+    print(f"  {LIZARD_LIGHT}/model <provider>{RESET}  Switch active LLM (nvidia, glm, deepseek, gemini, groq, ollama, lmstudio, experiential, exp:smart)")
     print(f"  {LIZARD_LIGHT}/exp{RESET}              Inspect Experiential Gateway health, OTel traces & diagnostics")
     print(f"  {LIZARD_LIGHT}/habits{RESET}            Inspect learned user habits & adaptive behavioral profile")
     print(f"  {LIZARD_LIGHT}/skills{RESET}            List all hot-loaded Python plugins & synthesized tools")
@@ -159,11 +158,10 @@ def run_cli():
     # Load plugins on start
     load_plugins()
     
-    current_provider = os.environ.get("OPENZESS_PROVIDER", "glm")
-    api_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
+    current_provider = "nvidia" if os.environ.get("NVIDIA_API_KEY") else os.environ.get("OPENZESS_PROVIDER", "glm")
     session_id = f"{time.strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
     
-    agent = OpenzessAgent(api_key=api_key, provider=current_provider)
+    agent = OpenzessAgent(provider=current_provider)
     
     # Render the gorgeous full Hermes-style header box
     render_dashboard_box(agent, session_id)
@@ -272,11 +270,11 @@ def run_cli():
 
                 elif cmd == "/model":
                     if not arg:
-                        print(f"{LIZARD_PRIMARY}Current provider: {current_provider}. Usage: /model <glm|deepseek|gemini|groq|ollama|lmstudio|experiential|exp:smart>{RESET}\n")
+                        print(f"{LIZARD_PRIMARY}Current provider: {current_provider} ({agent.model_name}).\nUsage: /model <nvidia|glm|deepseek|gemini|groq|ollama|lmstudio|experiential|exp:smart>{RESET}\n")
                     else:
                         current_provider = arg
-                        agent = OpenzessAgent(api_key=api_key, provider=current_provider)
-                        print(f"\n{LIZARD_LIGHT}✓ Active model switched to: {agent.model_name}{RESET}\n")
+                        agent = OpenzessAgent(provider=current_provider)
+                        print(f"\n{LIZARD_LIGHT}✓ Active model switched to: {agent.model_name} (Provider: {agent.provider}){RESET}\n")
                     continue
 
                 else:
@@ -292,39 +290,57 @@ def run_cli():
             first_token_time = None
             total_chars = 0
 
-            for chunk in agent.chat_stream(user_input):
-                ctype = chunk.get("type")
-                if ctype == "content":
-                    if first_token_time is None:
-                        first_token_time = time.time() - t0
-                    text = chunk.get("content", "")
-                    total_chars += len(text)
-                    sys.stdout.write(text)
-                    sys.stdout.flush()
-                elif ctype == "tool_start":
-                    sys.stdout.write(f"\n\n{CYAN}⚙️  Executing @{chunk.get('tool')}...{RESET}\n")
-                    sys.stdout.flush()
-                elif ctype == "tool_result":
-                    tool_name = chunk.get("tool", "")
-                    tool_args = chunk.get("args", {})
-                    output = chunk.get("output", "")
-                    preview = str(output)[:140] + ("..." if len(str(output)) > 140 else "")
-                    
-                    # Clickable file/link enhancement for VS Code & Windows Terminal
-                    if tool_name in ("create_file", "edit_code", "read_file") and "filepath" in tool_args:
-                        fp = tool_args["filepath"]
-                        link = experiential_client.format_terminal_link(fp, fp)
-                        sys.stdout.write(f"{DIM}   ↳ File: {link}{RESET}\n")
-                    elif tool_name in ("search_the_web", "read_web_page") and "url" in tool_args:
-                        u = tool_args["url"]
-                        link = experiential_client.format_terminal_link(u, u)
-                        sys.stdout.write(f"{DIM}   ↳ Link: {link}{RESET}\n")
+            def process_stream(stream):
+                nonlocal first_token_time, total_chars
+                for chunk in stream:
+                    ctype = chunk.get("type")
+                    if ctype == "content":
+                        if first_token_time is None:
+                            first_token_time = time.time() - t0
+                        text = chunk.get("content", "")
+                        total_chars += len(text)
+                        sys.stdout.write(text)
+                        sys.stdout.flush()
+                    elif ctype == "tool_start":
+                        sys.stdout.write(f"\n\n{CYAN}⚙️  Executing @{chunk.get('tool')}...{RESET}\n")
+                        sys.stdout.flush()
+                    elif ctype == "tool_result":
+                        tool_name = chunk.get("tool", "")
+                        tool_args = chunk.get("args", {})
+                        output = chunk.get("output", "")
+                        preview = str(output)[:140] + ("..." if len(str(output)) > 140 else "")
                         
-                    sys.stdout.write(f"{DIM}   ↳ Result: {preview}{RESET}\n\n")
-                    sys.stdout.flush()
-                elif ctype == "error":
-                    sys.stdout.write(f"\n\n{AMBER}❌ Error: {chunk.get('error')}{RESET}\n\n")
-                    sys.stdout.flush()
+                        # Clickable file/link enhancement for VS Code & Windows Terminal
+                        if tool_name in ("create_file", "edit_code", "read_file") and "filepath" in tool_args:
+                            fp = tool_args["filepath"]
+                            link = experiential_client.format_terminal_link(fp, fp)
+                            sys.stdout.write(f"{DIM}   ↳ File: {link}{RESET}\n")
+                        elif tool_name in ("search_the_web", "read_web_page") and "url" in tool_args:
+                            u = tool_args["url"]
+                            link = experiential_client.format_terminal_link(u, u)
+                            sys.stdout.write(f"{DIM}   ↳ Link: {link}{RESET}\n")
+                            
+                        sys.stdout.write(f"{DIM}   ↳ Result: {preview}{RESET}\n\n")
+                        sys.stdout.flush()
+                    elif ctype == "auth_required":
+                        pending = chunk.get("pending_calls", [])
+                        sys.stdout.write(f"\n\n{AMBER}⚠️  Authorization required for {len(pending)} tool call(s):{RESET}\n")
+                        for pc in pending:
+                            args_str = json.dumps(pc.get("args", {}))
+                            if len(args_str) > 120:
+                                args_str = args_str[:120] + "..."
+                            sys.stdout.write(f"   {CYAN}@{pc.get('name')}{RESET} args={args_str}\n")
+                        sys.stdout.write(f"{BOLD}Approve execution? [Y/n]: {RESET}")
+                        sys.stdout.flush()
+                        ans = input().strip().lower()
+                        approved = ans in ("", "y", "yes")
+                        sub_stream = agent.execute_pending_tools_stream(pending, approved=approved)
+                        process_stream(sub_stream)
+                    elif ctype == "error":
+                        sys.stdout.write(f"\n\n{AMBER}❌ Error: {chunk.get('error')}{RESET}\n\n")
+                        sys.stdout.flush()
+
+            process_stream(agent.chat_stream(user_input))
 
             total_time = time.time() - t0
             lat_str = f"{first_token_time:.2f}s" if first_token_time else f"{total_time:.2f}s"
