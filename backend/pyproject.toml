@@ -1,0 +1,19 @@
+# Ruff configuration for the Openzess backend.
+# Pragmatic baseline: correctness-first rules, with known legacy
+# patterns ignored until a dedicated cleanup pass.
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = [
+    "E402", # imports after env setup - intentional in agent.py (DISPLAY bootstrap)
+    "E701", # one-line compound statements - legacy pattern, tracked for cleanup
+    "E722", # bare excepts - legacy pattern, tracked for cleanup
+    "E741", # ambiguous variable names
+    "F811", # duplicate route handler in server.py, tracked for cleanup
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F401"]
