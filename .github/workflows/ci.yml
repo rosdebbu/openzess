@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   frontend:
-    name: Frontend — Type-check & Build
+    name: Frontend — Lint, Type-check & Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -31,11 +31,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint (ESLint)
+        run: npm run lint --if-present
+
       - name: Type-check & production build
         run: npm run build
 
   backend:
-    name: Backend — Syntax & Import Compile
+    name: Backend — Lint, Compile & Tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -55,9 +58,73 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Lint (Ruff)
+        run: ruff check app tools
+
       - name: Byte-compile all application modules
         run: python -m compileall app tools
 
-      - name: Run unit test suite (pytest)
-        run: pytest tests/ -v
+      - name: Run unit test suite (pytest) with coverage
+        run: pytest tests/ -v --cov=app --cov-report=term-missing
 
+  rust:
+    name: Rust Sidecar — Fmt, Clippy & Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust-sidecar
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry & build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rust-sidecar/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('rust-sidecar/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Format check (rustfmt)
+        run: cargo fmt --check
+
+      - name: Lint (clippy)
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Run tests
+        run: cargo test --release
+
+  security:
+    name: Security — Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: pip-audit (Python dependencies)
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          pip-audit -r backend/requirements.txt --skip-editable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: npm audit (frontend dependencies)
+        run: |
+          cd frontend
+          npm ci --ignore-scripts
+          npm audit --audit-level=high || true
