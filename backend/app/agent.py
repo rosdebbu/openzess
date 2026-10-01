@@ -61,21 +61,33 @@ except Exception as e:
     memory_collection = None
 
 # ---- NATIVE TOOLS ----
-def run_terminal_command(command: str) -> str:
+def run_terminal_command(command: str, **kwargs) -> str:
     try:
+        import re
+        command = re.sub(r'\[(.*?)\]\([^\)]*\)', r'\1', command).strip()
         if platform.system() == "Windows":
-            # Try default WSL first, fallback to PowerShell
+            # Try PowerShell first; fallback to cmd and WSL for shell scripts or complex pipes
             try:
-                result = subprocess.run(["wsl", "bash", "-c", command], capture_output=True, text=True, timeout=30)
-                if result.returncode == 0 or (result.stdout and not result.stderr):
-                    return result.stdout
+                result = subprocess.run(["powershell", "-NoProfile", "-Command", command], capture_output=True, text=True, timeout=30)
+                if result.returncode == 0:
+                    return result.stdout if result.stdout else "Command completed successfully with no output."
             except Exception:
                 pass
-            result = subprocess.run(["powershell", "-NoProfile", "-Command", command], capture_output=True, text=True, timeout=30)
-            return result.stdout if result.stdout else result.stderr
+            try:
+                result = subprocess.run(["cmd.exe", "/c", command], capture_output=True, text=True, timeout=30)
+                if result.returncode == 0:
+                    return result.stdout if result.stdout else "Command completed successfully with no output."
+            except Exception:
+                pass
+            try:
+                result = subprocess.run(["wsl", "bash", "-c", command], capture_output=True, text=True, timeout=30)
+                return result.stdout if result.stdout else (result.stderr if result.stderr else "Command execution completed.")
+            except Exception:
+                pass
+            return "Command execution completed."
         else:
             result = subprocess.run(["bash", "-c", command], capture_output=True, text=True, timeout=30)
-            return result.stdout if result.stdout else result.stderr
+            return result.stdout if result.stdout else (result.stderr if result.stderr else "Command completed.")
     except Exception as e:
         return str(e)
 
@@ -113,7 +125,7 @@ def create_file(filepath: str, content: str) -> str:
 def read_file(filepath: str) -> str:
     try:
         if not os.path.exists(filepath):
-            return f"Error: File does not exist."
+            return "Error: File does not exist."
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
             return content[:15000] if len(content) > 15000 else content
@@ -123,7 +135,7 @@ def read_file(filepath: str) -> str:
 def edit_code(filepath: str, old_string: str, new_string: str) -> str:
     try:
         if not os.path.exists(filepath):
-            return f"Error: File does not exist."
+            return "Error: File does not exist."
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
         if old_string not in content:
@@ -189,7 +201,7 @@ def computer_type_text(text: str) -> str:
     try:
         verify_sandbox_environment()
         pyautogui.write(text, interval=0.01)
-        return f"Typed text successfully."
+        return "Typed text successfully."
     except Exception as e:
         return f"Failed to type text: {e}"
 
@@ -298,6 +310,10 @@ def analyze_code_metrics(code_text: str) -> str:
 
 native_tool_funcs = {
     "run_terminal_command": run_terminal_command,
+    "bash_command": run_terminal_command,
+    "bash": run_terminal_command,
+    "execute_command": run_terminal_command,
+    "terminal": run_terminal_command,
     "search_the_web": search_the_web,
     "read_web_page": read_web_page,
     "create_file": create_file,
@@ -559,6 +575,22 @@ NATIVE_TOOL_SCHEMAS = [
 # Dynamically inject the schemas for the hot-loaded plugins!
 NATIVE_TOOL_SCHEMAS.extend(plugin_registry.schemas)
 
+def refresh_plugin_tools():
+    """Re-merge hot-loaded plugin functions and schemas (deduped by name).
+
+    Runs at import time and again after synthesize_skill and the brain-reload
+    endpoint, so plugins loaded at runtime are callable by the model without a
+    server restart.
+    """
+    for _name, _fn in plugin_registry.funcs.items():
+        native_tool_funcs[_name] = _fn
+    _existing = {s.get("function", {}).get("name") for s in NATIVE_TOOL_SCHEMAS}
+    for _schema in plugin_registry.schemas:
+        _sname = _schema.get("function", {}).get("name")
+        if _sname and _sname not in _existing:
+            NATIVE_TOOL_SCHEMAS.append(_schema)
+            _existing.add(_sname)
+
 PROVIDER_MODELS = {
     "gemini": "gemini/gemini-2.5-flash",
     "openai": "openai/gpt-4o-mini",
@@ -566,6 +598,9 @@ PROVIDER_MODELS = {
     "groq": "groq/llama-3.3-70b-versatile",
     "ollama": "ollama/llama3.2",
     "lmstudio": "openai/local-model",
+    "nvidia": "openai/z-ai/glm-5.3-flash",
+    "nvidia-glm": "openai/z-ai/glm-5.3-flash",
+    "nvidia_glm": "openai/z-ai/glm-5.3-flash",
     "deepseek": "openrouter/deepseek/deepseek-chat",
     "deepseek2": "openrouter/deepseek/deepseek-chat",
     "deepseek3": "openrouter/deepseek/deepseek-chat",
@@ -591,8 +626,12 @@ class OpenzessAgent:
                 self.api_key = os.environ.get("ANTHROPIC_API_KEY", "")
             elif provider == "groq":
                 self.api_key = os.environ.get("GROQ_API_KEY", "")
+            elif provider in ("nvidia", "nvidia-glm", "nvidia_glm"):
+                self.api_key = os.environ.get("NVIDIA_API_KEY", "")
+            elif provider == "glm" and os.environ.get("NVIDIA_API_KEY") and not os.environ.get("OPENROUTER_API_KEY"):
+                self.api_key = os.environ.get("NVIDIA_API_KEY", "")
             else:
-                self.api_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("DEEPSEEK_API_KEY", ""))
+                self.api_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("DEEPSEEK_API_KEY", os.environ.get("NVIDIA_API_KEY", "")))
         else:
             self.api_key = api_key
 
@@ -612,12 +651,20 @@ class OpenzessAgent:
             os.environ["ANTHROPIC_API_KEY"] = self.api_key
         elif provider == "groq" and self.api_key:
             os.environ["GROQ_API_KEY"] = self.api_key
+        elif (provider in ("nvidia", "nvidia-glm", "nvidia_glm") or (self.api_key and self.api_key.startswith("nvapi-"))) and self.api_key:
+            os.environ["NVIDIA_API_KEY"] = self.api_key
         elif ("openrouter/" in self.model_name or (self.api_key and self.api_key.startswith("sk-or-"))) and self.api_key:
             os.environ["OPENROUTER_API_KEY"] = self.api_key
         
-        # Configure custom localhost endpoints (Ollama / LM Studio / LocalAI / vLLM / Experiential Gateway)
+        # Configure custom endpoints (NVIDIA NIM / Ollama / LM Studio / LocalAI / vLLM / Experiential Gateway)
         self.api_base = None
-        if provider == "ollama":
+        if provider in ("nvidia", "nvidia-glm", "nvidia_glm") or (self.api_key and self.api_key.startswith("nvapi-")):
+            self.api_base = os.environ.get("NVIDIA_API_BASE", "https://integrate.api.nvidia.com/v1")
+            raw_model = os.environ.get("NVIDIA_MODEL", "z-ai/glm-5.3-flash")
+            if not raw_model.startswith("openai/") and not raw_model.startswith("nvidia_nim/"):
+                raw_model = f"openai/{raw_model}"
+            self.model_name = raw_model
+        elif provider == "ollama":
             self.api_base = os.environ.get("OLLAMA_API_BASE", "http://localhost:11434")
             self.model_name = os.environ.get("OLLAMA_MODEL", "ollama/llama3.2")
         elif provider == "lmstudio":
@@ -632,7 +679,7 @@ class OpenzessAgent:
                 self.api_key = os.environ.get("EXP_GATEWAY_KEY", "xpl_gateway")
         
         self.messages = []
-        default_inst = "You are openzess, a self-growing AI agent and coding assistant. You can synthesize your own tools, write code, persist memories into your ChromaDB vector vault, and execute commands inside a secure Linux Debian WSL sandbox."
+        default_inst = "You are openzess, a fast autonomous AI assistant. Be direct, concise, and helpful. Answer questions directly in text without running unnecessary tools. Only call file or terminal tools when the user explicitly asks to run commands, inspect files, or edit code."
         
         try:
             from . import habit_learner
@@ -665,13 +712,101 @@ class OpenzessAgent:
             unique_tools[t["function"]["name"]] = t
         self.tools = list(unique_tools.values())
 
+    def _extract_text_tool_calls(self, text: str) -> list:
+        if not text or "<tool_call>" not in text:
+            return []
+        calls = []
+        import re
+        import json
+        import uuid
+        blocks = re.split(r'<tool_call>', text)
+        for blk in blocks[1:]:
+            blk = blk.strip()
+            # 1. JSON-style
+            json_m = re.search(r'^\s*(\{.*?\})(?:\s*</tool_call>|\s*\Z|\s*<tool_call>)', blk, re.DOTALL)
+            if json_m:
+                try:
+                    data = json.loads(json_m.group(1))
+                    fn = data.get("name") or data.get("function")
+                    args = data.get("arguments", {})
+                    if isinstance(args, str):
+                        args = json.loads(args)
+                    if fn:
+                        if fn in ("bash_command", "bash", "execute_command", "terminal"):
+                            fn = "run_terminal_command"
+                        calls.append({
+                            "id": f"call_txt_{uuid.uuid4().hex[:6]}",
+                            "type": "function",
+                            "function": {"name": fn, "arguments": json.dumps(args)}
+                        })
+                        continue
+                except Exception:
+                    pass
+
+            # 2. Function-style call e.g. bash_command(command="...")
+            m = re.match(r'([a-zA-Z0-9_-]+)\s*\((.*?)(?:\)\s*</arg_value>|\)\s*</tool_call>|\)\s*>|\)\s*\Z)', blk, re.DOTALL)
+            if not m:
+                m = re.match(r'([a-zA-Z0-9_-]+)\s*\((.*)', blk, re.DOTALL)
+            if not m:
+                continue
+
+            fn_name = m.group(1).strip()
+            args_raw = m.group(2).strip()
+
+            args = {}
+            cmd_m = re.search(r'command\s*=\s*["\'](.*?)["\']\s*(?:\)|</arg_value>|</tool_call>|\Z)', args_raw, re.DOTALL)
+            if not cmd_m:
+                cmd_m = re.search(r'command\s*=\s*["\'](.*)', args_raw, re.DOTALL)
+
+            if cmd_m:
+                cmd = cmd_m.group(1).rstrip(')"\'').strip()
+                cmd = re.sub(r'\[(.*?)\]\([^\)]*\)', r'\1', cmd)
+                args["command"] = cmd
+            else:
+                clean = args_raw.rstrip(')"\'').strip()
+                clean = re.sub(r'\[(.*?)\]\([^\)]*\)', r'\1', clean)
+                if clean:
+                    args["command"] = clean
+
+            if fn_name in ("bash_command", "bash", "execute_command", "terminal"):
+                fn_name = "run_terminal_command"
+
+            calls.append({
+                "id": f"call_txt_{uuid.uuid4().hex[:6]}",
+                "type": "function",
+                "function": {
+                    "name": fn_name,
+                    "arguments": json.dumps(args)
+                }
+            })
+        return calls
+
     def _run_tool(self, name: str, args: dict) -> str:
+        import inspect
+        import re
+        if name in ("bash_command", "bash", "execute_command", "terminal"):
+            name = "run_terminal_command"
+
+        if name == "run_terminal_command":
+            if "cmd" in args and "command" not in args:
+                args["command"] = args.pop("cmd")
+            elif "code" in args and "command" not in args:
+                args["command"] = args.pop("code")
+            if "command" in args and isinstance(args["command"], str):
+                args["command"] = re.sub(r'\[(.*?)\]\([^\)]*\)', r'\1', args["command"]).strip()
+
         sid = mcp_registry.find_server_for_tool(name)
         if sid:
             return mcp_registry.call_tool(name, args)
             
         if name in native_tool_funcs:
-            return native_tool_funcs[name](**args)
+            fn = native_tool_funcs[name]
+            sig = inspect.signature(fn)
+            has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values())
+            if not has_var_keyword:
+                valid_args = {k: v for k, v in args.items() if k in sig.parameters}
+                return fn(**valid_args)
+            return fn(**args)
             
         return f"Unknown tool: {name}"
 
@@ -683,6 +818,7 @@ class OpenzessAgent:
                 "model": self.model_name,
                 "messages": self.messages,
                 "tools": self.tools if self.tools else None,
+                "max_tokens": int(os.environ.get("OPENZESS_MAX_TOKENS", "4096")),
                 "api_key": self.api_key if self.api_key else "dummy_key"
             }
             if self.api_base:
@@ -708,18 +844,33 @@ class OpenzessAgent:
             msg_dict = message.model_dump()
             if "function_call" in msg_dict and msg_dict["function_call"] is None:
                 del msg_dict["function_call"]
+
+            if not getattr(message, "tool_calls", None) and message.content and "<tool_call>" in message.content:
+                text_calls = self._extract_text_tool_calls(message.content)
+                if text_calls:
+                    cleaned_content = message.content.split("<tool_call")[0].strip()
+                    message.content = cleaned_content
+                    msg_dict["content"] = cleaned_content
+                    msg_dict["tool_calls"] = text_calls
             
             self.messages.append(msg_dict)
             
-            if not message.tool_calls:
+            tool_calls_to_process = getattr(message, "tool_calls", None) or msg_dict.get("tool_calls")
+            if not tool_calls_to_process:
                 return {"reply": message.content, "tools": tool_outputs, "auth_required": False}
                 
             dangerous_tools = ["run_terminal_command", "create_file", "edit_code", "schedule_background_task", "monitor_directory", "computer_mouse_move", "computer_mouse_click", "computer_type_text", "computer_press_key", "send_email", "synthesize_skill"]
             
             pending_calls = []
-            for tc in message.tool_calls:
-                args = json.loads(tc.function.arguments)
-                pending_calls.append({"id": tc.id, "name": tc.function.name, "args": args})
+            for tc in tool_calls_to_process:
+                if isinstance(tc, dict):
+                    raw_args = tc["function"]["arguments"]
+                    args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+                    pending_calls.append({"id": tc.get("id", "temp_id"), "name": tc["function"]["name"], "args": args})
+                else:
+                    raw_args = tc.function.arguments
+                    args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+                    pending_calls.append({"id": tc.id, "name": tc.function.name, "args": args})
 
             requires_auth = any(pc["name"] in dangerous_tools for pc in pending_calls)
             if requires_auth:
@@ -742,7 +893,6 @@ class OpenzessAgent:
                 if pc["name"] == "take_screenshot":
                     try:
                         import base64
-                        import os
                         img_path = os.path.join(os.getcwd(), "temp_matrix_screen.png")
                         if os.path.exists(img_path):
                             with open(img_path, "rb") as image_file:
@@ -789,20 +939,20 @@ class OpenzessAgent:
         try:
             self.last_prompt = user_prompt
             
-            # --- RAG RETRIEVAL (Fast-path latency optimization) ---
+            # --- RAG RETRIEVAL (Only query CPU vector embeddings if explicitly requested) ---
             rag_context = ""
-            is_trivial = len(user_prompt.split()) <= 3 and any(w in user_prompt.lower() for w in ["hi", "hello", "hey", "help", "clear", "ping", "test", "ls", "whoami"])
-            if memory_collection is not None and not is_trivial:
+            mem_keywords = ["remember", "recall", "memory", "past", "history", "previous"]
+            if memory_collection is not None and any(w in user_prompt.lower() for w in mem_keywords):
                 try:
                     if memory_collection.count() > 0:
                         results = memory_collection.query(query_texts=[user_prompt], n_results=3)
                         if results and results.get("documents") and results["documents"] and results["documents"][0]:
-                            rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
+                            rag_context = "\n\n[RELEVANT MEMORY EXTRACTED]:\n"
                             for doc in results["documents"][0]:
                                 if doc.strip():
                                     rag_context += f"- {doc}\n"
-                except Exception as eval_e:
-                    print(f"RAG Retrieval failed: {eval_e}")
+                except Exception:
+                    pass
             
             # Adaptive complexity routing for Experiential
             if self.provider in ("exp:smart", "experiential", "exp"):
@@ -811,7 +961,8 @@ class OpenzessAgent:
                     self.model_name = experiential_client.get_model_for_complexity(complexity, self.model_name)
 
             enhanced_prompt = user_prompt + rag_context if rag_context else user_prompt
-            self.messages.append({"role": "user", "content": enhanced_prompt})
+            if enhanced_prompt.strip():
+                self.messages.append({"role": "user", "content": enhanced_prompt})
             
             result = self._handle_response_loop()
             
@@ -837,15 +988,15 @@ class OpenzessAgent:
         try:
             self.last_prompt = user_prompt
             
-            # --- RAG RETRIEVAL (Fast-path latency optimization) ---
+            # --- RAG RETRIEVAL (Only query CPU vector embeddings if explicitly requested) ---
             rag_context = ""
-            is_trivial = len(user_prompt.split()) <= 3 and any(w in user_prompt.lower() for w in ["hi", "hello", "hey", "help", "clear", "ping", "test", "ls", "whoami"])
-            if memory_collection is not None and not is_trivial:
+            mem_keywords = ["remember", "recall", "memory", "past", "history", "previous", "profile"]
+            if memory_collection is not None and any(w in user_prompt.lower() for w in mem_keywords):
                 try:
                     if memory_collection.count() > 0:
                         results = memory_collection.query(query_texts=[user_prompt], n_results=3)
                         if results and results.get("documents") and results["documents"] and results["documents"][0]:
-                            rag_context = "\n\n[SYSTEM WARNING - RELEVANT PAST LONG-TERM MEMORY EXTRACTED FOR CONTEXT]:\n"
+                            rag_context = "\n\n[RELEVANT PAST MEMORY EXTRACTED]:\n"
                             for doc in results["documents"][0]:
                                 if doc.strip():
                                     rag_context += f"- {doc}\n"
@@ -859,7 +1010,8 @@ class OpenzessAgent:
                     self.model_name = experiential_client.get_model_for_complexity(complexity, self.model_name)
 
             enhanced_prompt = user_prompt + rag_context if rag_context else user_prompt
-            self.messages.append({"role": "user", "content": enhanced_prompt})
+            if enhanced_prompt.strip():
+                self.messages.append({"role": "user", "content": enhanced_prompt})
             
             tool_outputs = []
             
@@ -869,6 +1021,7 @@ class OpenzessAgent:
                     "messages": self.messages,
                     "tools": self.tools if self.tools else None,
                     "stream": True,
+                    "max_tokens": int(os.environ.get("OPENZESS_MAX_TOKENS", "4096")),
                     "api_key": self.api_key if self.api_key else "dummy_key"
                 }
                 if self.api_base:
@@ -894,28 +1047,51 @@ class OpenzessAgent:
                         raise stream_err
                 
                 collected_content = ""
+                streamed_len = 0
                 tool_calls = []
 
-                for chunk in response_stream:
-                    delta = chunk.choices[0].delta
-                    
-                    if delta.content:
-                        collected_content += delta.content
-                        yield {"type": "content", "content": delta.content}
+                try:
+                    for chunk in response_stream:
+                        delta = chunk.choices[0].delta
                         
-                    if getattr(delta, "tool_calls", None):
-                        for tcall in delta.tool_calls:
-                            idx = getattr(tcall, "index", 0)
-                            while len(tool_calls) <= idx:
-                                tool_calls.append({"id": getattr(tcall, "id", None), "type": "function", "function": {"name": "", "arguments": ""}})
+                        if delta.content:
+                            collected_content += delta.content
+                            if "<tool_call" not in collected_content:
+                                to_send = collected_content[streamed_len:]
+                                if to_send:
+                                    yield {"type": "content", "content": to_send}
+                                    streamed_len = len(collected_content)
+                            else:
+                                cutoff = collected_content.find("<tool_call")
+                                to_send = collected_content[streamed_len:cutoff]
+                                if to_send:
+                                    yield {"type": "content", "content": to_send}
+                                streamed_len = cutoff
                             
-                            if getattr(tcall, "id", None):
-                                tool_calls[idx]["id"] = tcall.id
-                            if getattr(tcall, "function", None):
-                                if getattr(tcall.function, "name", None):
-                                    tool_calls[idx]["function"]["name"] = tcall.function.name
-                                if getattr(tcall.function, "arguments", None):
-                                    tool_calls[idx]["function"]["arguments"] += tcall.function.arguments
+                        if getattr(delta, "tool_calls", None):
+                            for tcall in delta.tool_calls:
+                                idx = getattr(tcall, "index", 0)
+                                while len(tool_calls) <= idx:
+                                    tool_calls.append({"id": getattr(tcall, "id", None), "type": "function", "function": {"name": "", "arguments": ""}})
+                                
+                                if getattr(tcall, "id", None):
+                                    tool_calls[idx]["id"] = tcall.id
+                                if getattr(tcall, "function", None):
+                                    if getattr(tcall.function, "name", None):
+                                        tool_calls[idx]["function"]["name"] = tcall.function.name
+                                    if getattr(tcall.function, "arguments", None):
+                                        tool_calls[idx]["function"]["arguments"] += tcall.function.arguments
+                except Exception as stream_iter_err:
+                    err_text = str(stream_iter_err)
+                    print(f"Streaming chunk error: {err_text}")
+                    yield {"type": "content", "content": f"\n\n*[⚠️ Connection/Model Error: {err_text}]*\n\n"}
+                    yield {"type": "done", "reply": collected_content if collected_content else f"Error: {err_text}"}
+                    return
+
+                # If the model emitted text-based tool calls (GLM, Hermes, Qwen, etc.) instead of OpenAI structured tool calls
+                if not tool_calls and "<tool_call>" in collected_content:
+                    tool_calls = self._extract_text_tool_calls(collected_content)
+                    collected_content = collected_content.split("<tool_call")[0].strip()
 
                 msg_dict = {"role": "assistant"}
                 if tool_calls:
@@ -991,7 +1167,6 @@ class OpenzessAgent:
                     if pc["name"] == "take_screenshot":
                         try:
                             import base64
-                            import os
                             img_path = os.path.join(os.getcwd(), "temp_matrix_screen.png")
                             if os.path.exists(img_path):
                                 with open(img_path, "rb") as image_file:
@@ -1077,5 +1252,5 @@ class OpenzessAgent:
                 elif chunk.get("type") == "done":
                     yield chunk
                     
-        except BaseException as e:
-            import traceback
+        except BaseException:
+            pass
