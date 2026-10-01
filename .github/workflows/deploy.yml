@@ -1,0 +1,90 @@
+﻿name: Deploy (CD)
+
+# Build & push the production image to GHCR on every merge to main,
+# then deploy to Google Cloud Run. Deploy step requires environment approval.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    name: Build & Push Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata/tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-cloud-run:
+    name: Deploy to Cloud Run
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    # Set up a GitHub "production" environment with required reviewers
+    # so this job waits for manual approval before deploying.
+    environment: production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      id-token: write # for Workload Identity Federation
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v2
+        with:
+          # Configure these secrets after creating the WIF provider -
+          # see docs/google_cloud.md for the one-time gcloud setup.
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SA }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: >-
+          gcloud run deploy openzess
+          --image ${{ env.REGISTRY }}/${{ github.repository }}:sha-${{ github.sha }}
+          --region "${{ vars.GCP_REGION || 'us-central1' }}"
+          --platform managed
+          --allow-unauthenticated
+          --set-env-vars "OPENZESS_CORS_ORIGINS=${{ vars.OPENZESS_CORS_ORIGINS }}"
