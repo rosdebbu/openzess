@@ -1,56 +1,59 @@
 # ── Core web framework ──────────────────────────────────────────
-fastapi
-uvicorn[standard]
-pydantic
+# NOTE: Pinned for reproducible builds/CI. Bump deliberately, run tests after.
+fastapi==0.141.1
+uvicorn[standard]==0.52.3
+pydantic==2.13.4
 
 # ── LLM runtime (multi-provider) ────────────────────────────────
-litellm
+litellm==1.98.0
 
 # ── Database ────────────────────────────────────────────────────
-sqlalchemy
-psycopg2-binary          # PostgreSQL (docker-compose.yml)
+sqlalchemy==2.0.52
+psycopg2-binary==2.9.12   # PostgreSQL (docker-compose.yml)
 
 # ── Memory / vector store ───────────────────────────────────────
-chromadb
+chromadb==1.5.9
 
 # ── Web & search tooling ────────────────────────────────────────
-requests
-beautifulsoup4
-duckduckgo_search
+requests==2.34.2
+beautifulsoup4==4.15.0
+duckduckgo_search==8.1.1
 
 # ── MCP protocol ────────────────────────────────────────────────
-mcp
+mcp==2.1.1
 
 # ── Chat bridges ────────────────────────────────────────────────
-pyTelegramBotAPI         # telegram_worker.py (imports telebot)
-discord.py               # discord_worker.py
+pyTelegramBotAPI==4.36.1  # telegram_worker.py (imports telebot)
+discord.py==2.7.1         # discord_worker.py
 
 # ── Voice / TTS ─────────────────────────────────────────────────
-gtts                     # server.py text-to-speech endpoint
+gtts==2.5.4               # server.py text-to-speech endpoint
 
 # ── System / desktop automation ─────────────────────────────────
-psutil                   # plugins/system_health.py
-pyautogui                # PC control tools (Windows native / Linux Xvfb)
-mss                      # fast screen capture
-watchdog                 # background_workers.py file watchers
-apscheduler              # cron-style scheduled jobs
-Pillow                   # image handling (PIL)
+psutil==7.2.2             # plugins/system_health.py
+pyautogui==0.9.54         # PC control tools (Windows native / Linux Xvfb)
+mss==10.2.0               # fast screen capture
+watchdog==6.0.0           # background_workers.py file watchers
+APScheduler==3.11.3       # cron-style scheduled jobs
+pillow==12.3.0            # image handling (PIL)
 
 # ── Scientific & Visualization Tooling (PaperBanana) ────────────
-matplotlib
-seaborn
+matplotlib==3.11.1
+seaborn==0.13.2
 
 # ── Environment config ──────────────────────────────────────────
-python-dotenv
+python-dotenv==1.2.3
 
 # ── Server extras ───────────────────────────────────────────────
-python-multipart         # file uploads (FastAPI UploadFile)
-websockify               # Matrix Viewer VNC bridge (WSL sandbox)
+python-multipart==0.0.32  # file uploads (FastAPI UploadFile)
+websockify==0.13.0        # Matrix Viewer VNC bridge (WSL sandbox)
 
 # ── Testing ─────────────────────────────────────────────────────
-pytest
+pytest==9.1.1
+pytest-cov==7.0.0         # coverage reporting (CI)
 
 # ── Terminal CLI ────────────────────────────────────────────────
-rich                      # cli.py TUI panels and tables
+rich==15.0.0              # cli.py TUI panels and tables
 
-
+# ── Linting (CI-enforced) ───────────────────────────────────────
+ruff==0.14.2
