@@ -48,6 +48,10 @@ python-dotenv==1.2.3
 python-multipart==0.0.32  # file uploads (FastAPI UploadFile)
 websockify==0.13.0        # Matrix Viewer VNC bridge (WSL sandbox)
 
+# ── Auth (bearer-token middleware, auth.py) ─────────────────────
+bcrypt==5.0.0             # token/secret hashing — CI breaker if missing
+PyJWT==2.13.0             # JWT encode/verify — CI breaker if missing
+
 # ── Testing ─────────────────────────────────────────────────────
 pytest==9.1.1
 pytest-cov==7.0.0         # coverage reporting (CI)
