@@ -966,15 +966,9 @@ class OpenzessAgent:
             
             result = self._handle_response_loop()
             
-            # --- RAG & HABIT INGESTION ---
+            # --- RAG & HABIT INGESTION (fire-and-forget, never blocks the reply) ---
             if not result.get("auth_required") and result.get("reply"):
-                if memory_collection is not None:
-                    self._ingest_memory(self.last_prompt, result["reply"])
-                try:
-                    from . import habit_learner
-                    habit_learner.extract_and_learn_habits(self.last_prompt, result["reply"])
-                except Exception:
-                    pass
+                self._defer_learning(self.last_prompt, result["reply"])
                 
             return result
         except BaseException as e:
@@ -1105,13 +1099,8 @@ class OpenzessAgent:
                 
                 if not tool_calls:
                     if collected_content:
-                        if memory_collection is not None:
-                            self._ingest_memory(self.last_prompt, collected_content)
-                        try:
-                            from . import habit_learner
-                            habit_learner.extract_and_learn_habits(self.last_prompt, collected_content)
-                        except Exception:
-                            pass
+                        # Fire-and-forget: never delay the final "done" SSE event
+                        self._defer_learning(self.last_prompt, collected_content)
                     
                     # Record telemetry in Experiential OTel trace format
                     experiential_client.record_otel_trace(
@@ -1215,9 +1204,9 @@ class OpenzessAgent:
                 tool_outputs.extend(result["tools"])
             result["tools"] = tool_outputs
             
-            if not result.get("auth_required") and result.get("reply") and memory_collection is not None:
+            if not result.get("auth_required") and result.get("reply"):
                 if hasattr(self, 'last_prompt'):
-                    self._ingest_memory(self.last_prompt, result["reply"])
+                    self._defer_learning(self.last_prompt, result["reply"])
                     
             return result
         except BaseException as e:
