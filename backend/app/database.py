@@ -226,7 +226,9 @@ def get_session_messages(session_id: str):
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
             
-        results = db.query(Message).filter(Message.session_id == session_id).order_by(Message.created_at.asc()).all()
+        # Cap history load: fetch only the most recent 100 messages (reversed to chronological order)
+        recent = db.query(Message).filter(Message.session_id == session_id).order_by(Message.created_at.desc()).limit(100).all()
+        results = list(reversed(recent))
         return [{"id": m.id, "role": m.role, "content": m.content, "created_at": m.created_at.isoformat()} for m in results]
 
 def get_recent_activity(limit: int = 50):
