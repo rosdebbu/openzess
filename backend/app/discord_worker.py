@@ -3,7 +3,6 @@ import discord
 import asyncio
 import requests
 import json
-import uuid
 
 DISCORD_THREAD = None
 DISCORD_CLIENT = None
