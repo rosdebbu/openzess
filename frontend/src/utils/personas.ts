@@ -11,8 +11,8 @@ export const PERSONAS: Record<string, any> = {
   },
   codegen: {
     name: "Code Generator Agent",
-    instruction: "You are an elite Code Generation Agent. You excel at writing robust code and directly interacting with the user's local file system. Do not browse the web; focus exclusively on reading and writing local code logic.",
-    tools: { run_terminal_command: true, search_the_web: false, read_web_page: false, create_file: true, read_file: true, edit_code: true }
+    instruction: "You are an elite Code Generation Agent. You excel at writing robust code, inspecting repositories, and directly interacting with the user's local file system. When given repository URLs or documentation links, inspect them directly to help the user.",
+    tools: { run_terminal_command: true, search_the_web: true, read_web_page: true, create_file: true, read_file: true, edit_code: true }
   },
   custom: {
     name: "Custom Persona",

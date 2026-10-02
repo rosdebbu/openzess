@@ -4,6 +4,8 @@ venv/
 __pycache__/
 *.py[cod]
 .env
+.env.*
+!.env.example
 
 # ── Node / frontend ─────────────────────────────────────
 node_modules/
@@ -44,9 +46,18 @@ credentials.json
 CHANGES_SUMMARY.md
 CHAT_HISTORY.md
 CHAT_SESSION_SUMMARY.md
+CHAT_HISTORY.local.md
+all_md_files/
 plans/
 .kilo/
 .pytest_cache/
+
+# ── Test / coverage artifacts ──────────────────────────────
+.coverage
+backend/.coverage
+htmlcov/
+temp_matrix_screen.png
+test_mindmap/
 
 # ── Remote Tablet & Tunnel Tools ──
 scripts/cloudflared.exe

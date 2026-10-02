@@ -16,7 +16,7 @@ def start_telegram_listener(bot_token: str, provider: str, api_key: str):
         
     try:
         TELEGRAM_BOT = telebot.TeleBot(bot_token)
-    except ValueError as e:
+    except ValueError:
         raise Exception("Invalid API Token format. Telegram tokens must contain a colon (e.g. 123456:ABC...).")
         
     IS_RUNNING = True
@@ -127,7 +127,7 @@ def start_telegram_listener(bot_token: str, provider: str, api_key: str):
     def poll():
         while IS_RUNNING:
             try:
-                print(f"[Channels] Telegram Worker is now ONLINE and listening...")
+                print("[Channels] Telegram Worker is now ONLINE and listening...")
                 TELEGRAM_BOT.polling(none_stop=True, interval=1, timeout=20)
             except Exception as e:
                 print(f"[Channels] Telegram Worker Polling Exception: {e}")

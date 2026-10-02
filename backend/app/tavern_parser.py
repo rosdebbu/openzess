@@ -1,7 +1,6 @@
 import json
 import base64
 from PIL import Image
-import os
 
 def parse_tavern_png(file_path: str):
     """

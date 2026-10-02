@@ -11,7 +11,7 @@ import json
 import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
-from typing import Dict, Any, List
+from typing import List
 try:
     from plugin_loader import plugin_registry
 except ImportError:
@@ -334,7 +334,7 @@ def validate_mermaid_diagram(code: str, diagram_type: str = "auto") -> str:
     has_valid_header = any(first_line.startswith(s) for s in valid_starters)
     if not has_valid_header:
         # Prepend standard flowchart TD if missing header
-        cleaned = f"flowchart TD\n    " + "\n    ".join(lines)
+        cleaned = "flowchart TD\n    " + "\n    ".join(lines)
         
     # Syntax linting: check parentheses inside brackets
     fixed_lines = []

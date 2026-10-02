@@ -5,10 +5,8 @@ Automatically profiles user habits, coding preferences, and environment configur
 and persists them into ChromaDB for seamless multi-session adaptation.
 """
 
-import os
 import re
-import uuid
-from typing import Dict, List, Optional
+from typing import Dict, List
 from .agent import memory_collection
 
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Brain, Focus, Clock, RotateCcw, ChevronDown, Paperclip, Copy, CheckCircle2, Download, Play, FileText, Plus, Image } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Brain, Focus, Clock, RotateCcw, Paperclip, Copy, CheckCircle2, Download, Play, FileText, Plus, Image, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -74,6 +74,10 @@ export default function Chat() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = searchParams.get('session_id');
+  // Ref mirror of sessionId: survives the render-tick race where a second
+  // message is sent before setSearchParams re-renders (prevents the backend
+  // from forking a second session and splitting history).
+  const sessionIdRef = useRef<string | null>(sessionId);
 
   const handleDownload = (code: string, language: string) => {
       const ext = language || 'txt';
@@ -293,6 +297,13 @@ export default function Chat() {
 
     const isSwarm = textTrimmed.startsWith('@');
     const triggerKeyword = isSwarm ? textTrimmed.split(' ')[0].substring(1).toLowerCase() : null;
+    // @keyword triggers a full swarm debate only when swarm keys are
+    // configured; otherwise the hot-swap persona flow stays as-is.
+    const hasSwarmKeys = Boolean(
+      localStorage.getItem('openzess_deepseek2_key') ||
+      localStorage.getItem('openzess_deepseek3_key') ||
+      localStorage.getItem('openzess_glm_key')
+    );
     
     // Combine standard personas with local storage skills
     let activePersona = null;
@@ -339,12 +350,12 @@ export default function Chat() {
       const requestBody = {
         message: userMessage.content,
         api_key: apiKey,
-        provider: localStorage.getItem('openzess_provider') || 'gemini',
-        session_id: sessionId || undefined,
+        provider: localStorage.getItem('openzess_provider') || 'glm',
+        session_id: sessionIdRef.current || sessionId || undefined,
         system_instruction: systemInstruction,
         allowed_tools: allowedTools,
         stream: true,
-        use_swarm: useSwarm,
+        use_swarm: useSwarm || (isSwarm && hasSwarmKeys),
         matrix_keys: {
             deepseek2: localStorage.getItem('openzess_deepseek2_key') || '',
             deepseek3: localStorage.getItem('openzess_deepseek3_key') || '',
@@ -359,8 +370,12 @@ export default function Chat() {
       });
 
       if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText);
+          let errorMsg = `Request failed (${response.status})`;
+          try {
+              const errJson = JSON.parse(await response.text());
+              if (errJson?.detail) errorMsg = typeof errJson.detail === 'string' ? errJson.detail : JSON.stringify(errJson.detail);
+          } catch { /* non-JSON error body — keep the default message */ }
+          throw new Error(errorMsg);
       }
 
       if (!response.body) throw new Error("No response body");
@@ -390,7 +405,8 @@ export default function Chat() {
                         const data = JSON.parse(dataStr);
                         
                         if (data.type === 'session') {
-                            if (data.session_id && data.session_id !== sessionId) {
+                            if (data.session_id && data.session_id !== sessionIdRef.current) {
+                              sessionIdRef.current = data.session_id;
                               setSearchParams({ session_id: data.session_id }, { replace: true });
                             }
                         } else if (data.type === 'content') {
@@ -566,19 +582,10 @@ export default function Chat() {
                   </span>
                </div>
                <div className="w-[1px] h-4 bg-[#E2DAD2] dark:bg-[#3A3838] mx-1"></div>
-               <div className="relative group/select">
-                  <select 
-                     className="appearance-none bg-transparent hover:bg-[#EDE8E2] dark:hover:bg-white/5 text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-[14px] font-medium py-2 pl-3 pr-8 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-0 max-w-[200px] outline-none"
-                     defaultValue="gemini-3.1-flash-lite-preview-google"
-                  >
-                     <option className="bg-white dark:bg-[#1A1818]" value="gemini-3.1-flash-lite-preview-google">Gemini 3.1 Flash</option>
-                     <option className="bg-white dark:bg-[#1A1818]" value="gemini-2.5-flash">Gemini 2.5</option>
-                     <option className="bg-white dark:bg-[#1A1818]" value="openai">OpenAI GPT-4o</option>
-                     <option className="bg-white dark:bg-[#1A1818]" value="deepseek">DeepSeek</option>
-                     <option className="bg-white dark:bg-[#1A1818]" value="qwen">Qwen</option>
-                  </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#B8AFA8] pointer-events-none group-hover/select:text-[#3A3838]/80 dark:group-hover:text-neutral-200 transition-colors" />
-               </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EDE8E2]/60 dark:bg-[#2A2828]/60 rounded-xl border border-[#E2DAD2] dark:border-[#3A3838] text-[12px] font-mono text-[#3A3838]/80 dark:text-[#E2DAD2]/80">
+                   <Zap size={13} className="text-brand" />
+                   <span className="capitalize">{localStorage.getItem('openzess_provider') || 'nvidia'}</span>
+                </div>
             </div>
 
             {/* Right Header - Actions */}
@@ -739,7 +746,7 @@ export default function Chat() {
                             </button>
                             <span className="px-1.5 text-[#B8AFA8]/60 dark:text-[#3A3838]">•</span>
                             <span className="bg-[#EDE8E2] dark:bg-white/5 px-1.5 py-0.5 rounded text-[#B8AFA8]">
-                               {localStorage.getItem('openzess_provider') || 'Gemini'}
+                               {localStorage.getItem('openzess_provider') || 'GLM'}
                             </span>
                         </div>
                       </div>

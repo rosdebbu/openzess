@@ -53,11 +53,9 @@ pub fn analyze_code(req: CodeStatsRequest) -> CodeStatsResponse {
                     break;
                 }
             }
-            '}' => {
-                if stack.pop() != Some('{') {
-                    is_balanced = false;
-                    break;
-                }
+            '}' if stack.pop() != Some('{') => {
+                is_balanced = false;
+                break;
             }
             _ => {}
         }

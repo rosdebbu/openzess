@@ -2,11 +2,18 @@
 //!
 //! Provides fast shortest-path finding and connection analysis across
 //! Graphify knowledge graphs without blocking Python's async event loop.
+#![allow(dead_code)]
 
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet, VecDeque};
 
+/// A knowledge-graph node as sent by the Graphify exporter.
+///
+/// The BFS pathfinder works purely off link endpoints, but the payload
+/// mirrors the full exporter schema — extra fields are accepted on the
+/// wire and intentionally not read yet.
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct GraphNode {
     pub id: String,
     #[serde(default)]
@@ -16,6 +23,7 @@ pub struct GraphNode {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct GraphLink {
     pub source: String,
     pub target: String,
@@ -26,6 +34,7 @@ pub struct GraphLink {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct GraphPayload {
     #[serde(default)]
     pub nodes: Vec<GraphNode>,

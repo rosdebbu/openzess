@@ -1,6 +1,5 @@
 import os
 import uuid
-import json
 import traceback
 
 # Import OpenZess plugin registrar
@@ -9,8 +8,10 @@ try:
 except ImportError:
     from app.plugin_loader import plugin_registry
 
-# Configure static upload directories
-UPLOADS_DIR = os.path.abspath(os.path.join(os.getcwd(), "uploads"))
+# Configure static upload directories.
+# Anchored to this file (three levels up = repo root) so PaperBanana artifacts
+# land in the same folder the server serves at /uploads, regardless of CWD.
+UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "uploads"))
 DIAGRAMS_DIR = os.path.join(UPLOADS_DIR, "diagrams")
 PLOTS_DIR = os.path.join(UPLOADS_DIR, "plots")
 
@@ -180,7 +181,7 @@ def generate_methodology_diagram(title: str, nodes: list, edges: list, theme: st
             '  <filter id="shadow" x="-5%" y="-5%" width="115%" height="120%">',
             '    <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.08"/>',
             '  </filter>',
-            f'  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">',
+            '  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">',
             f'    <path d="M 0 1 L 10 5 L 0 9 z" fill="{palette["accent"]}"/>',
             '  </marker>',
             '</defs>',

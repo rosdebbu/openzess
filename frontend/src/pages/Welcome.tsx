@@ -126,6 +126,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                              disabled={isConnecting}
                                              className="w-full bg-white/5 border border-white/10 text-white p-3.5 rounded-xl appearance-none focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/50 transition-all cursor-pointer font-medium"
                                          >
+                                             <option value="nvidia" className="text-black">NVIDIA NIM (z-ai/glm-5.3-flash)</option>
                                              <option value="gemini" className="text-black">Gemini (gemini-2.5-flash)</option>
                                              <option value="openai" className="text-black">OpenAI (gpt-4o-mini)</option>
                                              <option value="anthropic" className="text-black">Anthropic (claude-3-5-sonnet)</option>
@@ -156,7 +157,7 @@ export default function Welcome({ onComplete }: WelcomeProps) {
                                              value={apiKey}
                                              onChange={(e) => setApiKey(e.target.value)}
                                              disabled={provider === 'ollama' || provider === 'lmstudio' || isConnecting}
-                                             placeholder={(provider === 'ollama' || provider === 'lmstudio') ? "Local mode - No API key required" : "Enter Master API Key..."}
+                                             placeholder={(provider === 'ollama' || provider === 'lmstudio') ? "Local mode - No API key required" : provider === 'nvidia' ? "Enter NVIDIA NIM API Key (nvapi-...)" : "Enter Master API Key..."}
                                              className="w-full bg-white/5 border border-white/10 text-white p-3.5 pl-11 rounded-xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/50 transition-all disabled:opacity-50 font-mono tracking-widest placeholder:tracking-normal placeholder:font-sans placeholder:text-[#3A3838]/80"
                                          />
                                      </div>

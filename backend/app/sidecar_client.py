@@ -358,7 +358,7 @@ def code_quick_stats_py(text: str) -> Dict[str, Any]:
     word_count = len(text.split())
     lines = text.splitlines()
     line_count = len(lines)
-    non_empty = sum(1 for l in lines if l.strip())
+    non_empty = sum(1 for line in lines if line.strip())
 
     approx_tokens = max(word_count, math.ceil(char_count / 3.8))
 

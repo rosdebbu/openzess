@@ -96,7 +96,7 @@ else:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+|[a-zA-Z0-9-]+\.trycloudflare\.com)(:\d+)?$",
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$",
     allow_credentials=_cors_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -576,16 +576,6 @@ def delete_session_endpoint(session_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/files")
-def list_files():
-    try:
-        current_dir = os.getcwd()
-        items = os.listdir(current_dir)
-        files = [{"name": item, "is_dir": os.path.isdir(os.path.join(current_dir, item))} for item in items]
-        return {"directory": current_dir, "files": sorted(files, key=lambda x: (not x["is_dir"], x["name"].lower()))}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.get("/api/tools")
 def list_tools():
     return {
@@ -778,7 +768,8 @@ def delete_repo_sentry(repo_id: str):
 # ================================
 @app.post("/api/personas/import")
 def import_persona(file: UploadFile = File(...)):
-    file_path = f"temp_{uuid.uuid4()}_{file.filename}"
+    safe_filename = os.path.basename(file.filename or "import")
+    file_path = f"temp_{uuid.uuid4()}_{safe_filename}"
     try:
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -1358,6 +1349,16 @@ async def rebuild_graphify_graph():
 # ================================
 @app.websocket("/api/matrix/stream")
 async def matrix_stream(websocket: WebSocket):
+    if _OPENZESS_AUTH_TOKEN:
+        token = websocket.query_params.get("token", "")
+        if not token:
+            auth_header = websocket.headers.get("authorization", "")
+            if auth_header.lower().startswith("bearer "):
+                token = auth_header[7:].strip()
+        if token != _OPENZESS_AUTH_TOKEN:
+            await websocket.close(code=1008)
+            return
+
     await websocket.accept()
     
     current_fps = 30

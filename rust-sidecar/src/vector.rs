@@ -88,7 +88,11 @@ pub fn compute_top_k(mut req: TopKRequest) -> TopKResponse {
         .collect();
 
     // Sort descending by score (handling NaNs gracefully)
-    scored.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+    scored.sort_by(|a, b| {
+        b.score
+            .partial_cmp(&a.score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     if req.top_k > 0 && scored.len() > req.top_k {
         scored.truncate(req.top_k);

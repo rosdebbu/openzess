@@ -1,5 +1,4 @@
 import os
-import base64
 from plugin_loader import plugin_registry
 
 try:

@@ -22,8 +22,7 @@ use std::net::SocketAddr;
 async fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "info".into()),
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
         )
         .init();
 
@@ -35,12 +34,27 @@ async fn main() {
         .route("/vector/topk", post(vector_topk))
         .route("/code/stats", post(code_stats_handler));
 
-    let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 8100));
+    let host: std::net::IpAddr = std::env::var("SIDECAR_HOST")
+        .or_else(|_| std::env::var("HOST"))
+        .unwrap_or_else(|_| "0.0.0.0".to_string())
+        .parse()
+        .unwrap_or_else(|_| std::net::IpAddr::from([0, 0, 0, 0]));
+
+    let port: u16 = std::env::var("SIDECAR_PORT")
+        .or_else(|_| std::env::var("PORT"))
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(8100);
+
+    let addr = SocketAddr::new(host, port);
     let listener = tokio::net::TcpListener::bind(addr)
         .await
         .unwrap_or_else(|e| panic!("failed to bind {addr}: {e}"));
 
-    tracing::info!("openzess-sidecar {} listening on http://{addr}", env!("CARGO_PKG_VERSION"));
+    tracing::info!(
+        "openzess-sidecar {} listening on http://{addr}",
+        env!("CARGO_PKG_VERSION")
+    );
     axum::serve(listener, app).await.expect("server error");
 }
 
@@ -80,7 +94,14 @@ async fn encode_image(headers: HeaderMap, body: axum::body::Bytes) -> Response {
 
     // Encoding is CPU-bound: keep it off the async reactor threads.
     let result = tokio::task::spawn_blocking(move || {
-        imaging::encode(&body, width as u32, height as u32, &layout, &format, quality)
+        imaging::encode(
+            &body,
+            width as u32,
+            height as u32,
+            &layout,
+            &format,
+            quality,
+        )
     })
     .await;
 
@@ -88,10 +109,7 @@ async fn encode_image(headers: HeaderMap, body: axum::body::Bytes) -> Response {
         Ok(Ok((bytes, mime))) => (
             [
                 (header::CONTENT_TYPE, mime),
-                (
-                    HeaderName::from_static("x-encoded-by"),
-                    "rust-sidecar",
-                ),
+                (HeaderName::from_static("x-encoded-by"), "rust-sidecar"),
             ],
             bytes,
         )
@@ -120,10 +138,7 @@ async fn graphify_report(Json(body): Json<serde_json::Value>) -> Response {
 
         let mut communities = std::collections::HashSet::new();
         for node in nodes {
-            let community = node
-                .get("community")
-                .and_then(|v| v.as_i64())
-                .unwrap_or(1);
+            let community = node.get("community").and_then(|v| v.as_i64()).unwrap_or(1);
             communities.insert(community);
         }
 

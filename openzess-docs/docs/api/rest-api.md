@@ -106,6 +106,5 @@ Approve or deny pending tool calls.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/files` | List files in current directory |
 | `GET` | `/api/tools` | List available tools |
 | `POST` | `/api/tts` | Generate text-to-speech audio |

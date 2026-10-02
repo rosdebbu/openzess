@@ -14,15 +14,17 @@ interface Channel {
   desc: string;
 }
 
-// Generate 10,000 messages to demonstrate Pretext's massive performance gains
-const mockMessages = Array.from({ length: 10000 }).map((_, i) => ({
-  id: i,
-  sender: i % 3 === 0 ? 'System O.' : i % 3 === 1 ? 'Architect Bot' : 'Security Daemon',
-  role: i % 3 === 0 ? 'system' : 'agent',
-  align: 'left',
-  text: `[LOG-${i}] System diagnostic trace complete. Everything looks nominal. ${"Buffer flushed. Memory cleared. ".repeat(Math.floor(Math.random() * 8) + 1)}`,
-  time: '10:45 AM',
-}));
+// Real agent-activity messages loaded live from the backend (/api/activity).
+// No mock data: the feed shows what your agent actually did, and channels
+// stay honestly empty when there is no activity yet.
+interface ActivityMessage {
+  id: string;
+  sender: string;
+  role: string;
+  align?: 'left' | 'right';
+  text: string;
+  time: string;
+}
 
 export default function Channels() {
   const { showToast } = useToast();
@@ -39,6 +41,10 @@ export default function Channels() {
   const [discordToken, setDiscordToken] = useState(localStorage.getItem('openzess_discord_token') || '');
   const [isDiscordRunning, setIsDiscordRunning] = useState(false);
   const [containerWidth, setContainerWidth] = useState(600); // fallback width
+
+  // Real Activity Feed State
+  const [feedMessages, setFeedMessages] = useState<ActivityMessage[]>([]);
+  const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -61,6 +67,30 @@ export default function Channels() {
     axios.get('http://localhost:8000/api/channels/discord/status')
       .then(res => setIsDiscordRunning(res.data.is_running))
       .catch(() => console.error("Could not fetch discord status"));
+
+    // Load the real agent-activity feed (recent messages + error count)
+    axios.get('http://localhost:8000/api/activity')
+      .then(res => {
+        const feed = (res.data.feed || []) as any[];
+        setFeedMessages(feed.map((m) => {
+          const role = m.role || 'agent';
+          const sender = role === 'user' ? 'You' : role === 'tool' ? 'Tool Runner' : (role.startsWith('agent:') ? role.slice(6) : 'Agent');
+          let time = '';
+          try {
+            time = m.created_at ? new Date(m.created_at).toLocaleTimeString() : '';
+          } catch { time = ''; }
+          return {
+            id: String(m.id),
+            sender,
+            role: role === 'user' ? 'user' : role === 'tool' ? 'system' : 'agent',
+            align: 'left' as const,
+            text: m.content || '',
+            time,
+          };
+        }));
+        setErrorCount(res.data.error_count || 0);
+      })
+      .catch(() => console.error("Could not fetch activity feed"));
   }, []);
 
   const toggleTelegram = async () => {
@@ -125,13 +155,16 @@ export default function Channels() {
     }
   };
 
+  // Badges show real counts: Alerts = agent errors logged in the DB,
+  // General Logs = recent activity entries. The bridges have no unread
+  // concept, so they stay honestly at 0 instead of showing fake numbers.
   const channels: Channel[] = [
     { id: 'telegram', name: 'Telegram Bridge', icon: Send, unread: 0, desc: 'External Messaging Configuration.' },
     { id: 'discord', name: 'Discord Bridge', icon: MessageSquare, unread: 0, desc: 'Setup Discord Bot integration.' },
-    { id: 'general', name: 'General Logs', icon: Hash, unread: 0, desc: 'Primary broadcast network for all autonomous agents.' },
-    { id: 'alerts', name: 'Alerts', icon: Bell, unread: 843, desc: 'Critical system failures and execution blocks.' },
+    { id: 'general', name: 'General Logs', icon: Hash, unread: feedMessages.length, desc: 'Live agent-activity feed from your sessions.' },
+    { id: 'alerts', name: 'Alerts', icon: Bell, unread: errorCount, desc: 'Agent errors and execution failures logged in the DB.' },
     { id: 'deployments', name: 'Deployments', icon: Volume2, unread: 0, desc: 'CI/CD pipeline updates and server handshakes.' },
-    { id: 'security', name: 'Security', icon: Shield, unread: 10000, desc: 'Audit logs and vulnerability scans.' },
+    { id: 'security', name: 'Security', icon: Shield, unread: 0, desc: 'Audit logs and vulnerability scans.' },
   ];
 
   const currentChannel = channels.find(c => c.id === activeChannel);
@@ -140,7 +173,7 @@ export default function Channels() {
   const measuredHeights = useMemo(() => {
       // 80% max width container minus internal paddings roughly
       const availableTextWidth = (containerWidth * 0.8) - 48; 
-      return mockMessages.map(msg => {
+      return feedMessages.map((msg: ActivityMessage) => {
           // Prepare the plain text via Canvas
           const handle = prepare(msg.text, '14px sans-serif'); 
           // layout args: handle, width limit, line height approximation
@@ -149,10 +182,10 @@ export default function Channels() {
           // Math layout: text height + 32px (p-4 padding) + 20px (header) + 24px (gap)
           return stats.height + 32 + 20 + 24; 
       });
-  }, [containerWidth]);
+  }, [containerWidth, feedMessages]);
 
   const virtualizer = useVirtualizer({
-    count: mockMessages.length,
+    count: feedMessages.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: (i) => measuredHeights[i] || 100, // Pretext provides 100% accurate mathematical sizes
     overscan: 20
@@ -342,7 +375,7 @@ export default function Channels() {
                     }}
                   >
                     {virtualizer.getVirtualItems().map((virtualRow) => {
-                      const msg = mockMessages[virtualRow.index];
+                      const msg = feedMessages[virtualRow.index];
                       return (
                         <div
                           key={virtualRow.index}
@@ -371,13 +404,21 @@ export default function Channels() {
                       );
                     })}
                   </div>
+
+                  {feedMessages.length === 0 && (
+                    <div className="text-center py-16 text-[#B8AFA8]">
+                      <Radio size={36} className="mx-auto opacity-40 mb-3" />
+                      <p className="text-sm font-medium">No activity yet</p>
+                      <p className="text-xs">Chat with your agent or connect a bridge — activity appears here live.</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-4 border-t border-[#E2DAD2] dark:border-border bg-white/50 dark:bg-surface/50 backdrop-blur-md shrink-0">
                   <div className="flex items-center gap-2 max-w-4xl mx-auto relative">
                      <input
                         type="text"
-                        placeholder={`Read Only - Pretext Render Pipeline Benchmark Active.`}
+                        placeholder={`Read-only activity feed — connect Telegram or Discord to interact.`}
                         value={inputVal}
                         onChange={e => setInputVal(e.target.value)}
                         className="w-full bg-[#EDE8E2] dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand/50 transition-colors"

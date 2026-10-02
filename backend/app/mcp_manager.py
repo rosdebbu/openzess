@@ -1,6 +1,5 @@
 import asyncio
 import threading
-import concurrent.futures
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.client.sse import sse_client
@@ -57,7 +56,6 @@ class MCPManager:
                 sse_mgr = http_mgr
             except (ImportError, Exception) as e:
                 print(f"[{server_id}] Streamable HTTP unavailable ({e}), falling back to SSE...", flush=True)
-                import httpx
                 headers.update({"Accept": "text/event-stream"})
                 sse_mgr = sse_client(url=url, headers=headers, timeout=120.0)
                 read, write = await sse_mgr.__aenter__()

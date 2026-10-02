@@ -43,12 +43,16 @@ pub fn encode(
     let rgb: Vec<u8> = match layout {
         "rgb" => raw[..expected].to_vec(),
         "rgba" => raw[..expected]
-            .chunks_exact(4)
+            .as_chunks::<4>()
+            .0
+            .iter()
             .flat_map(|px| [px[0], px[1], px[2]])
             .collect(),
         // mss BGRA / BGRX share byte order B,G,R,X for RGB extraction.
         _ => raw[..expected]
-            .chunks_exact(4)
+            .as_chunks::<4>()
+            .0
+            .iter()
             .flat_map(|px| [px[2], px[1], px[0]])
             .collect(),
     };

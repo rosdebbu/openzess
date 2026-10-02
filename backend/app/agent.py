@@ -60,11 +60,52 @@ except Exception as e:
     print(f"Warning: ChromaDB failed to initialize {e}")
     memory_collection = None
 
+# ---- NATIVE TOOLS SECURITY GUARDS ----
+_DANGEROUS_CMD_PATTERNS = [
+    r"\bformat\s+[a-zA-Z]:",
+    r"\bdel\s+/[fFqsQS\s]*[a-zA-Z]:\\",
+    r"\brmdir\s+/[sS]\s+/[qQ]\s+[a-zA-Z]:\\",
+    r"\brm\s+-rf\s+/\b",
+    r":\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:",
+]
+
+_PROTECTED_PATH_PATTERNS = (
+    ".ssh",
+    "id_rsa",
+    "id_ed25519",
+    "etc/shadow",
+    "etc/passwd",
+    "windows/system32",
+    "windows\\system32",
+    "sam",
+    "system.dat",
+)
+
+def _is_safe_command(cmd: str) -> tuple[bool, str]:
+    import re
+    low = cmd.strip().lower()
+    for pat in _DANGEROUS_CMD_PATTERNS:
+        if re.search(pat, low):
+            return False, "Command execution blocked by security policy (destructive system pattern detected)."
+    return True, ""
+
+def _is_safe_file_access(filepath: str) -> tuple[bool, str]:
+    if not filepath or not isinstance(filepath, str):
+        return False, "Error: Invalid file path."
+    normalized = os.path.normpath(os.path.abspath(filepath)).lower()
+    for bad in _PROTECTED_PATH_PATTERNS:
+        if bad in normalized:
+            return False, f"Access denied: Path targets protected system or secret resource '{bad}'."
+    return True, ""
+
 # ---- NATIVE TOOLS ----
 def run_terminal_command(command: str, **kwargs) -> str:
     try:
         import re
         command = re.sub(r'\[(.*?)\]\([^\)]*\)', r'\1', command).strip()
+        is_safe, block_reason = _is_safe_command(command)
+        if not is_safe:
+            return block_reason
         if platform.system() == "Windows":
             # Try PowerShell first; fallback to cmd and WSL for shell scripts or complex pipes
             try:
@@ -113,6 +154,9 @@ def read_web_page(url: str) -> str:
 
 def create_file(filepath: str, content: str) -> str:
     try:
+        is_safe, block_reason = _is_safe_file_access(filepath)
+        if not is_safe:
+            return block_reason
         os.makedirs(os.path.dirname(os.path.abspath(filepath)) or ".", exist_ok=True)
         if os.path.exists(filepath):
             return f"Error: File {filepath} already exists."
@@ -124,6 +168,9 @@ def create_file(filepath: str, content: str) -> str:
 
 def read_file(filepath: str) -> str:
     try:
+        is_safe, block_reason = _is_safe_file_access(filepath)
+        if not is_safe:
+            return block_reason
         if not os.path.exists(filepath):
             return "Error: File does not exist."
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -134,6 +181,9 @@ def read_file(filepath: str) -> str:
 
 def edit_code(filepath: str, old_string: str, new_string: str) -> str:
     try:
+        is_safe, block_reason = _is_safe_file_access(filepath)
+        if not is_safe:
+            return block_reason
         if not os.path.exists(filepath):
             return "Error: File does not exist."
         with open(filepath, 'r', encoding='utf-8') as f:

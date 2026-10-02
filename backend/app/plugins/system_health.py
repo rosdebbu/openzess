@@ -1,6 +1,5 @@
 import psutil
 import platform
-import os
 from plugin_loader import plugin_registry
 
 @plugin_registry.register(

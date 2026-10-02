@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import Sidebar from './components/Sidebar';
 import Chat from './pages/Chat';
-import Files from './pages/Files';
 import Tools from './pages/Tools';
 import Sessions from './pages/Sessions';
 import MemoryVault from './pages/Memory';
@@ -40,7 +39,6 @@ function AnimatedRoutes({ persona: _persona }: { persona: string }) {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Chat /></PageTransition>} />
           <Route path="/sessions" element={<PageTransition><Sessions /></PageTransition>} />
-          <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
           <Route path="/tools" element={<PageTransition><Tools /></PageTransition>} />
           <Route path="/brain" element={<PageTransition><BrainEvolution /></PageTransition>} />
           <Route path="/evolution" element={<PageTransition><BrainEvolution /></PageTransition>} />
@@ -69,7 +67,7 @@ function AnimatedRoutes({ persona: _persona }: { persona: string }) {
 }
 
 function App() {
-  const [provider, setProvider] = useState(() => localStorage.getItem('openzess_provider') || 'gemini');
+  const [provider, setProvider] = useState(() => localStorage.getItem('openzess_provider') || 'glm');
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('openzess_api_key') || '');
   
   const [showSettings, setShowSettings] = useState(false);
@@ -232,6 +230,7 @@ function App() {
                            onChange={(e) => setProvider(e.target.value)}
                            className="w-full bg-neutral-50 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand/50 dark:focus:border-brand transition-colors"
                         >
+                           <option value="nvidia" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">NVIDIA NIM (z-ai/glm-5.3-flash)</option>
                            <option value="gemini" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Google Gemini / Gemma (gemini-2.5-flash)</option>
                            <option value="openai" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">OpenAI (gpt-4o-mini)</option>
                            <option value="anthropic" className="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">Anthropic (claude-3-5-sonnet-20241022)</option>
@@ -248,7 +247,7 @@ function App() {
                         
                         <input 
                           type="password"
-                          placeholder={provider === 'ollama' || provider === 'experiential' ? "Local / Gateway - API Key not required" : "API Key (optional if configured in .env or terminal)"}
+                          placeholder={provider === 'ollama' || provider === 'experiential' ? "Local / Gateway - API Key not required" : provider === 'nvidia' ? "NVIDIA API Key (nvapi-... or set in .env)" : "API Key (optional if configured in .env or terminal)"}
                           value={apiKey}
                           onChange={(e) => setApiKey(e.target.value)}
                           disabled={provider === 'ollama'}

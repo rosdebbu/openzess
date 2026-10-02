@@ -31,12 +31,35 @@ services:
       PORT: 8080
       DATABASE_URL: postgresql://${POSTGRES_USER:-openzess}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-openzess}
       OPENZESS_CORS_ORIGINS: ${OPENZESS_CORS_ORIGINS:-http://localhost:5173}
-      SIDECAR_URL: http://127.0.0.1:8100
+      # Optional bearer-token auth — empty keeps auth off (matches the middleware default)
+      OPENZESS_AUTH_TOKEN: ${OPENZESS_AUTH_TOKEN:-}
+      SIDECAR_URL: http://sidecar:8100
     ports:
       - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
+      sidecar:
+        condition: service_healthy
+    restart: unless-stopped
+
+  sidecar:
+    build:
+      context: ./rust-sidecar
+      dockerfile: Dockerfile
+    container_name: openzess_sidecar
+    environment:
+      SIDECAR_HOST: 0.0.0.0
+      SIDECAR_PORT: 8100
+      RUST_LOG: info
+    ports:
+      - "127.0.0.1:8100:8100"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8100/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
     restart: unless-stopped
 
 volumes:
