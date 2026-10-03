@@ -98,6 +98,71 @@ def _is_safe_file_access(filepath: str) -> tuple[bool, str]:
             return False, f"Access denied: Path targets protected system or secret resource '{bad}'."
     return True, ""
 
+# ---- SANDBOX ESCALATION PATTERNS ----
+_ESCALATION_COMMAND_PATTERNS = [
+    # Privilege escalation / administrative override
+    r"\bsudo\b",
+    r"\bdoas\b",
+    r"\brunas\b",
+    r"\bsu\s+-\b",
+    r"\bsu\s+root\b",
+    r"\bgsudo\b",
+    r"start-process\s+.*-verb\s+runas",
+    r"-verb\s+runas",
+    r"powershell\s+.*-executionpolicy\s+bypass",
+    r"set-executionpolicy\s+.*(bypass|unrestricted)",
+    
+    # Destructive disk & filesystem wiping
+    r"\bformat\s+[a-zA-Z]:",
+    r"\bdel\s+/[fFqsQS\s]*[a-zA-Z]:\\",
+    r"\brmdir\s+/[sS]\s+/[qQ]\s+[a-zA-Z]:\\",
+    r"\brm\s+-rf\s+/\b",
+    r"\bmkfs\b",
+    r"\bdd\s+if=",
+    r"\bdiskpart\b",
+    
+    # Network sockets / pipe execution
+    r"\|\s*(bash|sh|zsh)\s*$",
+    r"curl\s+.*\|\s*(bash|sh)",
+    r"wget\s+.*\|\s*(bash|sh)",
+    r"nc(\.exe)?\s+.*-e",
+    r"/dev/tcp/",
+    r":\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:",
+]
+
+def is_sandbox_escalation(tool_name: str, args: dict) -> tuple[bool, str]:
+    """
+    Checks if a tool invocation attempts sandbox escalation or protected resource access.
+    Returns (is_escalation, reason).
+    """
+    import re
+    if not isinstance(args, dict):
+        return False, ""
+        
+    if tool_name == "run_terminal_command":
+        cmd = str(args.get("command", "")).strip()
+        cmd_low = cmd.lower()
+        for pat in _ESCALATION_COMMAND_PATTERNS:
+            if re.search(pat, cmd_low, re.IGNORECASE):
+                return True, f"Command contains elevated privilege or destructive pattern: '{pat}'"
+        for bad in _PROTECTED_PATH_PATTERNS:
+            if bad in cmd_low:
+                return True, f"Command accesses protected system/secret path: '{bad}'"
+                
+    elif tool_name in ("create_file", "edit_code", "read_file"):
+        path = str(args.get("filepath", args.get("path", ""))).strip().lower()
+        for bad in _PROTECTED_PATH_PATTERNS:
+            if bad in path:
+                return True, f"File operation targets protected system resource: '{bad}'"
+                
+    elif tool_name in ("schedule_background_task", "monitor_directory"):
+        target = str(args.get("command", args.get("path", ""))).strip().lower()
+        for bad in _PROTECTED_PATH_PATTERNS:
+            if bad in target:
+                return True, f"Background task targets protected system resource: '{bad}'"
+                
+    return False, ""
+
 # ---- NATIVE TOOLS ----
 def run_terminal_command(command: str, **kwargs) -> str:
     try:
@@ -663,7 +728,8 @@ PROVIDER_MODELS = {
 }
 
 class OpenzessAgent:
-    def __init__(self, api_key: str = "", provider: str = "gemini", history: list = None, system_instruction: str = None, allowed_tools: list = None):
+    def __init__(self, api_key: str = "", provider: str = "gemini", history: list = None, system_instruction: str = None, allowed_tools: list = None, auto_approve: bool = False):
+        self.auto_approve = auto_approve
         # Fallback to environment variables if client-side api_key is empty
         if not api_key or not str(api_key).strip():
             if provider in ("experiential", "exp", "exp:smart"):
@@ -678,12 +744,19 @@ class OpenzessAgent:
                 self.api_key = os.environ.get("GROQ_API_KEY", "")
             elif provider in ("nvidia", "nvidia-glm", "nvidia_glm"):
                 self.api_key = os.environ.get("NVIDIA_API_KEY", "")
+                if not self.api_key and os.environ.get("OPENROUTER_API_KEY"):
+                    self.api_key = os.environ.get("OPENROUTER_API_KEY", "")
+                    provider = "glm"
             elif provider == "glm" and os.environ.get("NVIDIA_API_KEY") and not os.environ.get("OPENROUTER_API_KEY"):
                 self.api_key = os.environ.get("NVIDIA_API_KEY", "")
             else:
                 self.api_key = os.environ.get("OPENROUTER_API_KEY", os.environ.get("DEEPSEEK_API_KEY", os.environ.get("NVIDIA_API_KEY", "")))
         else:
             self.api_key = api_key
+            if provider in ("nvidia", "nvidia-glm", "nvidia_glm") and not str(self.api_key).startswith("nvapi-"):
+                if os.environ.get("OPENROUTER_API_KEY"):
+                    self.api_key = os.environ.get("OPENROUTER_API_KEY", "")
+                    provider = "glm"
 
         if provider in PROVIDER_MODELS:
             self.model_name = PROVIDER_MODELS[provider]
@@ -868,7 +941,7 @@ class OpenzessAgent:
                 "model": self.model_name,
                 "messages": self.messages,
                 "tools": self.tools if self.tools else None,
-                "max_tokens": int(os.environ.get("OPENZESS_MAX_TOKENS", "4096")),
+                "max_tokens": int(os.environ.get("OPENZESS_MAX_TOKENS", "1500")),
                 "api_key": self.api_key if self.api_key else "dummy_key"
             }
             if self.api_base:
@@ -877,8 +950,22 @@ class OpenzessAgent:
             try:
                 response = litellm.completion(**call_kwargs)
             except Exception as call_err:
+                err_str = str(call_err).lower()
+                # 402 credit cap handler: if OpenRouter requires fewer max_tokens, retry with 800
+                if "402" in err_str or "max_tokens" in err_str or "afford" in err_str:
+                    try:
+                        call_kwargs["max_tokens"] = 800
+                        response = litellm.completion(**call_kwargs)
+                    except Exception:
+                        raise call_err
                 # Circuit breaker: if gateway is offline/unreachable or transient connection error
-                if self.provider in ("experiential", "exp", "exp:smart") or (self.api_base and ("127.0.0.1" in self.api_base or "localhost" in self.api_base)):
+                elif os.environ.get("OPENROUTER_API_KEY") and (self.provider in ("nvidia", "nvidia-glm", "nvidia_glm") or "AuthenticationError" in type(call_err).__name__):
+                    fallback_model = "openrouter/z-ai/glm-5.3-flash"
+                    call_kwargs["model"] = fallback_model
+                    call_kwargs["api_key"] = os.environ.get("OPENROUTER_API_KEY")
+                    call_kwargs.pop("api_base", None)
+                    response = litellm.completion(**call_kwargs)
+                elif self.provider in ("experiential", "exp", "exp:smart") or (self.api_base and ("127.0.0.1" in self.api_base or "localhost" in self.api_base)):
                     fallback_prov = os.environ.get("OPENZESS_FALLBACK_PROVIDER", "gemini")
                     fallback_model = PROVIDER_MODELS.get(fallback_prov, "gemini/gemini-2.5-flash")
                     fallback_key = os.environ.get(f"{fallback_prov.upper()}_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
@@ -916,21 +1003,43 @@ class OpenzessAgent:
                 if isinstance(tc, dict):
                     raw_args = tc["function"]["arguments"]
                     args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
-                    pending_calls.append({"id": tc.get("id", "temp_id"), "name": tc["function"]["name"], "args": args})
+                    t_name = tc["function"]["name"]
+                    t_id = tc.get("id", "temp_id")
                 else:
                     raw_args = tc.function.arguments
                     args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
-                    pending_calls.append({"id": tc.id, "name": tc.function.name, "args": args})
+                    t_name = tc.function.name
+                    t_id = tc.id
 
-            requires_auth = any(pc["name"] in dangerous_tools for pc in pending_calls)
+                is_esc, esc_reason = is_sandbox_escalation(t_name, args)
+                pending_calls.append({
+                    "id": t_id,
+                    "name": t_name,
+                    "args": args,
+                    "is_escalation": is_esc,
+                    "escalation_reason": esc_reason
+                })
+
+            effective_auto_approve = self.auto_approve if auto_approve is None else auto_approve
+            escalation_calls = [pc for pc in pending_calls if pc.get("is_escalation")]
+
+            # Auto-approve is enabled: Permission prompts will be approved automatically.
+            # Sandbox escalation prompts are always excluded and require manual approval.
+            if effective_auto_approve:
+                requires_auth = bool(escalation_calls)
+            else:
+                requires_auth = any(pc["name"] in dangerous_tools for pc in pending_calls)
+
             if requires_auth:
                 return {
                     "reply": None,
                     "auth_required": True,
-                    "pending_calls": pending_calls
+                    "pending_calls": pending_calls,
+                    "is_escalation": bool(escalation_calls),
+                    "escalation_reason": escalation_calls[0].get("escalation_reason") if escalation_calls else None
                 }
             
-            # Auto-execute safe tools
+            # Auto-execute safe tools or auto-approved non-escalation tools
             for pc in pending_calls:
                 output = self._run_tool(pc["name"], pc["args"])
                 tool_outputs.append({"tool": pc["name"], "args": pc["args"], "output": output})
@@ -985,9 +1094,11 @@ class OpenzessAgent:
                 pass
         threading.Thread(target=_worker, daemon=True, name="openzess-learning").start()
 
-    def chat(self, user_prompt: str):
+    def chat(self, user_prompt: str, auto_approve: bool = None):
         try:
             self.last_prompt = user_prompt
+            if auto_approve is not None:
+                self.auto_approve = auto_approve
             
             # --- RAG RETRIEVAL (Only query CPU vector embeddings if explicitly requested) ---
             rag_context = ""
@@ -1014,7 +1125,7 @@ class OpenzessAgent:
             if enhanced_prompt.strip():
                 self.messages.append({"role": "user", "content": enhanced_prompt})
             
-            result = self._handle_response_loop()
+            result = self._handle_response_loop(auto_approve=self.auto_approve)
             
             # --- RAG & HABIT INGESTION (fire-and-forget, never blocks the reply) ---
             if not result.get("auth_required") and result.get("reply"):
@@ -1026,11 +1137,13 @@ class OpenzessAgent:
             traceback.print_exc()
             raise e
 
-    def chat_stream(self, user_prompt: str):
+    def chat_stream(self, user_prompt: str, auto_approve: bool = None):
         t_start = time.time()
         used_tools = []
         try:
             self.last_prompt = user_prompt
+            if auto_approve is not None:
+                self.auto_approve = auto_approve
             
             # --- RAG RETRIEVAL (Only query CPU vector embeddings if explicitly requested) ---
             rag_context = ""
@@ -1065,7 +1178,7 @@ class OpenzessAgent:
                     "messages": self.messages,
                     "tools": self.tools if self.tools else None,
                     "stream": True,
-                    "max_tokens": int(os.environ.get("OPENZESS_MAX_TOKENS", "4096")),
+                    "max_tokens": int(os.environ.get("OPENZESS_MAX_TOKENS", "1500")),
                     "api_key": self.api_key if self.api_key else "dummy_key"
                 }
                 if self.api_base:
@@ -1078,7 +1191,22 @@ class OpenzessAgent:
                             raise ConnectionError("Experiential gateway is offline")
                     response_stream = litellm.completion(**call_kwargs)
                 except Exception as stream_err:
-                    if self.provider in ("experiential", "exp", "exp:smart") or (self.api_base and ("127.0.0.1" in self.api_base or "localhost" in self.api_base)):
+                    err_str = str(stream_err).lower()
+                    # 402 credit cap handler: if OpenRouter requires fewer max_tokens, retry with 800
+                    if "402" in err_str or "max_tokens" in err_str or "afford" in err_str:
+                        try:
+                            call_kwargs["max_tokens"] = 800
+                            response_stream = litellm.completion(**call_kwargs)
+                        except Exception:
+                            raise stream_err
+                    elif os.environ.get("OPENROUTER_API_KEY") and (self.provider in ("nvidia", "nvidia-glm", "nvidia_glm") or "AuthenticationError" in type(stream_err).__name__):
+                        fallback_model = "openrouter/z-ai/glm-5.3-flash"
+                        call_kwargs["model"] = fallback_model
+                        call_kwargs["api_key"] = os.environ.get("OPENROUTER_API_KEY")
+                        call_kwargs.pop("api_base", None)
+                        yield {"type": "content", "content": "*[⚡ Endpoint Unauthorized/Missing → Auto-switched to OpenRouter GLM]*\n\n"}
+                        response_stream = litellm.completion(**call_kwargs)
+                    elif self.provider in ("experiential", "exp", "exp:smart") or (self.api_base and ("127.0.0.1" in self.api_base or "localhost" in self.api_base)):
                         fallback_prov = os.environ.get("OPENZESS_FALLBACK_PROVIDER", "gemini")
                         fallback_model = PROVIDER_MODELS.get(fallback_prov, "gemini/gemini-2.5-flash")
                         fallback_key = os.environ.get(f"{fallback_prov.upper()}_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
@@ -1128,8 +1256,13 @@ class OpenzessAgent:
                 except Exception as stream_iter_err:
                     err_text = str(stream_iter_err)
                     print(f"Streaming chunk error: {err_text}")
-                    yield {"type": "content", "content": f"\n\n*[⚠️ Connection/Model Error: {err_text}]*\n\n"}
-                    yield {"type": "done", "reply": collected_content if collected_content else f"Error: {err_text}"}
+                    if "incomplete chunked read" in err_text or "EOF" in err_text or "connection" in err_text.lower():
+                        clean_msg = "Remote endpoint interrupted connection mid-stream. (Network socket closed)."
+                    else:
+                        clean_msg = err_text
+                    if not collected_content:
+                        yield {"type": "content", "content": f"\n\n*[⚠️ {clean_msg}]*\n\n"}
+                    yield {"type": "done", "reply": collected_content if collected_content else f"Error: {clean_msg}"}
                     return
 
                 # If the model emitted text-based tool calls (GLM, Hermes, Qwen, etc.) instead of OpenAI structured tool calls
@@ -1173,23 +1306,46 @@ class OpenzessAgent:
                     args = {}
                     try:
                         args = json.loads(tc["function"]["arguments"])
-                        # If args contains a dictionary with an identical string representation it might need strict loading
                     except:
                         try:
-                            # fallback for bad quotes
                             import ast
                             args = ast.literal_eval(tc["function"]["arguments"])
                         except:
                             pass
-                    pending_calls.append({"id": tc["id"], "name": tc["function"]["name"], "args": args})
+                    is_esc, esc_reason = is_sandbox_escalation(tc["function"]["name"], args)
+                    pending_calls.append({
+                        "id": tc["id"],
+                        "name": tc["function"]["name"],
+                        "args": args,
+                        "is_escalation": is_esc,
+                        "escalation_reason": esc_reason
+                    })
                 
-                requires_auth = any(pc["name"] in dangerous_tools for pc in pending_calls)
+                effective_auto_approve = self.auto_approve if auto_approve is None else auto_approve
+                escalation_calls = [pc for pc in pending_calls if pc.get("is_escalation")]
+
+                # Auto-approve is enabled: Permission prompts will be approved automatically.
+                # Sandbox escalation prompts are always excluded and require manual approval.
+                if effective_auto_approve:
+                    requires_auth = bool(escalation_calls)
+                else:
+                    requires_auth = any(pc["name"] in dangerous_tools for pc in pending_calls)
+
                 if requires_auth:
                     yield {
                         "type": "auth_required",
-                        "pending_calls": pending_calls
+                        "pending_calls": pending_calls,
+                        "is_escalation": bool(escalation_calls),
+                        "escalation_reason": escalation_calls[0].get("escalation_reason") if escalation_calls else None
                     }
                     return
+
+                if effective_auto_approve and any(pc["name"] in dangerous_tools for pc in pending_calls):
+                    yield {
+                        "type": "auto_approved",
+                        "notice": "Auto-approve is enabled. Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded.",
+                        "tools": [pc["name"] for pc in pending_calls]
+                    }
                     
                 for pc in pending_calls:
                     used_tools.append(pc["name"])

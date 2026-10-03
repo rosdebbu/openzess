@@ -166,6 +166,9 @@ def init_active_mcps():
 # Run the initialization in the background so it doesn't block server startup
 threading.Thread(target=init_active_mcps, daemon=True).start()
 
+# Re-register persisted cron jobs after a restart (they lived only in memory before)
+threading.Thread(target=background_workers.cron_manager.restore_jobs, daemon=True).start()
+
 # Create the bootstrap admin account when OPENZESS_ADMIN_* env vars are set
 ensure_admin_bootstrap()
 
@@ -237,6 +240,7 @@ class ChatRequest(BaseModel):
     agent_name: Optional[str] = None
     use_swarm: Optional[bool] = False
     matrix_keys: Optional[Dict[str, str]] = None
+    auto_approve: Optional[bool] = False
 
 # Store session agents locally for speed, hydrate from DB on restart
 sessions: Dict[str, OpenzessAgent] = {}
@@ -372,8 +376,8 @@ async def chat(request: ChatRequest):
             req_provider = "glm"
             effective_key = os.environ.get("OPENROUTER_API_KEY")
 
-    # If requested provider is nvidia without a key, fallback to OpenRouter GLM
-    if req_provider in ("nvidia", "nvidia-glm", "nvidia_glm") and not effective_key:
+    # If requested provider is nvidia without a valid nvapi key, fallback to OpenRouter GLM
+    if req_provider in ("nvidia", "nvidia-glm", "nvidia_glm") and (not effective_key or not effective_key.startswith("nvapi-")):
         if os.environ.get("OPENROUTER_API_KEY"):
             req_provider = "glm"
             effective_key = os.environ.get("OPENROUTER_API_KEY")
@@ -434,7 +438,8 @@ async def chat(request: ChatRequest):
             provider=request.provider,
             history=history,
             system_instruction=request.system_instruction,
-            allowed_tools=request.allowed_tools
+            allowed_tools=request.allowed_tools,
+            auto_approve=bool(request.auto_approve)
         )
         new_agent.raw_allowed_tools = request.allowed_tools
         new_agent.system_instruction = request.system_instruction
@@ -448,6 +453,7 @@ async def chat(request: ChatRequest):
         _evict_stale_sessions()
         
     agent = sessions[session_id]
+    agent.auto_approve = bool(request.auto_approve)
     
     try:
         # 1. Save user message to database
@@ -461,16 +467,19 @@ async def chat(request: ChatRequest):
                 # Stream initialization
                 yield f"data: {json.dumps({'type': 'session', 'session_id': session_id})}\n\n"
                 
-                for chunk in agent.chat_stream(request.message):
-                    yield f"data: {json.dumps(chunk)}\n\n"
-                    if chunk.get("type") == "done" and not chunk.get("auth_required") and chunk.get("reply"):
-                        db_role = f"agent:{request.agent_name}" if request.agent_name else "agent"
-                        database.add_message(session_id, db_role, chunk.get("reply"))
+                try:
+                    for chunk in agent.chat_stream(request.message, auto_approve=bool(request.auto_approve)):
+                        yield f"data: {json.dumps(chunk)}\n\n"
+                        if chunk.get("type") == "done" and not chunk.get("auth_required") and chunk.get("reply"):
+                            db_role = f"agent:{request.agent_name}" if request.agent_name else "agent"
+                            database.add_message(session_id, db_role, chunk.get("reply"))
+                except Exception as stream_err:
+                    yield f"data: {json.dumps({'type': 'error', 'error': str(stream_err)})}\n\n"
             return StreamingResponse(event_generator(), media_type="text/event-stream")
         else:
             # agent.chat() runs a blocking LLM + tool loop (can take minutes) —
             # offload to a thread so the event loop can serve other requests.
-            response = await asyncio.to_thread(agent.chat, request.message)
+            response = await asyncio.to_thread(agent.chat, request.message, bool(request.auto_approve))
             if not response.get("auth_required") and response.get("reply"):
                 db_role = f"agent:{request.agent_name}" if request.agent_name else "agent"
                 database.add_message(session_id, db_role, response.get("reply"))
@@ -495,10 +504,13 @@ async def chat_approve(request: ApprovalRequest):
     try:
         if request.stream:
             def event_generator():
-                for chunk in agent.execute_pending_tools_stream(request.pending_calls, request.approved):
-                    yield f"data: {json.dumps(chunk)}\n\n"
-                    if chunk.get("type") == "done" and not chunk.get("auth_required") and chunk.get("reply"):
-                        database.add_message(request.session_id, "agent", chunk.get("reply"))
+                try:
+                    for chunk in agent.execute_pending_tools_stream(request.pending_calls, request.approved):
+                        yield f"data: {json.dumps(chunk)}\n\n"
+                        if chunk.get("type") == "done" and not chunk.get("auth_required") and chunk.get("reply"):
+                            database.add_message(request.session_id, "agent", chunk.get("reply"))
+                except Exception as stream_err:
+                    yield f"data: {json.dumps({'type': 'error', 'error': str(stream_err)})}\n\n"
             return StreamingResponse(event_generator(), media_type="text/event-stream")
         else:
             # Tool execution can block for a long time (30s terminal timeouts) —

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, MonitorPlay, X, Mic, Brain, Focus, Clock, RotateCcw, Paperclip, Copy, CheckCircle2, Download, Play, FileText, Plus, Image, Zap } from 'lucide-react';
+import { Send, Terminal, Sparkles, Code, Globe, ShieldAlert, ShieldCheck, MonitorPlay, X, Mic, Brain, Focus, Clock, RotateCcw, Paperclip, Copy, CheckCircle2, Download, Play, FileText, Plus, Image, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -25,6 +25,9 @@ export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState<ToolExecution[]>([]);
   const [pendingCalls, setPendingCalls] = useState<any[] | null>(null);
+  const [autoApprove, setAutoApprove] = useState(() => localStorage.getItem('openzess_auto_approve') === 'true');
+  const [isEscalation, setIsEscalation] = useState(false);
+  const [escalationReason, setEscalationReason] = useState<string | null>(null);
   const [useTools, setUseTools] = useState(() => localStorage.getItem('openzess_use_tools') !== 'false');
   const [useSwarm] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
@@ -53,13 +56,18 @@ export default function Chat() {
     const handlePersonaChanged = () => {
       setCurrentPersonaKey(localStorage.getItem('openzess_persona') || 'architect');
     };
+    const handleAutoApproveChanged = () => {
+      setAutoApprove(localStorage.getItem('openzess_auto_approve') === 'true');
+    };
     
     document.addEventListener("mousedown", handleClickOutside);
     window.addEventListener("persona-changed", handlePersonaChanged);
+    window.addEventListener("auto-approve-changed", handleAutoApproveChanged);
     
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("persona-changed", handlePersonaChanged);
+      window.removeEventListener("auto-approve-changed", handleAutoApproveChanged);
     };
   }, []);
 
@@ -289,6 +297,8 @@ export default function Chat() {
     setIsLoading(true);
     isStreamingRef.current = true;
     setPendingCalls(null);
+    setIsEscalation(false);
+    setEscalationReason(null);
 
     // Swarm Native Parser
     const textTrimmed = textToSend.trim();
@@ -354,6 +364,7 @@ export default function Chat() {
         session_id: sessionIdRef.current || sessionId || undefined,
         system_instruction: systemInstruction,
         allowed_tools: allowedTools,
+        auto_approve: autoApprove,
         stream: true,
         use_swarm: useSwarm || (isSwarm && hasSwarmKeys),
         matrix_keys: {
@@ -432,6 +443,14 @@ export default function Chat() {
                         } else if (data.type === 'auth_required') {
                             setIsLoading(false);
                             setPendingCalls(data.pending_calls);
+                            setIsEscalation(Boolean(data.is_escalation));
+                            setEscalationReason(data.escalation_reason || null);
+                        } else if (data.type === 'auto_approved') {
+                            setTerminalLogs(prev => [...prev, {
+                                tool: 'auto_approve',
+                                args: { tools: data.tools },
+                                output: data.notice || 'Auto-approve is enabled. Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded.'
+                            }]);
                         } else if (data.type === 'error') {
                             setIsLoading(false);
                             streamedResponse += `\n\n❌ Error: ${data.error}`;
@@ -448,6 +467,15 @@ export default function Chat() {
                 }
             }
         }
+      }
+
+      // If stream finished without any message being added
+      if (!messageAdded && !streamedResponse) {
+          setMessages(prev => [...prev, {
+              id: Date.now().toString() + 'err',
+              role: 'agent',
+              content: '⚠️ No response received from server or model provider. Please check your provider & API key in Settings.'
+          }]);
       }
 
       // Phase 3 trigger
@@ -473,6 +501,8 @@ export default function Chat() {
       setIsLoading(true);
       const callsRef = pendingCalls;
       setPendingCalls(null);
+      setIsEscalation(false);
+      setEscalationReason(null);
       
       try {
          const response = await fetch('http://localhost:8000/api/chat/approve', {
@@ -540,6 +570,10 @@ export default function Chat() {
              }
          }
          
+         if (!streamedResponse) {
+             setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: '⚠️ Tool execution finished with no further response.' } : m));
+         }
+
          // Phase 3 trigger
          if (streamedResponse && (window as any).electronAPI) {
              (window as any).electronAPI.companionSpeak(streamedResponse);
@@ -556,6 +590,13 @@ export default function Chat() {
     const val = !useTools;
     setUseTools(val);
     localStorage.setItem('openzess_use_tools', val.toString());
+  };
+
+  const toggleAutoApprove = () => {
+    const val = !autoApprove;
+    setAutoApprove(val);
+    localStorage.setItem('openzess_auto_approve', val.toString());
+    window.dispatchEvent(new Event('auto-approve-changed'));
   };
 
   const handleDeleteMessage = async (msgId: string) => {
@@ -783,26 +824,66 @@ export default function Chat() {
           </div>
         )}
 
-        <div className="px-4 md:px-10 pb-6 md:pb-8 flex justify-center sticky bottom-0 bg-gradient-to-t from-[#F5F0EB] via-[#F5F0EB] dark:from-[#1A1818] dark:via-[#1A1818] to-transparent pt-10 shrink-0">
+        <div className="px-4 md:px-10 pb-6 md:pb-8 flex flex-col items-center justify-center sticky bottom-0 bg-gradient-to-t from-[#F5F0EB] via-[#F5F0EB] dark:from-[#1A1818] dark:via-[#1A1818] to-transparent pt-6 shrink-0">
           
+          {autoApprove && !pendingCalls && (
+            <motion.div 
+              initial={{ opacity: 0, y: 6 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              className="w-full max-w-4xl mb-2.5 px-4 py-2 rounded-2xl bg-emerald-500/10 dark:bg-emerald-950/40 border border-emerald-500/25 dark:border-emerald-500/30 flex items-center justify-between text-xs text-emerald-900 dark:text-emerald-300 backdrop-blur-sm shadow-sm"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="leading-snug">
+                  <strong className="font-semibold text-emerald-800 dark:text-emerald-200">Auto-approve is enabled.</strong> Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded.
+                </span>
+              </div>
+              <button 
+                onClick={toggleAutoApprove}
+                className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-200 underline ml-3 shrink-0 cursor-pointer transition-colors"
+              >
+                Disable
+              </button>
+            </motion.div>
+          )}
+
           {pendingCalls ? (
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-full max-w-4xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex flex-col p-5 shadow-xl z-20">
-                 <div className="text-rose-800 dark:text-rose-400 font-semibold mb-3 flex items-center gap-2">
-                    <ShieldAlert size={20} />
-                    Agent requires your permission to execute {pendingCalls.length} sensitive local command(s).
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className={`w-full max-w-4xl ${isEscalation ? 'bg-amber-50 dark:bg-amber-950/25 border-amber-300 dark:border-amber-700/60' : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/50'} border rounded-2xl flex flex-col p-5 shadow-xl z-20`}>
+                 <div className={`font-semibold mb-2 flex items-center gap-2 ${isEscalation ? 'text-amber-800 dark:text-amber-400' : 'text-rose-800 dark:text-rose-400'}`}>
+                    {isEscalation ? <ShieldAlert size={20} className="text-amber-600 dark:text-amber-400" /> : <ShieldAlert size={20} />}
+                    {isEscalation ? (
+                      <span>
+                        Sandbox Escalation: Permission prompt cannot be auto-approved.
+                      </span>
+                    ) : (
+                      <span>
+                        Agent requires your permission to execute {pendingCalls.length} sensitive local command(s).
+                      </span>
+                    )}
                  </div>
+
+                 {isEscalation && (
+                   <div className="text-xs text-amber-800 dark:text-amber-300 mb-3 bg-amber-100/60 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/40 rounded-xl p-3 flex flex-col gap-1">
+                     <div>
+                       <span className="font-semibold">Security Gate:</span> {escalationReason || 'Elevated privileges, destructive commands, or protected system resources detected.'}
+                     </div>
+                     <div className="text-[11px] text-amber-700/90 dark:text-amber-400/80">
+                       Auto-approve is enabled, but sandbox escalation prompts are always excluded.
+                     </div>
+                   </div>
+                 )}
                  
                  <div className="flex flex-col gap-2 mb-5 max-h-[160px] overflow-y-auto custom-scrollbar">
                     {pendingCalls.map((c, i) => (
                        <div key={i} className="bg-white/60 dark:bg-[#1E1C1C]/40 p-3 rounded-xl text-xs font-mono border border-rose-100 dark:border-rose-900/40 text-[#3A3838] dark:text-[#E2DAD2]/80">
-                          <span className="font-bold text-rose-600 dark:text-rose-400 mr-2">{c.name}</span>
+                          <span className={`font-bold mr-2 ${isEscalation ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>{c.name}</span>
                           <span className="text-[#3A3838]/80 dark:text-[#B8AFA8]">{JSON.stringify(c.args)}</span>
                        </div>
                     ))}
                  </div>
 
                  <div className="flex gap-3">
-                    <button onClick={() => handleApproval(true)} disabled={isLoading} className="flex-1 bg-brand hover:bg-brand-hover text-white py-3 rounded-xl font-medium transition-colors shadow-lg shadow-brand/20">
+                    <button onClick={() => handleApproval(true)} disabled={isLoading} className={`flex-1 ${isEscalation ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/20' : 'bg-brand hover:bg-brand-hover shadow-brand/20'} text-white py-3 rounded-xl font-medium transition-colors shadow-lg`}>
                        Safe to Approve
                     </button>
                     <button onClick={() => handleApproval(false)} disabled={isLoading} className="flex-1 bg-rose-100 hover:bg-rose-200 dark:bg-rose-900/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-400 py-3 rounded-xl font-medium transition-colors border border-rose-200 dark:border-rose-900 shadow-sm">
@@ -893,6 +974,16 @@ export default function Chat() {
                     className={`p-2.5 rounded-full transition-colors ${useTools ? 'text-brand bg-brand/10 dark:text-brand dark:bg-brand/20' : 'text-[#B8AFA8] hover:bg-[#E2DAD2]/60 dark:hover:bg-white/10 dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2]'}`}
                   >
                     <Terminal size={18} />
+                  </button>
+                  <button 
+                    onClick={toggleAutoApprove}
+                    disabled={isLoading}
+                    title={autoApprove 
+                      ? "Auto-approve is enabled. Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded."
+                      : "Auto-approve is disabled. All sensitive commands will prompt for permission."}
+                    className={`p-2.5 rounded-full transition-colors ${autoApprove ? 'text-emerald-600 bg-emerald-500/15 dark:text-emerald-400 dark:bg-emerald-500/20' : 'text-[#B8AFA8] hover:bg-[#E2DAD2]/60 dark:hover:bg-white/10 dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2]'}`}
+                  >
+                    <ShieldCheck size={18} />
                   </button>
                   <button 
                     onClick={toggleListen}
