@@ -24,8 +24,12 @@ if not exist .env (
 )
 
 REM ── Start FastAPI backend on port 8000 ──
+REM --reload restarts the whole server on every file change, which drops all
+REM MCP connections, cron jobs, and cached agents. Opt in with OPENZESS_RELOAD=1.
+set RELOAD_FLAG=
+if "%OPENZESS_RELOAD%"=="1" set RELOAD_FLAG=--reload
 echo [1/2] Starting FastAPI Backend on port 8000...
-start "openzess Backend" cmd /k "cd /d %~dp0backend && %~dp0venv\Scripts\python -m uvicorn app.server:app --host 0.0.0.0 --reload --port 8000"
+start "openzess Backend" cmd /k "cd /d %~dp0backend && %~dp0venv\Scripts\python -m uvicorn app.server:app --host 0.0.0.0 %RELOAD_FLAG% --port 8000"
 
 REM ── Start React (Vite) frontend - opens in your browser ──
 echo [2/2] Starting Web Frontend (opens in browser)...
