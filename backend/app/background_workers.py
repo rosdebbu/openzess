@@ -43,10 +43,8 @@ class CronManager:
         except Exception as e:
             print(f"[CRON ERR] {e}")
 
-    def add_job(self, command: str, schedule_type: str = "interval", interval_minutes: int = 60, cron_time: str = None) -> str:
-        job_id = str(uuid.uuid4())
-        
-        # Schedule the APScheduler Job
+    def _schedule_job(self, job_id: str, command: str, schedule_type: str, interval_minutes: int, cron_time: str = None):
+        """Register a job with APScheduler under an explicit id."""
         if schedule_type == "time" and cron_time:
             try:
                 hour, minute = map(int, cron_time.split(':'))
@@ -69,7 +67,6 @@ class CronManager:
                 args=[job_id, command],
                 id=job_id
             )
-        
         self.jobs[job_id] = {
             "id": job_id,
             "command": command,
@@ -80,7 +77,37 @@ class CronManager:
             "next_run_time": job.next_run_time.isoformat() if job.next_run_time else None,
             "status": "active"
         }
+
+    def add_job(self, command: str, schedule_type: str = "interval", interval_minutes: int = 60, cron_time: str = None, persist: bool = True) -> str:
+        job_id = str(uuid.uuid4())
+        self._schedule_job(job_id, command, schedule_type, interval_minutes, cron_time)
+        if persist:
+            try:
+                from . import database
+                database.save_cron_job(job_id, command, schedule_type, interval_minutes, cron_time)
+            except Exception as e:
+                print(f"[CRON PERSIST ERR] {e}")
         return job_id
+
+    def restore_jobs(self):
+        """Re-register persisted cron jobs (with their original ids) after a restart."""
+        try:
+            from . import database
+            restored = 0
+            for j in database.get_all_cron_jobs():
+                if j["id"] in self.jobs or self.scheduler.get_job(j["id"]):
+                    continue
+                self._schedule_job(
+                    job_id=j["id"],
+                    command=j["command"],
+                    schedule_type=j["schedule_type"],
+                    interval_minutes=j["interval_minutes"],
+                    cron_time=j["cron_time"],
+                )
+                restored += 1
+            print(f"[CRON RESTORE] Restored {restored} persisted job(s)", flush=True)
+        except Exception as e:
+            print(f"[CRON RESTORE ERR] {e}")
 
     def get_jobs(self) -> List[dict]:
         active = []
@@ -98,6 +125,11 @@ class CronManager:
             except:
                 pass
             del self.jobs[job_id]
+        try:
+            from . import database
+            database.remove_cron_job(job_id)
+        except Exception as e:
+            print(f"[CRON PERSIST ERR] {e}")
 
 # ----------------- WATCHDOG MANAGER -----------------
 class AgentWatchdogHandler(FileSystemEventHandler):
