@@ -112,6 +112,16 @@ class Note(Base):
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
 
+class CronJob(Base):
+    """Persisted cron jobs so scheduled tasks survive server restarts."""
+    __tablename__ = "cron_jobs"
+    id = Column(String, primary_key=True, index=True)
+    command = Column(String)
+    schedule_type = Column(String, default="interval")
+    interval_minutes = Column(Integer, default=60)
+    cron_time = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 def _auto_migrate():
     """Lightweight auto-migration: add user_id columns to existing tables.
 
@@ -293,6 +303,37 @@ def remove_mcp_server(server_id: str):
         server = db.query(MCPServer).filter(MCPServer.server_id == server_id).first()
         if server:
             db.delete(server)
+
+def save_cron_job(job_id: str, command: str, schedule_type: str, interval_minutes: int, cron_time: Optional[str] = None):
+    with _session() as db:
+        job = db.query(CronJob).filter(CronJob.id == job_id).first()
+        if job:
+            job.command = command
+            job.schedule_type = schedule_type
+            job.interval_minutes = interval_minutes
+            job.cron_time = cron_time
+        else:
+            db.add(CronJob(
+                id=job_id, command=command, schedule_type=schedule_type,
+                interval_minutes=interval_minutes, cron_time=cron_time
+            ))
+
+def get_all_cron_jobs():
+    with _session() as db:
+        results = db.query(CronJob).all()
+        return [{
+            "id": j.id,
+            "command": j.command,
+            "schedule_type": j.schedule_type,
+            "interval_minutes": j.interval_minutes,
+            "cron_time": j.cron_time,
+        } for j in results]
+
+def remove_cron_job(job_id: str):
+    with _session() as db:
+        job = db.query(CronJob).filter(CronJob.id == job_id).first()
+        if job:
+            db.delete(job)
 
 def add_or_update_persona(persona_id: str, data: dict):
     if IS_POSTGRES:
