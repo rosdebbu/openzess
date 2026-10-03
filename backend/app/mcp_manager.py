@@ -15,6 +15,7 @@ class MCPManager:
         
         self.servers = {} # server_id -> {"session": ..., "stdio": ...}
         self.server_tools = {} # server_id -> [mcp.types.Tool]
+        self._last_params = {} # server_id -> last connect params (for auto-revive)
 
     def _start_event_loop(self):
         asyncio.set_event_loop(self._loop)
@@ -132,10 +133,18 @@ class MCPManager:
 
     async def _acall_tool(self, server_id: str, tool_name: str, args: dict):
         if server_id not in self.servers:
-            raise ValueError("Server disconnected")
-            
+            # Revive a dropped connection from its last known params instead
+            # of failing outright (npx processes die silently on Windows).
+            await self._areconnect(server_id)
+
         session = self.servers[server_id]["session"]
-        result = await session.call_tool(tool_name, arguments=args)
+        try:
+            result = await session.call_tool(tool_name, arguments=args)
+        except Exception:
+            # Session died mid-call: reconnect once and retry.
+            await self._areconnect(server_id)
+            session = self.servers[server_id]["session"]
+            result = await session.call_tool(tool_name, arguments=args)
         
         # Parse MCP text content logic
         if result.isError:
@@ -143,10 +152,29 @@ class MCPManager:
             
         return "\n".join([c.text for c in result.content if hasattr(c, "text")])
 
+    async def _areconnect(self, server_id: str):
+        params = self._last_params.get(server_id)
+        if not params:
+            raise ValueError("Server disconnected")
+        if server_id in self.servers:
+            await self._adisconnect(server_id)
+        await self._amake_connection(
+            server_id, params["command"], params["args"],
+            transport=params["transport"], url=params.get("url", ""),
+            headers=params.get("headers")
+        )
+
     # ---- Synchronous EXPOSED API ----
     def connect(self, server_id: str, command: str, args: list, env: dict = None, transport: str = "stdio", url: str = "", headers: dict = None) -> bool:
         self.current_env_patch = env
-        return self._run_async(self._amake_connection(server_id, command, args, transport=transport, url=url, headers=headers))
+        self._last_params[server_id] = {
+            "command": command, "args": args, "transport": transport,
+            "url": url, "headers": headers or {}
+        }
+        # The npx pre-install inside _amake_connection can legitimately take
+        # up to 45s (cold npm cache), so the connect timeout must exceed it
+        # or the coroutine gets cancelled mid-handshake and leaves a dead pipe.
+        return self._run_async(self._amake_connection(server_id, command, args, transport=transport, url=url, headers=headers), timeout=60)
 
     def disconnect(self, server_id: str):
         self._run_async(self._adisconnect(server_id))
@@ -186,7 +214,9 @@ class MCPManager:
         if not sid:
             return f"Error: MCP Tool '{tool_name}' not found."
             
-        return self._run_async(self._acall_tool(sid, tool_name, args))
+        # Long-running MCP tools (the Test Sandbox exposes some) need far more
+        # than the old 15s budget before the future gets cancelled.
+        return self._run_async(self._acall_tool(sid, tool_name, args), timeout=120)
 
 # Create our Global Registry
 mcp_registry = MCPManager()
