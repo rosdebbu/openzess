@@ -265,12 +265,20 @@ function App() {
 
                       <div className="mt-3 p-4 rounded-xl border border-neutral-200 dark:border-[#3A3838] bg-neutral-50/60 dark:bg-surface/60 flex items-start justify-between gap-4">
                         <div className="flex items-start gap-3">
-                          <div className={`p-2 rounded-lg mt-0.5 ${autoApprove ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'}`}>
-                            <ShieldCheck size={20} />
+                          <div className={`relative inline-flex items-center justify-center p-2 rounded-xl mt-0.5 ${autoApprove ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'}`}>
+                            <ShieldCheck size={22} className={autoApprove ? "text-emerald-600 dark:text-emerald-300" : "text-neutral-400"} />
+                            {autoApprove && (
+                              <span className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#1E1C1C] shadow-[0_0_6px_rgba(16,185,129,0.9)]" />
+                            )}
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
+                            <span className="font-medium text-sm text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
                               Auto-Approve Actions
+                              {autoApprove && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ACTIVE
+                                </span>
+                              )}
                             </span>
                             <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
                               Auto-approve is enabled. Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded.
