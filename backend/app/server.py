@@ -159,7 +159,13 @@ def init_active_mcps():
         if s["is_active"]:
             try:
                 print(f"Auto-connecting MCP: {s['name']}")
-                mcp_registry.connect(s["id"], s["command"], s["args"])
+                mcp_registry.connect(
+                    s["id"], s["command"], s["args"],
+                    transport=s.get("transport", "stdio"),
+                    url=s.get("url", ""),
+                    env=s.get("env"),
+                    headers=s.get("headers"),
+                )
             except Exception as e:
                 print(f"Failed to auto-connect MCP {s['name']}: {e}")
 
@@ -666,7 +672,9 @@ def connect_mcp(request: MCPConnectRequest):
         success = mcp_registry.connect(request.server_id, request.command, request.args, env=request.env, transport=request.transport, url=request.url, headers=request.headers)
         if success:
             display_name = request.name if request.name else request.server_id
-            database.add_or_update_mcp_server(request.server_id, display_name, request.command, request.args, is_active=True)
+            database.add_or_update_mcp_server(request.server_id, display_name, request.command, request.args, is_active=True,
+                                              transport=request.transport, url=request.url,
+                                              env=request.env, headers=request.headers)
         return {"status": "connected" if success else "failed"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -677,7 +685,9 @@ def disconnect_mcp(server_id: str):
     saved = database.get_all_mcp_servers()
     for s in saved:
         if s["id"] == server_id:
-            database.add_or_update_mcp_server(server_id, s["name"], s["command"], s["args"], is_active=False)
+            database.add_or_update_mcp_server(server_id, s["name"], s["command"], s["args"], is_active=False,
+                                              transport=s.get("transport", "stdio"), url=s.get("url", ""),
+                                              env=s.get("env"), headers=s.get("headers"))
             break
     return {"status": "disconnected"}
 
