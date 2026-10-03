@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2 } from 'lucide-react';
+import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Sidebar from './components/Sidebar';
@@ -69,6 +69,7 @@ function AnimatedRoutes({ persona: _persona }: { persona: string }) {
 function App() {
   const [provider, setProvider] = useState(() => localStorage.getItem('openzess_provider') || 'glm');
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('openzess_api_key') || '');
+  const [autoApprove, setAutoApprove] = useState(() => localStorage.getItem('openzess_auto_approve') === 'true');
   
   const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'persona'>('general');
@@ -102,11 +103,16 @@ function App() {
         edit_code: localStorage.getItem('openzess_tool_edit') === 'true',
       });
     };
+    const handleAutoApproveSync = () => {
+      setAutoApprove(localStorage.getItem('openzess_auto_approve') === 'true');
+    };
     window.addEventListener('open-settings', handleOpenSettings);
     window.addEventListener('persona-changed', handlePersonaChanged);
+    window.addEventListener('auto-approve-changed', handleAutoApproveSync);
     return () => {
       window.removeEventListener('open-settings', handleOpenSettings);
       window.removeEventListener('persona-changed', handlePersonaChanged);
+      window.removeEventListener('auto-approve-changed', handleAutoApproveSync);
     };
   }, []);
 
@@ -140,6 +146,8 @@ function App() {
     localStorage.setItem('openzess_tool_create', tools.create_file.toString());
     localStorage.setItem('openzess_tool_readf', tools.read_file.toString());
     localStorage.setItem('openzess_tool_edit', tools.edit_code.toString());
+    localStorage.setItem('openzess_auto_approve', autoApprove.toString());
+    window.dispatchEvent(new Event('auto-approve-changed'));
     setShowSettings(false);
   };
 
@@ -253,6 +261,38 @@ function App() {
                           disabled={provider === 'ollama'}
                           className="w-full bg-neutral-50 dark:bg-surface border border-neutral-200 dark:border-border text-neutral-900 dark:text-neutral-200 p-3 rounded-xl focus:outline-none focus:border-brand/50 dark:focus:border-brand font-mono transition-colors disabled:opacity-50"
                         />
+                      </div>
+
+                      <div className="mt-3 p-4 rounded-xl border border-neutral-200 dark:border-[#3A3838] bg-neutral-50/60 dark:bg-surface/60 flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-lg mt-0.5 ${autoApprove ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'}`}>
+                            <ShieldCheck size={20} />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
+                              Auto-Approve Actions
+                            </span>
+                            <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
+                              Auto-approve is enabled. Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded.
+                            </span>
+                          </div>
+                        </div>
+                        <button 
+                          type="button"
+                          role="switch"
+                          aria-checked={autoApprove}
+                          onClick={() => {
+                            const next = !autoApprove;
+                            setAutoApprove(next);
+                            localStorage.setItem('openzess_auto_approve', next.toString());
+                            window.dispatchEvent(new Event('auto-approve-changed'));
+                          }}
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${autoApprove ? 'bg-emerald-600' : 'bg-neutral-300 dark:bg-neutral-700'}`}
+                        >
+                          <span 
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${autoApprove ? 'translate-x-5' : 'translate-x-0'}`} 
+                          />
+                        </button>
                       </div>
                     </motion.div>
                   ) : (
