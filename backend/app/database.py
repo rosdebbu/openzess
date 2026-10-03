@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict
 import json
 from contextlib import contextmanager
 from dotenv import load_dotenv
@@ -88,6 +88,10 @@ class MCPServer(Base):
     command = Column(String)
     args_json = Column(String) # JSON string array
     is_active = Column(Integer, default=1) # 1=active, 0=inactive
+    transport = Column(String, default="stdio")   # stdio | sse | streamable_http
+    url = Column(String, default="")              # remote endpoint (HTTP/SSE transports)
+    env_json = Column(String)                     # JSON object of env vars
+    headers_json = Column(String)                 # JSON object of HTTP headers
 
 class Persona(Base):
     __tablename__ = "personas"
@@ -258,18 +262,58 @@ def get_recent_activity(limit: int = 50):
         ]
         return {"feed": feed, "error_count": error_count}
 
-def add_or_update_mcp_server(server_id: str, name: str, command: str, args: list, is_active: bool = True):
+_mcp_columns_ready = False
+
+def _ensure_mcp_columns():
+    """One-time migration: add transport/url/env/headers to mcp_servers for DBs
+    created before these columns existed (create_all never alters existing tables)."""
+    global _mcp_columns_ready
+    if _mcp_columns_ready:
+        return
+    from sqlalchemy import inspect as sa_inspect, text as sa_text
+    try:
+        inspector = sa_inspect(engine)
+        existing = {c["name"] for c in inspector.get_columns("mcp_servers")}
+        stmts = []
+        if "transport" not in existing:
+            stmts.append("ALTER TABLE mcp_servers ADD COLUMN transport VARCHAR DEFAULT 'stdio'")
+        if "url" not in existing:
+            stmts.append("ALTER TABLE mcp_servers ADD COLUMN url VARCHAR DEFAULT ''")
+        if "env_json" not in existing:
+            stmts.append("ALTER TABLE mcp_servers ADD COLUMN env_json VARCHAR")
+        if "headers_json" not in existing:
+            stmts.append("ALTER TABLE mcp_servers ADD COLUMN headers_json VARCHAR")
+        if stmts:
+            with engine.begin() as conn:
+                for stmt in stmts:
+                    conn.execute(sa_text(stmt))
+        _mcp_columns_ready = True
+    except Exception:
+        pass  # Table may not exist yet (init_db creates it) — retried on next call
+
+def add_or_update_mcp_server(server_id: str, name: str, command: str, args: list, is_active: bool = True,
+                             transport: str = "stdio", url: str = "",
+                             env: Optional[Dict[str, str]] = None,
+                             headers: Optional[Dict[str, str]] = None):
+    """Persist the FULL MCP connection config — without transport/url/env/headers,
+    HTTP/SSE servers break on every backend restart (auto-reconnect used stdio)."""
+    _ensure_mcp_columns()
     args_str = json.dumps(args)
+    env_str = json.dumps(env) if env else None
+    headers_str = json.dumps(headers) if headers else None
     if IS_POSTGRES:
         # Native atomic upsert — no race conditions on Neon
         from sqlalchemy.dialects.postgresql import insert as pg_insert
         with _session() as db:
             stmt = pg_insert(MCPServer).values(
                 server_id=server_id, name=name, command=command,
-                args_json=args_str, is_active=1 if is_active else 0
+                args_json=args_str, is_active=1 if is_active else 0,
+                transport=transport, url=url, env_json=env_str, headers_json=headers_str
             ).on_conflict_do_update(
                 index_elements=["server_id"],
-                set_={"name": name, "command": command, "args_json": args_str, "is_active": 1 if is_active else 0}
+                set_={"name": name, "command": command, "args_json": args_str,
+                      "is_active": 1 if is_active else 0, "transport": transport,
+                      "url": url, "env_json": env_str, "headers_json": headers_str}
             )
             db.execute(stmt)
     else:
@@ -281,13 +325,19 @@ def add_or_update_mcp_server(server_id: str, name: str, command: str, args: list
                 server.command = command
                 server.args_json = args_str
                 server.is_active = 1 if is_active else 0
+                server.transport = transport
+                server.url = url
+                server.env_json = env_str
+                server.headers_json = headers_str
             else:
                 db.add(MCPServer(
                     server_id=server_id, name=name, command=command,
-                    args_json=args_str, is_active=1 if is_active else 0
+                    args_json=args_str, is_active=1 if is_active else 0,
+                    transport=transport, url=url, env_json=env_str, headers_json=headers_str
                 ))
 
 def get_all_mcp_servers():
+    _ensure_mcp_columns()
     with _session() as db:
         results = db.query(MCPServer).all()
         return [{
@@ -295,7 +345,11 @@ def get_all_mcp_servers():
             "name": s.name, 
             "command": s.command, 
             "args": json.loads(s.args_json) if s.args_json else [],
-            "is_active": bool(s.is_active)
+            "is_active": bool(s.is_active),
+            "transport": s.transport or "stdio",
+            "url": s.url or "",
+            "env": json.loads(s.env_json) if s.env_json else None,
+            "headers": json.loads(s.headers_json) if s.headers_json else None,
         } for s in results]
 
 def remove_mcp_server(server_id: str):
