@@ -558,6 +558,14 @@ export default function Chat() {
                                  setTerminalLogs(prev => [...prev, { tool: data.tool, args: data.args, output: data.output }]);
                              } else if (data.type === 'auth_required') {
                                  setPendingCalls(data.pending_calls);
+                                 setIsEscalation(Boolean(data.is_escalation));
+                                 setEscalationReason(data.escalation_reason || null);
+                             } else if (data.type === 'auto_approved') {
+                                 setTerminalLogs(prev => [...prev, {
+                                     tool: 'auto_approve',
+                                     args: { tools: data.tools },
+                                     output: data.notice || 'Auto-approve is enabled. Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded.'
+                                 }]);
                              } else if (data.type === 'error') {
                                  streamedResponse += `\n\n❌ Error: ${data.error}`;
                                  setMessages(prev => prev.map(m => m.id === responseId ? { ...m, content: streamedResponse } : m));
