@@ -989,9 +989,14 @@ export default function Chat() {
                     title={autoApprove 
                       ? "Auto-approve is enabled. Permission prompts will be approved automatically. Sandbox escalation prompts are always excluded."
                       : "Auto-approve is disabled. All sensitive commands will prompt for permission."}
-                    className={`p-2.5 rounded-full transition-colors ${autoApprove ? 'text-emerald-600 bg-emerald-500/15 dark:text-emerald-400 dark:bg-emerald-500/20' : 'text-[#B8AFA8] hover:bg-[#E2DAD2]/60 dark:hover:bg-white/10 dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2]'}`}
+                    className={`p-2.5 rounded-full transition-all relative flex items-center justify-center ${autoApprove ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'text-[#B8AFA8] hover:bg-[#E2DAD2]/60 dark:hover:bg-white/10 dark:text-[#B8AFA8] dark:hover:text-[#E2DAD2]'}`}
                   >
-                    <ShieldCheck size={18} />
+                    <div className="relative inline-flex items-center justify-center">
+                      <ShieldCheck size={18} className={autoApprove ? "text-emerald-600 dark:text-emerald-300" : "text-current"} />
+                      {autoApprove && (
+                        <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#252222] shadow-[0_0_6px_rgba(16,185,129,0.9)] animate-pulse" />
+                      )}
+                    </div>
                   </button>
                   <button 
                     onClick={toggleListen}
