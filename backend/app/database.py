@@ -134,14 +134,18 @@ def _auto_migrate():
     (For full versioned migrations use Alembic; this keeps upgrades turnkey.)
     """
     from sqlalchemy import text as sql_text
-    targets = {
-        "sessions": "user_id",
-        "messages": "user_id",
-        "notes": "user_id",
-        "personas": "user_id",
-    }
+    targets = [
+        ("sessions", "user_id"),
+        ("messages", "user_id"),
+        ("notes", "user_id"),
+        ("personas", "user_id"),
+        ("users", "display_name"),
+        ("users", "avatar_url"),
+        ("users", "bio"),
+        ("users", "preferences_json"),
+    ]
     with engine.connect() as conn:
-        for table, col in targets.items():
+        for table, col in targets:
             try:
                 if IS_POSTGRES:
                     check = conn.execute(sql_text(
