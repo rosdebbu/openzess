@@ -1,0 +1,2076 @@
+# Openzess — Complete Documentation Digest (llms-full.txt)
+
+> Openzess is an open-source, provider-agnostic autonomous AI workspace and
+> cyberpunk terminal agent. This file concatenates every foundational doc into
+> a single markdown document for zero-shot LLM ingestion.
+> Site: https://openzess.vercel.app · Docs: https://openzess-docs.vercel.app ·
+> Repo: https://github.com/rosdebbu/openzess (MIT License)
+
+---
+
+# Project README
+
+---
+
+<!-- source: README.md -->
+
+<h1 align="center">🦎 Openzess</h1>
+<p align="center"><strong>The autonomous, self-growing AI workspace & cyberpunk terminal agent — built for builders.</strong></p>
+
+<p align="center">
+  <a href="https://github.com/rosdebbu/openzess"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-rosdebbu%2Fopenzess-16a34a?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/rosdebbu/openzess/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/badge/Tests-86%2F86%20Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white"></a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-React%2019-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.12%20%2F%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img alt="Rust" src="https://img.shields.io/badge/Rust-Axum%20Sidecar-DEA584?style=for-the-badge&logo=rust&logoColor=white">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-16a34a?style=for-the-badge">
+</p>
+
+```text
+         /\_/\
+       >( o.o )<    OPENZESS — LIZARD MATRIX CORE
+       /  \~/  \    Autonomous AI Coding Assistant & Self-Growth Engine
+      / /|   |\ \   70% Python + 30% Rust Architecture
+     ( ( | ~ | ) )  Native Terminal TUI + React 19 Web Workspace
+      \ \|   |/ /
+       \ \_-_/ /
+        `--\ \-
+            \ \_
+             `--)
+```
+
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-why-openzess">Why Openzess</a> •
+  <a href="#-dual-interface-terminal--web">Dual Interface</a> •
+  <a href="#-the-self-growth-loop">Self-Growth Loop</a> •
+  <a href="#-cli-commands">CLI Commands</a> •
+  <a href="#%EF%B8%8F-architecture">Architecture</a> •
+  <a href="#-roadmap">Roadmap</a>
+</p>
+
+---
+
+## ⚡ Why Openzess?
+
+**Openzess** is a full-stack, provider-agnostic autonomous AI workspace designed to give developers total control over how AI models reason, code, remember, and execute on their machines. 
+
+Unlike closed walled-garden tools, Openzess provides:
+1. **Zero Provider Lock-in** — Connect any LLM via OpenRouter, Gemini, OpenAI, Claude, DeepSeek, Groq, Qwen, Moonshot, or local Ollama / LM Studio.
+2. **Hermes-Grade Cyberpunk Terminal TUI** — Run the full agent natively in your terminal with live token streaming, latency tracking, and rich capability boxes.
+3. **Autonomous Self-Growth Loop** — The agent learns your habits, coding preferences, and environment configurations automatically, persisting them into a long-term ChromaDB vector vault.
+4. **Multi-Agent WarRoom & Debate Arena** — Run multi-model consensus debates where distinct agents argue, critique, and synthesize decisions before writing code.
+5. **Hot-Loaded Extensibility** — Drop Python scripts into `backend/app/plugins/` or connect any MCP (Model Context Protocol) server with instant reload.
+
+---
+
+## 🚀 Quick Start
+
+### 🪟 Windows (Native PowerShell)
+```powershell
+# Launch the Cyberpunk Terminal CLI
+.\openzess.bat
+
+# Or start the Full Web Workspace (React + FastAPI)
+.\start.bat
+```
+
+### 🐧 Linux / Debian WSL2
+```bash
+# Launch the Interactive Terminal CLI
+openzess
+# or
+./openzess.sh
+
+# Or start the backend server
+uvicorn backend.app.server:app --host 0.0.0.0 --port 8000 --reload
+```
+
+---
+
+## 💻 Dual Interface: Terminal + Web
+
+Openzess is built with dual complementary interfaces:
+
+<table>
+<tr>
+<td width="50%">
+
+### 📟 Cyberpunk Terminal TUI
+Run `openzess` or `.\openzess.bat` for instant terminal-native AI power:
+- **3D ASCII Lizard Branding** in Deep/Olive Green (`#16a34a`).
+- **Live Capabilities Panel** showing available tools, skills, and memory count.
+- **Sub-Second Token Streaming** with real-time latency diagnostics.
+- **Interactive Slash Commands** (`/habits`, `/skills`, `/model`, `/memory`).
+
+</td>
+<td width="50%">
+
+### 🌐 React 19 Web Workspace
+Run `.\start.bat` and open `http://localhost:5173`:
+- **WarRoom Multi-Agent Debate Arena** with judge synthesis.
+- **Visual Matrix Sandbox** with screen-stream & mouse/keyboard injection.
+- **ChromaDB Memory Vault Inspector** with semantic search.
+- **Tavern Multi-Persona Card Importer** (PNG & JSON).
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🧠 The Self-Growth Loop
+
+Openzess implements an autonomous dialectic learning loop inspired by Honcho & Hermes Agent:
+
+```mermaid
+graph TD
+    A[User Interaction] -->|SSE Stream| B[Openzess Hybrid Core]
+    B -->|Tool Invocation| C[Debian WSL / Windows Sandbox]
+    B -->|Post-Turn Analysis| D[Habit Learner Engine]
+    D -->|Infer Preferences & Environment| E[(ChromaDB Vector Vault)]
+    E -->|Inject Adaptive Profile| F[System Prompt on Next Turn]
+```
+
+- **Zero Configuration Needed:** As you interact with Openzess, it notes whether you prefer concise code, specific languages (e.g. Rust / Python), or Debian execution paths.
+- **Persistent Across Sessions:** Habits are stored as vector embeddings in ChromaDB and automatically hydrate the agent's system prompt on subsequent launches.
+- **Inspect Anytime:** Type `/habits` in the terminal to inspect your learned profile in real time.
+
+---
+
+## ⌨️ CLI Slash Commands Reference
+
+| Command | Description |
+| :--- | :--- |
+| **`/model <provider>`** | Switch active model (`glm`, `deepseek`, `gemini`, `openai`, `anthropic`, `groq`, `ollama`, `lmstudio`) |
+| **`/habits`** | Inspect learned user habits, environment targets, and behavioral profiles |
+| **`/skills`** | List all hot-loaded Python plugins and synthesized capabilities |
+| **`/memory <query>`** | Perform a semantic similarity search across the ChromaDB vector vault |
+| **`/clear`** | Reset conversation context while retaining persistent habits and long-term memory |
+| **`/help`** | Display the interactive command guide |
+| **`/exit`** | Gracefully disconnect and exit the terminal session |
+
+---
+
+## 🏗️ Architecture & Codebase Map
+
+Openzess utilizes a hybrid engine combining Python's rich AI ecosystem with high-throughput Rust sidecars:
+
+```
+openzess/
+├── openzess.bat               # One-click Windows PowerShell CLI launcher
+├── openzess.sh                # Linux / Debian WSL2 CLI launcher
+├── start.bat                  # Web workspace launcher (FastAPI + Vite)
+├── backend/
+│   ├── app/
+│   │   ├── agent.py           # Core agent loop, LiteLLM orchestration, tool runner
+│   │   ├── cli.py             # Rich Cyberpunk Matrix TUI console
+│   │   ├── habit_learner.py   # Autonomous habit extraction & ChromaDB persistence
+│   │   ├── server.py          # FastAPI server, SSE streaming, REST & WebSocket routes
+│   │   ├── mcp_manager.py     # Model Context Protocol stdio/SSE client
+│   │   ├── plugin_loader.py   # Hot-reloading Python tool registrar
+│   │   └── plugins/           # Custom tools (paperbanana, pc_control, system_health)
+│   └── tests/                 # 86 automated unit tests (100% green)
+├── frontend/
+│   ├── src/
+│   │   ├── components/        # LizardLogo, Sidebar, VRMAvatar, Modals
+│   │   ├── pages/             # Chat, WarRoom, Tavern, MatrixViewer, Skills, Memory
+│   │   └── App.tsx            # Main router & theme provider
+│   └── package.json           # React 19 + Vite 8
+└── rust_engine/               # High-performance Axum acceleration sidecar (port 8100)
+```
+
+---
+
+## 🗺️ Product Roadmap
+
+**Legend:** ✅ Shipped & Verified · 🚧 In Active Development · 🔜 Next Up · 💡 Future Horizons
+
+### ✅ v2.0 — Cyberpunk Terminal CLI & Self-Growth Engine *(Current)*
+- ✅ **Hermes-Grade Matrix Terminal CLI** — Full-featured interactive TUI (`openzess` / `openzess.bat`) with 3D ASCII branding, slash commands, and turn dividers.
+- ✅ **Autonomous Habit Profiler & Self-Growth Loop** (`habit_learner.py`) — Automatic user habit learning, coding preference detection, and ChromaDB persistence.
+- ✅ **Ultra-Low Latency Streaming UI** — Instant SSE token rendering, lazy message bubble allocation, and real-time latency diagnostics.
+- ✅ **Debian 13 (Trixie) WSL2 Sandbox Integration** — Seamless cross-platform execution with automatic Python venv detection.
+- ✅ **Lizard Matrix Brand Overhaul** — Deep/Olive Lizard Green theme (`#16a34a`), ASCII Lizard totem, and glowing Web Mascot component.
+- ✅ **100% Green Test Suite** — 86 passing pytest unit tests covering agent reasoning, streaming, plugins, and habit persistence.
+
+### 🚧 v2.1 — Autonomous Healing & Rust Sidecar *(In Progress)*
+- 🚧 **Auto-Healing Traceback Debugger** — Agent autonomously intercepts terminal syntax/runtime errors, inspects logs, generates diffs, and applies auto-fixes.
+- 🚧 **Rust Axum Acceleration Sidecar** (`port 8100`) — High-throughput image encoding and compute offload with pure Python fallback.
+- 🚧 **Graphify Knowledge Graph Rebuilder** (`POST /api/graphify/rebuild`) — Live codebase dependency parsing and interactive visual topology.
+- 🚧 **PaperBanana Theme Engine** — Four publication-ready figure palettes (`academic`, `dark_matrix`, `vibrant`, `deep`) at 300 DPI.
+
+### 🔜 v2.2 — Autonomous Multi-Step Planner *(Planned)*
+- 🔜 **Goal-Driven Execution Planner** (`/goal` mode) — Multi-step task decomposition with automated milestone verification.
+- 🔜 **Simulation & Dry-Run Mode** — Safe preview of destructive file operations before applying to disk.
+- 🔜 **Community Plugin Registry** — One-click import of verified third-party agent skills.
+
+### 💡 v3.0 — Ubiquitous Intelligence *(Exploring)*
+- 💡 **Real-Time Voice Matrix** — Whisper STT with sub-second streaming neural TTS.
+- 💡 **Distributed Agent Swarms** — Peer-to-peer agent node clustering across local networks.
+- 💡 **Single-Click Cloud Deployment** — Automated Docker/Render deployment workflows.
+
+---
+
+## 👨‍💻 Author & Contributing
+
+Built with ❤️ by **[@rosdebbu](https://github.com/rosdebbu)**.
+
+Contributions are welcome! Please open an issue or submit a PR following standard conventional commits.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+# Guide
+
+---
+
+<!-- source: openzess-docs/docs/guide/introduction.md -->
+
+# Introduction
+
+OpenZess is an **open-source, self-hosted autonomous agent platform** that gives AI models direct access to your local system through a secure, sandboxed environment.
+
+## The Vision
+
+Most AI chat interfaces are isolated text boxes — they can generate code but can't run it, they can describe files but can't create them. OpenZess breaks this barrier entirely.
+
+When you chat with an OpenZess agent, it can:
+
+- **Execute terminal commands** inside a sandboxed Linux environment
+- **Create, read, and edit files** on your system
+- **Search the web** and scrape URLs for live information
+- **Control a virtual desktop** via mouse and keyboard
+- **Schedule background tasks** that run autonomously
+- **Connect to external services** via the Model Context Protocol (MCP)
+
+## Core Philosophy
+
+### 1. Safety First
+Every command executes inside a **Debian WSL sandbox**. The agent physically cannot touch your Windows host. Even GUI interactions are trapped inside an invisible X11 virtual display.
+
+### 2. Provider Agnostic
+OpenZess doesn't lock you into a single AI provider. Through [LiteLLM](https://docs.litellm.ai/), it routes to **10+ providers** including Google Gemini, OpenAI, Anthropic, Groq, DeepSeek, Qwen, and local Ollama models.
+
+### 3. Extensible by Design
+The plugin system supports two extension mechanisms:
+- **MCP Servers**: Industry-standard protocol for connecting external tools
+- **Python Plugins**: Drop a `.py` file into `backend/plugins/` and it's instantly available to your agent
+
+## System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| OS | Windows 10 + WSL2 | Windows 11 + WSL2 |
+| RAM | 4 GB | 8 GB+ |
+| Node.js | v18+ | v20+ |
+| Python | 3.10+ | 3.12+ |
+| Browser | Chrome/Edge | Chrome |
+
+---
+
+<!-- source: openzess-docs/docs/guide/getting-started.md -->
+
+# Installation & Setup 🦎
+
+This guide walks you through launching Openzess either in the **Cyberpunk Terminal TUI** or the **Full Web Workspace**.
+
+---
+
+## 🚀 Quick Launch (One-Liner)
+
+### 🪟 Windows (Native PowerShell)
+```powershell
+# 1. Interactive Terminal CLI
+.\openzess.bat
+
+# 2. Full Web Workspace (React + FastAPI)
+.\start.bat
+```
+
+### 🐧 Linux / Debian WSL2
+```bash
+# 1. Interactive Terminal CLI
+openzess
+# or
+./openzess.sh
+
+# 2. Start Backend Server
+uvicorn backend.app.server:app --host 0.0.0.0 --port 8000 --reload
+```
+
+---
+
+## 📋 Prerequisites
+
+Before starting, ensure you have:
+
+```bash
+# 1. Python 3.12+ (Windows) or Python 3.13 (Debian WSL2)
+python --version
+
+# 2. Node.js 18+ & npm (for Web UI)
+node --version
+
+# 3. Optional: Debian WSL2 Sandbox
+wsl --status
+```
+
+---
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the project root:
+
+```text
+# Primary LLM API Keys (or enter them in Web UI / CLI)
+OPENROUTER_API_KEY=sk-or-v1-...
+GEMINI_API_KEY=AIzaSy...
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Localhost Endpoints (optional)
+OLLAMA_API_BASE=http://localhost:11434
+LMSTUDIO_API_BASE=http://localhost:1234/v1
+```
+
+---
+
+## 🤖 Supported LLM Models & Providers
+
+| Provider | Default Model | Key Type |
+|---|---|---|
+| **GLM (Zhipu / Z-AI)** | `openrouter/z-ai/glm-5.3-flash` | OpenRouter Key |
+| **DeepSeek** | `openrouter/deepseek/deepseek-chat` | DeepSeek / OpenRouter Key |
+| **Google Gemini** | `gemini/gemini-2.5-flash` | Gemini Key |
+| **OpenAI** | `openai/gpt-4o-mini` | OpenAI Key |
+| **Anthropic** | `anthropic/claude-3-5-sonnet-20241022` | Anthropic Key |
+| **Groq** | `groq/llama-3.3-70b-versatile` | Groq Key |
+| **Qwen** | `openrouter/qwen/qwen-2.5-72b-instruct` | OpenRouter Key |
+| **Ollama (Local)** | `ollama/llama3.2` | Local Endpoint |
+| **LM Studio (Local)**| `openai/local-model` | Local Endpoint |
+
+::: tip Switching Models on the Fly
+In the Terminal CLI, type `/model [provider]` (e.g. `/model deepseek` or `/model gemini`) to switch active neural engines instantly.
+:::
+
+---
+
+<!-- source: openzess-docs/docs/guide/configuration.md -->
+
+# Configuration
+
+OpenZess is highly configurable through environment variables, the Settings panel, and the Agent Persona system.
+
+## Environment Variables
+
+All environment variables are stored in the `.env` file at the project root.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string (Neon recommended) |
+| `STITCH_API_KEY` | No | API key for the Stitch MCP design system |
+| `VITE_STITCH_API_KEY` | No | Same key exposed to the frontend |
+
+## Agent Personas
+
+OpenZess ships with 3 built-in personas plus a custom option:
+
+### The Architect (Default)
+The all-purpose agent with full tool access. Can execute commands, browse the web, manage files, and write code.
+
+### Web Scraper Agent
+A specialized agent that can only browse the web. Cannot execute commands or modify files. Perfect for research tasks.
+
+### Code Generator Agent
+Focused exclusively on reading and writing code. Cannot browse the web. Ideal for pure development tasks.
+
+### Custom Persona
+Create your own system instruction and enable/disable individual tools.
+
+## Tool Configuration
+
+Each persona has a configurable set of tools:
+
+| Tool | Description |
+|------|-------------|
+| `run_terminal_command` | Execute bash commands in the WSL sandbox |
+| `search_the_web` | Search DuckDuckGo for real-time information |
+| `read_web_page` | Scrape and extract text from any URL |
+| `create_file` | Create new files on the filesystem |
+| `read_file` | Read contents of existing files |
+| `edit_code` | Find-and-replace editing of existing files |
+
+::: tip
+Additional tools are available but always enabled: `schedule_background_task`, `monitor_directory`, `take_screenshot`, and the full suite of computer control tools (mouse move, click, type, key press).
+:::
+
+---
+
+<!-- source: openzess-docs/docs/guide/architecture.md -->
+
+# System Architecture
+
+OpenZess follows a clean three-layer architecture optimized for real-time AI agent interaction.
+
+## High-Level Overview
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Browser (React)                    │
+│  ┌──────┐ ┌────────┐ ┌───────┐ ┌────────┐ ┌──────┐ │
+│  │ Chat │ │Sessions│ │Matrix │ │WarRoom │ │Tavern│ │
+│  └──┬───┘ └───┬────┘ └──┬────┘ └───┬────┘ └──┬───┘ │
+│     │         │         │          │          │      │
+│     └─────────┴────┬────┴──────────┴──────────┘      │
+│                    │ HTTP / WebSocket                  │
+└────────────────────┼──────────────────────────────────┘
+                     │
+┌────────────────────┼──────────────────────────────────┐
+│              FastAPI Server (server.py)                │
+│  ┌─────────────┐ ┌────────────┐ ┌──────────────────┐ │
+│  │ OpenzessAgent│ │MCP Manager │ │Background Workers│ │
+│  │  (agent.py) │ │(mcp_mgr.py)│ │ (cron/watchdog)  │ │
+│  └──────┬──────┘ └─────┬──────┘ └────────┬─────────┘ │
+│         │              │                  │            │
+│  ┌──────┴──────┐ ┌─────┴──────┐ ┌────────┴─────────┐ │
+│  │   LiteLLM   │ │ MCP Servers│ │  Plugin Loader   │ │
+│  │ (10+ models)│ │(Stitch etc)│ │  (hot-loading)   │ │
+│  └─────────────┘ └────────────┘ └──────────────────┘ │
+│                                                        │
+│  ┌──────────────┐ ┌─────────────┐ ┌────────────────┐ │
+│  │  PostgreSQL  │ │  ChromaDB   │ │  Xvfb + X11    │ │
+│  │   (Neon)     │ │(Memory Vault│ │ (Matrix View)  │ │
+│  └──────────────┘ └─────────────┘ └────────────────┘ │
+└───────────────────────────────────────────────────────┘
+```
+
+## Component Breakdown
+
+### Frontend (`frontend/`)
+- **Framework**: React 19 + Vite 8
+- **Styling**: Tailwind CSS with custom design tokens
+- **Animations**: Framer Motion
+- **Routing**: React Router v7
+
+**Key Pages** (21 total):
+
+| Page | Purpose |
+|------|---------|
+| `Chat.tsx` | Primary AI chat interface with voice control |
+| `MatrixViewer.tsx` | Real-time X11 desktop streaming |
+| `WarRoom.tsx` | Multi-agent swarm debate interface |
+| `DebateArena.tsx` | Structured AI debate with turns |
+| `Tavern.tsx` | Persona-based roleplay chat |
+| `Sessions.tsx` | Chat session history browser |
+| `KnowledgeBase.tsx` | Personal notes & canvas |
+| `Skills.tsx` | Agent skill management |
+| `Channels.tsx` | Telegram/Discord bot configuration |
+| `CronJobs.tsx` | Background task scheduler |
+| `MCP.tsx` | MCP server connection manager |
+| `Marketplace.tsx` | Plugin marketplace browser |
+| `Companion.tsx` | VRM 3D avatar companion |
+
+### Backend (`backend/`)
+
+| File | Responsibility |
+|------|---------------|
+| `server.py` | FastAPI application with 30+ REST endpoints |
+| `agent.py` | Core LLM agent with tool execution loop |
+| `database.py` | SQLAlchemy ORM for Neon PostgreSQL |
+| `mcp_manager.py` | MCP client connection manager |
+| `plugin_loader.py` | Dynamic Python plugin hot-loader |
+| `swarm_manager.py` | Multi-agent parallel execution engine |
+| `background_workers.py` | Cron scheduler and filesystem watchdog |
+| `tavern_parser.py` | TavernAI character card importer |
+| `telegram_worker.py` | Telegram bot integration |
+| `discord_worker.py` | Discord bot integration |
+
+## Data Flow
+
+1. **User sends message** → Frontend `POST /api/chat` with SSE streaming
+2. **Server creates session** → Stored in PostgreSQL via SQLAlchemy
+3. **Agent processes** → LiteLLM routes to selected provider
+4. **Tool calls detected** → Agent pauses, frontend shows approval dialog
+5. **User approves** → `POST /api/chat/approve` executes tools in sandbox
+6. **Results streamed** → SSE chunks flow back to the React UI
+7. **Memory saved** → Important context stored in ChromaDB vector database
+
+---
+
+<!-- source: openzess-docs/docs/guide/hybrid-engine.md -->
+
+# ⚡ Hybrid Python/Rust Architecture
+
+Openzess uses a hybrid engine architecture: **70% Python** for agent reasoning and dynamic plugin hot-loading, combined with **30% Rust** for CPU-bound performance tasks.
+
+---
+
+## 🏛️ Architecture Overview
+
+```
+┌────────────────────────────────────────────────────────┐
+│                   Openzess Agent                       │
+│      (Python 3.12/3.13 + LiteLLM + FastAPI + Rich)     │
+└───────────────────────────┬────────────────────────────┘
+                            │ HTTP / IPC Loopback
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│               Rust Acceleration Sidecar                │
+│              (Axum Microservice : 8100)                │
+│   • /image/encode (TurboJPEG frame compression)        │
+│   • Compute-intensive token transforms                 │
+│   • Sub-millisecond latency offloading                 │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛡️ Zero-Downtime Pure Python Fallback
+
+If the Rust sidecar binary is offline or compiling:
+- The Python engine automatically detects the sidecar state and falls back seamlessly to **Pillow (`PIL.Image`)** and native asyncio loops.
+- **Zero errors or tracebacks** are surfaced to the user.
+- As soon as the Rust sidecar boots on port `8100`, high-performance offloading resumes automatically.
+
+---
+
+## 🚀 Running the Rust Sidecar
+
+```bash
+cd rust-sidecar
+cargo run --release
+```
+The sidecar binds to `http://127.0.0.1:8100` and reports health metrics directly to the Openzess backend.
+
+---
+
+<!-- source: openzess-docs/docs/guide/database.md -->
+
+# Database (Neon PostgreSQL)
+
+OpenZess uses [Neon](https://neon.tech) — a serverless PostgreSQL service — as its primary database.
+
+## Why Neon?
+
+Previously, OpenZess used a local SQLite file (`chat_history.db`). This caused critical problems:
+
+- **Data loss risk**: If WSL crashed or Docker containers were reset, all chat history was destroyed
+- **No portability**: The database was locked to a single machine
+- **No concurrent access**: SQLite has limited write concurrency
+
+Neon solves all of these:
+
+| Feature | SQLite (Old) | Neon PostgreSQL (Current) |
+|---------|-------------|--------------------------|
+| Data persistence | ❌ Local file | ✅ Cloud-hosted |
+| Crash resilience | ❌ Lost on reset | ✅ Always safe |
+| Multi-device access | ❌ Single machine | ✅ Any machine |
+| Branching | ❌ None | ✅ Git-like DB branches |
+| Vector search | ❌ None | ✅ pgvector support |
+| Free tier | ✅ | ✅ Generous free tier |
+
+## Schema
+
+The database contains 5 core tables managed by SQLAlchemy ORM:
+
+### `sessions`
+```sql
+CREATE TABLE sessions (
+    id VARCHAR PRIMARY KEY,
+    title VARCHAR,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### `messages`
+```sql
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR REFERENCES sessions(id),
+    role VARCHAR,        -- 'user', 'agent', 'agent:PersonaName'
+    content TEXT,
+    timestamp TIMESTAMP DEFAULT NOW()
+);
+```
+
+### `personas`
+Stores imported TavernAI character cards with fields for name, description, personality, scenario, and example dialogues.
+
+### `mcp_servers`
+Tracks connected MCP servers with their commands, arguments, and active status for auto-reconnection on restart.
+
+### `notes`
+The Knowledge Base / Canvas personal notes system with title, content, and category.
+
+## Connection Configuration
+
+The connection string is set in your `.env` file:
+
+```env
+DATABASE_URL=postgresql://neondb_owner:PASSWORD@ep-your-host.neon.tech/neondb?sslmode=require
+```
+
+The backend automatically handles the connection in `database.py`:
+
+```python
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./chat_history.db")
+
+# Auto-fix prefix for psycopg2 compatibility
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(DATABASE_URL, pool_size=10, max_overflow=20)
+```
+
+::: tip
+The fallback to SQLite means you can still run OpenZess without Neon for local development. Just don't set `DATABASE_URL` in your `.env`.
+:::
+
+---
+
+<!-- source: openzess-docs/docs/guide/security.md -->
+
+# Security & Sandboxing
+
+Security is a core design principle of OpenZess. Every potentially dangerous operation is isolated inside a sandboxed environment.
+
+## The WSL Sandbox
+
+All terminal commands executed by the agent run inside **Debian WSL** (Windows Subsystem for Linux). This creates a hard isolation boundary:
+
+```
+┌──────────────────────────────┐
+│       Windows Host           │
+│  ┌────────────────────────┐  │
+│  │    Debian WSL Sandbox  │  │
+│  │  ┌──────────────────┐  │  │
+│  │  │  Agent Commands   │  │  │
+│  │  │  (bash, python3)  │  │  │
+│  │  └──────────────────┘  │  │
+│  │  ┌──────────────────┐  │  │
+│  │  │  Xvfb Display     │  │  │
+│  │  │  (invisible GUI)  │  │  │
+│  │  └──────────────────┘  │  │
+│  └────────────────────────┘  │
+│                              │
+│  Browser ←→ FastAPI Server   │
+└──────────────────────────────┘
+```
+
+### Key Security Measures
+
+1. **Command Isolation**: `subprocess.run(["wsl", "-d", "Debian", "bash", "-c", command])` — the agent cannot escape the WSL boundary
+2. **Timeout Protection**: All commands have a 15-second timeout to prevent infinite loops
+3. **Matrix Safety**: PyAutoGUI's `FAILSAFE` is disabled in the sandbox to prevent accidental interference, but the sandbox itself prevents any interaction with the real Windows desktop
+4. **Tool Approval**: Before executing any tool call, the frontend displays an approval dialog. The user must explicitly approve dangerous actions.
+
+## The X11 Sandbox
+
+The Matrix Viewer uses a completely separate display from your real monitor:
+
+- **Xvfb** creates a virtual framebuffer on Display `:100`
+- **Fluxbox** provides a minimal window manager
+- The agent's `DISPLAY` environment variable points to `:100`
+- Your real Windows desktop is on a completely different display stack
+
+::: danger
+Never change `os.environ["DISPLAY"]` in `agent.py` to point to your real display. This would allow the agent to control your actual mouse and keyboard.
+:::
+
+# Features
+
+---
+
+<!-- source: openzess-docs/docs/features/terminal-cli.md -->
+
+# 📟 Cyberpunk Terminal TUI
+
+Openzess features a Hermes-grade interactive terminal interface designed for ultra-fast, developer-first workflows.
+
+```text
+  ██████╗ ██████╗ ███████╗███╗   ██╗███████╗███████╗███████╗
+ ██╔═══██╗██╔══██╗██╔════╝████╗  ██║╚══███╔╝██╔════╝██╔════╝
+ ██║   ██║██████╔╝█████╗  ██╔██╗ ██║  ███╔╝ █████╗  ███████╗
+ ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║ ███╔╝  ██╔══╝  ╚════██║
+ ╚██████╔╝██║     ███████╗██║ ╚████║███████╗███████╗███████║
+  ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝
+```
+
+---
+
+## 🚀 Quick Launch
+
+### Windows PowerShell
+```powershell
+.\openzess.bat
+```
+
+### Linux / Debian WSL2
+```bash
+openzess
+# or
+./openzess.sh
+```
+
+---
+
+## 🎨 Interface Features
+
+1. **3D ASCII Lizard Mascot:**
+   * Styled in **Deep/Olive Lizard Green (`#16a34a`)** with neon lime accents.
+2. **Metadata & Capabilities Card:**
+   * Displays active model, sandbox target (`Debian 13 WSL2`), engine status, and session hash.
+   * Categorized tools breakdown (`terminal`, `filesystem`, `browser`, `memory`, `evolution`, `matrix`).
+   * Categorized skills breakdown (`autonomous-coding`, `system-ops`, `creative`, `memory-vault`).
+3. **Turn Headers & Streaming:**
+   * Turn delimiter (`● user prompt` $\rightarrow$ `─ ⚡ Openzess ─`).
+   * Real-time token streaming with first-token latency calculation (`[Latency: 0.62s · Total: 1.84s]`).
+4. **Bottom Status Line:**
+   * Shows active model, sandbox target, Rust engine status, and vector memory count.
+
+---
+
+## ⌨️ Slash Commands
+
+| Command | Action |
+|---|---|
+| **`/model [provider]`** | Switch active model (`glm`, `deepseek`, `gemini`, `openai`, `anthropic`, `groq`, `ollama`, `lmstudio`) |
+| **`/habits`** | Inspect learned user habits & adaptive behavioral profile |
+| **`/skills`** | List all hot-loaded Python plugins and synthesized capabilities |
+| **`/memory [query]`** | Search ChromaDB vector memory vault semantically |
+| **`/clear`** | Reset conversation memory while keeping learned habits |
+| **`/help`** | Display interactive help menu |
+| **`/exit`** | Disconnect and exit cleanly |
+
+---
+
+<!-- source: openzess-docs/docs/features/habit-learner.md -->
+
+# 🧠 Habit Learner & Self-Growth Engine
+
+Openzess features an autonomous behavioral learning loop inspired by **Honcho** & **Hermes Agent**.
+
+Instead of requiring manual prompt engineering, Openzess automatically observes your conversation turns, extracts your coding style, environment preferences, and workflows, and stores them in a long-term ChromaDB vector vault.
+
+---
+
+## 🔄 How the Learning Loop Works
+
+```text
+┌──────────────┐     Streaming SSE     ┌─────────────────────┐
+│ User Prompt  │ ────────────────────► │ Openzess Agent Core │
+└──────────────┘                       └──────────┬──────────┘
+                                                  │
+                                  Post-Turn Event │
+                                                  ▼
+┌──────────────────────────────┐       ┌─────────────────────┐
+│ Dynamic System Prompt Update │ ◄──── │   habit_learner.py  │
+└──────────────────────────────┘       └──────────┬──────────┘
+                                                  │
+                                 Semantic Vectors │
+                                                  ▼
+                                       ┌─────────────────────┐
+                                       │ ChromaDB Memory RAG │
+                                       └─────────────────────┘
+```
+
+---
+
+## 🎯 What Gets Learned Automatically?
+
+1. **Language & Architecture Preferences:**
+   * Preferred languages (e.g. *Rust for backend performance*, *TypeScript + React for UI*).
+2. **Response & Communication Styles:**
+   * Conciseness, technical depth, formatting requirements.
+3. **Execution Environment:**
+   * Target sandbox (e.g. *Debian 13 WSL2 user: rossdeb*), shell preferences, and compiler flags.
+
+---
+
+## 🔍 Inspecting Your Profile
+
+You can inspect your learned behavioral profile at any time in the terminal CLI:
+
+```bash
+❯ /habits
+```
+
+Output:
+```text
+🧠 Learned User Habits & Behavioral Profile:
+  • Preferred Language: Prefers Rust for high-performance modules and low latency.
+  • Execution Environment: Prefers executing bash commands inside Debian WSL2 (user: rossdeb).
+  • Response Style: Prefers concise, direct answers with actionable code.
+```
+
+---
+
+## 🛠️ Programmatic API
+
+You can also record or inspect habits via Python:
+
+```python
+from backend.app import habit_learner
+
+# Manually record or update a habit
+habit_learner.record_habit("coding_style", "Prefers functional TypeScript with strict typing.")
+
+# Retrieve all stored habits
+habits = habit_learner.get_all_habits()
+```
+
+---
+
+<!-- source: openzess-docs/docs/features/agent-core.md -->
+
+# Agent Core & LLM Routing
+
+The `OpenzessAgent` class in `agent.py` is the brain of the entire system. It manages the conversation loop, tool execution, and multi-provider LLM routing.
+
+## How It Works
+
+### 1. Provider Selection
+When you select a provider in the Settings panel, OpenZess maps it to a LiteLLM model string:
+
+```python
+PROVIDER_MODELS = {
+    "gemini":    "gemini/gemini-2.5-flash",
+    "openai":    "openai/gpt-4o-mini",
+    "anthropic": "anthropic/claude-3-5-sonnet-20241022",
+    "groq":      "groq/llama-3.3-70b-versatile",
+    "ollama":    "ollama/llama3.2",
+    "deepseek":  "openrouter/deepseek/deepseek-chat",
+    "qwen":      "openrouter/qwen/qwen-2.5-72b-instruct",
+    "glm":       "openrouter/zhipu/glm-4",
+    "kimi":      "openrouter/moonshotai/moonshot-v1-8k"
+}
+```
+
+### 2. The Agentic Loop
+
+The agent uses a multi-turn tool-calling loop:
+
+```
+User Message
+    ↓
+LLM generates response
+    ↓
+Response contains tool calls? ──→ No ──→ Return text to user
+    ↓ Yes
+Send tool calls to frontend for approval
+    ↓
+User approves? ──→ No ──→ Return "Action denied"
+    ↓ Yes
+Execute tools in sandbox
+    ↓
+Feed results back to LLM
+    ↓
+Loop again (up to 15 iterations)
+```
+
+### 3. Streaming
+
+All chat interactions support **Server-Sent Events (SSE)** streaming. The frontend receives chunks in real-time:
+
+```json
+{"type": "session", "session_id": "abc123"}
+{"type": "content", "content": "Here is my "}
+{"type": "content", "content": "response..."}
+{"type": "tool_call", "name": "run_terminal_command", "args": {"command": "ls -la"}}
+{"type": "done", "reply": "Full response text..."}
+```
+
+## Smart Provider Detection
+
+When using the OpenAI-compatible API (`/v1/chat/completions`), OpenZess auto-detects the provider from the API key format:
+
+```python
+def guess_provider(key: str) -> str:
+    if key.startswith("sk-ant"): return "anthropic"
+    if key.startswith("gsk_"):  return "groq"
+    if key.startswith("sk-"):   return "openai"
+    return "gemini"
+```
+
+## Memory Integration
+
+The agent automatically stores important context in **ChromaDB** — a local vector database. This gives the agent long-term memory that persists across sessions.
+
+```python
+memory_collection = chroma_client.get_or_create_collection(
+    name="openzess_memory"
+)
+```
+
+---
+
+<!-- source: openzess-docs/docs/features/tools.md -->
+
+# Native Tool System
+
+OpenZess provides 13 built-in tools that the agent can invoke during conversations. These tools are the agent's hands and eyes — they allow it to interact with the real world.
+
+## Core Tools
+
+### `run_terminal_command`
+Executes a bash command inside the Debian WSL sandbox.
+
+```python
+def run_terminal_command(command: str) -> str:
+    result = subprocess.run(
+        ["wsl", "-d", "Debian", "bash", "-c", command],
+        capture_output=True, text=True, timeout=15
+    )
+    return result.stdout if result.stdout else result.stderr
+```
+
+**Examples**: `ls -la`, `python3 script.py`, `grep -r "TODO" .`, `pip install requests`
+
+### `search_the_web`
+Searches DuckDuckGo and returns top 3 results with titles, URLs, and snippets.
+
+### `read_web_page`
+Fetches a URL and extracts clean text content using BeautifulSoup. Returns up to 5,000 characters.
+
+### `create_file`
+Creates a new file at a specified path. Refuses to overwrite existing files for safety.
+
+### `read_file`
+Reads and returns file contents, capped at 15,000 characters for large files.
+
+### `edit_code`
+Performs exact string find-and-replace on existing files. The agent specifies `old_string` and `new_string` for precise, surgical edits.
+
+## Automation Tools
+
+### `schedule_background_task`
+Creates a recurring cron job that executes a command at a specified interval (in minutes).
+
+### `monitor_directory`
+Mounts a filesystem watchdog on a directory. When any file changes, the agent automatically executes a specified action.
+
+## Computer Control Tools
+
+These tools allow the agent to interact with the virtual X11 desktop:
+
+| Tool | Action |
+|------|--------|
+| `take_screenshot` | Captures the entire virtual display |
+| `computer_mouse_move` | Moves cursor to (x, y) coordinates |
+| `computer_mouse_click` | Clicks left, right, or middle button |
+| `computer_type_text` | Types a string character-by-character |
+| `computer_press_key` | Presses a keyboard key (enter, tab, etc.) |
+
+::: warning
+Computer control tools are only available when running inside the WSL sandbox with an active Xvfb display. They will fail gracefully if the display is not available.
+:::
+
+## Tool Approval Flow
+
+When the agent wants to execute a tool, the process is:
+
+1. Agent generates a `tool_call` response
+2. Frontend displays the tool name and arguments to the user
+3. User clicks **Approve** or **Deny**
+4. If approved, the tool executes and results are fed back to the agent
+5. If denied, the agent receives "Action denied by user" and adjusts its approach
+
+---
+
+<!-- source: openzess-docs/docs/features/memory-vault.md -->
+
+# Memory Vault (ChromaDB)
+
+The Memory Vault gives your agent persistent, searchable long-term memory using vector embeddings.
+
+## Overview
+
+OpenZess uses [ChromaDB](https://www.trychroma.com/) — an open-source vector database — to store important context that persists across sessions.
+
+Unlike regular chat history (which is stored in PostgreSQL), the Memory Vault uses **semantic similarity search**. This means the agent can find relevant memories based on meaning, not just keywords.
+
+## How It Works
+
+```python
+import chromadb
+
+chroma_client = chromadb.PersistentClient(path="./chroma_db")
+memory_collection = chroma_client.get_or_create_collection(
+    name="openzess_memory"
+)
+```
+
+### Storing Memories
+The agent can store text snippets with metadata:
+
+```python
+memory_collection.add(
+    documents=["User prefers Python over JavaScript"],
+    ids=["mem-001"],
+    metadatas=[{"source": "conversation", "topic": "preferences"}]
+)
+```
+
+### Retrieving Memories
+Retrieve memories based on semantic similarity:
+
+```python
+results = memory_collection.query(
+    query_texts=["What language does the user like?"],
+    n_results=3
+)
+```
+
+## Managing Memories
+
+The frontend provides a dedicated Memory Vault page where you can:
+
+- **View all memories** with their stored text and metadata
+- **Delete individual memories** that are no longer relevant
+- **Clear all memories** to start fresh
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/memory` | List all stored memories |
+| `DELETE` | `/api/memory/{id}` | Delete a specific memory |
+| `DELETE` | `/api/memory` | Clear all memories |
+
+---
+
+<!-- source: openzess-docs/docs/features/mcp-plugins.md -->
+
+# MCP Plugin System
+
+OpenZess natively supports the **Model Context Protocol (MCP)** — an industry standard for connecting AI systems with external tools and data sources.
+
+## What is MCP?
+
+MCP is like USB for AI. Just as USB lets you plug any peripheral into any computer, MCP lets you plug any tool server into any AI agent. OpenZess acts as an MCP **client** that connects to external MCP **servers**.
+
+## Supported Transports
+
+| Transport | Use Case | Example |
+|-----------|----------|---------|
+| `stdio` | Local CLI tools | `npx @prisma/mcp-server` |
+| `sse` | Remote HTTP servers | Stitch Design API |
+| `streamablehttp` | Modern HTTP streaming | Newer MCP servers |
+
+## Connecting an MCP Server
+
+### From the UI
+
+1. Navigate to **Tools → MCP Plugins** in the sidebar
+2. Click **Add Server**
+3. Fill in the connection details:
+   - **Server ID**: A unique identifier (e.g., `prisma`)
+   - **Command**: The CLI command to start the server (e.g., `npx`)
+   - **Args**: Command arguments (e.g., `["-y", "@prisma/mcp-server"]`)
+   - **Transport**: `stdio`, `sse`, or `streamablehttp`
+
+### Auto-Reconnection
+
+Connected MCP servers are saved to the database. On every system restart, OpenZess automatically reconnects all previously active servers:
+
+```python
+def init_active_mcps():
+    servers = database.get_all_mcp_servers()
+    for s in servers:
+        if s["is_active"]:
+            mcp_registry.connect(s["id"], s["command"], s["args"])
+```
+
+## How MCP Tools Appear to the Agent
+
+When an MCP server connects, its tools are dynamically merged into the agent's tool schema:
+
+```python
+def get_all_tools_for_litellm(self) -> list:
+    openai_tools = []
+    for sid, tools in self.server_tools.items():
+        for t in tools:
+            openai_tools.append({
+                "type": "function",
+                "function": {
+                    "name": t.name,
+                    "description": f"[MCP: {sid}] {t.description}",
+                    "parameters": t.inputSchema
+                }
+            })
+    return openai_tools
+```
+
+The `[MCP: server_id]` prefix helps the agent understand which tools come from external servers.
+
+## Process Management
+
+OpenZess uses `psutil` to properly clean up MCP server processes, preventing zombie processes (especially common with `npx` on Windows):
+
+```python
+parent = psutil.Process(pid)
+for child in parent.children(recursive=True):
+    child.kill()
+parent.kill()
+```
+
+---
+
+<!-- source: openzess-docs/docs/features/custom-plugins.md -->
+
+# Custom Python Plugins
+
+OpenZess has a hot-loading plugin system that lets you add custom tools by simply dropping a Python file into the `backend/plugins/` directory.
+
+## Creating a Plugin
+
+Create a new `.py` file in `backend/plugins/`:
+
+```python
+# backend/plugins/weather.py
+from plugin_loader import plugin_registry
+
+@plugin_registry.register(
+    name="get_weather",
+    description="Gets the current weather for a city",
+    schema_params={
+        "properties": {
+            "city": {"type": "string", "description": "City name"}
+        },
+        "required": ["city"]
+    }
+)
+def get_weather(city: str) -> str:
+    import requests
+    response = requests.get(f"https://wttr.in/{city}?format=3")
+    return response.text
+```
+
+That's it! On the next server restart, the `get_weather` tool will be automatically available to every agent.
+
+## How It Works
+
+The `plugin_loader.py` module:
+
+1. **Scans** the `backend/plugins/` directory for `.py` files
+2. **Loads** each file as a dynamic Python module
+3. **Injects** the `plugin_registry` into the module's namespace
+4. **Merges** all registered functions and schemas into the agent's tool system
+
+```python
+native_tool_funcs.update(plugin_registry.funcs)
+NATIVE_TOOL_SCHEMAS.extend(plugin_registry.schemas)
+```
+
+## The `@plugin_registry.register` Decorator
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `name` | `str` | Unique tool name (used by the LLM) |
+| `description` | `str` | What this tool does (shown to the LLM) |
+| `schema_params` | `dict` | OpenAI-format JSON schema for parameters |
+
+## Example: PC Control Plugin
+
+OpenZess ships with `pc_control.py` as a built-in plugin example:
+
+```python
+@plugin_registry.register(
+    name="open_application",
+    description="Opens a desktop application in the Matrix sandbox",
+    schema_params={
+        "properties": {
+            "app_name": {"type": "string"}
+        },
+        "required": ["app_name"]
+    }
+)
+def open_application(app_name: str) -> str:
+    import subprocess
+    subprocess.Popen(["xdg-open", app_name])
+    return f"Opened {app_name}"
+```
+
+::: tip
+Plugins are loaded once at server startup. If you add a new plugin file, restart the backend to pick it up.
+:::
+
+---
+
+<!-- source: openzess-docs/docs/features/swarm.md -->
+
+# Swarm Intelligence / War Room
+
+The War Room is OpenZess's multi-agent collaboration system. It lets you deploy multiple AI agents simultaneously to debate, analyze, and synthesize solutions.
+
+## How It Works
+
+### Swarm Debate Mode
+
+When you enable **Swarm Mode** in the chat, your message is sent to multiple AI agents in parallel. Each agent has a different role and provider:
+
+- **Strategist** (DeepSeek) — Plans the high-level approach
+- **Critic** (DeepSeek) — Finds flaws and challenges assumptions
+- **Optimizer** (GLM) — Refines and optimizes the solution
+
+The agents take turns debating in a structured conversation. If all agents agree, they output `[CONSENSUS REACHED]` and the debate ends.
+
+### The Final Synthesis
+
+After the debate, a **Final Judge** (your primary model) reads the entire transcript and synthesizes a definitive answer as a structured Markdown table.
+
+## Architecture
+
+```python
+class SwarmManager:
+    def __init__(self):
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
+
+    async def dispatch_squad_stream(self, prompt, squad_config):
+        # Fire off all agents in parallel with 400ms stagger
+        for i, config in enumerate(squad_config):
+            delay = i * 400  # Prevents API rate limiting
+            futures.append(
+                loop.run_in_executor(self.executor, run_agent_stream, ...)
+            )
+```
+
+### Why 400ms Stagger?
+
+Launching all API calls simultaneously can trigger rate limits and socket exhaustion. The 400ms delay between each agent launch provides just enough breathing room.
+
+## Squad Configuration
+
+Each squad member is defined by:
+
+```json
+{
+    "role_name": "Strategist",
+    "provider": "deepseek2",
+    "api_key": "sk-...",
+    "system_instruction": "You are a strategic planner..."
+}
+```
+
+## Use Cases
+
+- **Code Review**: Let one agent write code while another critiques it
+- **Research**: Deploy multiple agents to search different aspects of a topic
+- **Decision Making**: Get multiple AI perspectives before making a choice
+- **Brainstorming**: Let agents build on each other's ideas iteratively
+
+---
+
+<!-- source: openzess-docs/docs/features/tavern.md -->
+
+# Tavern & Personas
+
+OpenZess supports importing AI character cards from the **TavernAI/SillyTavern** ecosystem, enabling rich persona-based roleplay conversations.
+
+## Importing Characters
+
+### Supported Formats
+- **PNG** files with embedded character data (TavernAI format)
+- **JSON** character definition files
+
+### How to Import
+
+1. Navigate to the **Tavern** page in the sidebar
+2. Click **Import Character**
+3. Upload a `.png` or `.json` character card
+
+The character's name, description, personality, scenario, and example dialogues are parsed and stored in the database.
+
+## Character Card Schema
+
+```json
+{
+    "name": "Luna",
+    "description": "A mysterious stargazer...",
+    "personality": "Curious, whimsical, thoughtful",
+    "scenario": "You meet Luna at an observatory...",
+    "mes_example": "{{user}}: Hello!\n{{char}}: *looks up from telescope*"
+}
+```
+
+## How Personas Work in Chat
+
+When you select a persona in the Tavern and start chatting, the system instruction is dynamically constructed:
+
+```python
+system_instruction = f"""
+You are {persona.name}, roleplaying in a group chat room.
+
+Description: {persona.description}
+Personality: {persona.personality}
+Scenario: {persona.scenario}
+
+Example Dialogues: {persona.mes_example}
+
+Respond naturally to the conversation IN CHARACTER as {persona.name}.
+"""
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/personas/import` | Import a character card |
+| `GET` | `/api/personas` | List all imported personas |
+| `DELETE` | `/api/personas/{id}` | Delete a persona |
+| `POST` | `/api/tavern/chat` | Chat with a specific persona |
+
+---
+
+<!-- source: openzess-docs/docs/features/matrix-viewer.md -->
+
+# Matrix Viewer
+
+The Matrix Viewer is OpenZess's most unique feature — a real-time window into an invisible Linux desktop that your AI agent can control autonomously.
+
+## How It Works
+
+### The Virtual Display Stack
+
+```
+┌─────────────────────────────────────────┐
+│  Your Browser (Matrix Viewer tab)       │
+│  ┌───────────────────────────────────┐  │
+│  │   Live JPEG stream @ 15 FPS      │  │
+│  │   (WebSocket binary frames)      │  │
+│  └───────────────┬───────────────────┘  │
+│                  │                       │
+│  Click/Type ─────┼──→ WebSocket JSON     │
+└──────────────────┼───────────────────────┘
+                   │
+┌──────────────────┼───────────────────────┐
+│  FastAPI Server  │                       │
+│  ┌───────────────┴───────────────────┐   │
+│  │  /api/matrix/stream (WebSocket)   │   │
+│  │  ┌─────────┐  ┌────────────────┐  │   │
+│  │  │  mss    │  │  PyAutoGUI     │  │   │
+│  │  │ (grab)  │  │ (click/type)   │  │   │
+│  │  └────┬────┘  └───────┬────────┘  │   │
+│  └───────┼───────────────┼───────────┘   │
+│          │               │               │
+│  ┌───────┴───────────────┴───────────┐   │
+│  │      Xvfb (Display :100)          │   │
+│  │      1280x800x24 virtual screen   │   │
+│  │      + Fluxbox window manager     │   │
+│  └───────────────────────────────────┘   │
+└──────────────────────────────────────────┘
+```
+
+### Frame Capture
+
+The server uses `mss` (a fast screen capture library) to grab frames from the Xvfb display at ~15 FPS:
+
+```python
+sct = mss.mss()
+monitor = sct.monitors[0]
+
+sct_img = sct.grab(monitor)
+img = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
+
+buffer = io.BytesIO()
+img.save(buffer, format="JPEG", quality=65, optimize=True)
+await websocket.send_bytes(buffer.getvalue())
+```
+
+### User Input
+
+When you click or type inside the Matrix Viewer, the frontend sends JSON messages over the same WebSocket:
+
+```json
+// Click
+{"action": "click", "x": 0.45, "y": 0.32}
+
+// Type
+{"action": "type", "text": "hello world"}
+
+// Key press
+{"action": "key", "key": "enter"}
+```
+
+The coordinates are sent as percentages (0.0 to 1.0) since the UI image scales responsively. The server converts them to native pixel coordinates.
+
+## Troubleshooting
+
+### "Can't connect to display"
+Ensure `DISPLAY=:100` is set in both `start_wsl.sh` and `agent.py`.
+
+### Matrix is blank
+Check that `fluxbox` started correctly. Run `ps aux | grep fluxbox` inside WSL.
+
+### Low frame rate
+Reduce the Xvfb resolution or increase JPEG compression quality in `server.py`.
+
+---
+
+<!-- source: openzess-docs/docs/features/channels.md -->
+
+# Channels (Telegram & Discord)
+
+OpenZess can deploy your agent as a bot on **Telegram** and **Discord**, responding to messages in real-time.
+
+## Telegram Integration
+
+### Setup
+
+1. Create a bot via [BotFather](https://t.me/BotFather) and get your bot token
+2. Go to **Channels** in the OpenZess sidebar
+3. Enter your bot token, LLM provider, and API key
+4. Click **Start**
+
+### How It Works
+
+The Telegram worker runs in a background thread, polling for new messages:
+
+```python
+def start_telegram_listener(bot_token, provider, api_key):
+    # Creates a dedicated session for Telegram messages
+    # Routes each message through OpenzessAgent
+    # Sends the response back to the Telegram chat
+```
+
+Each Telegram chat gets its own session ID (`telegram_{chat_id}`), so conversation context is preserved across messages.
+
+## Discord Integration
+
+### Setup
+
+1. Create a Discord Application at [Discord Developer Portal](https://discord.com/developers)
+2. Create a Bot and copy the token
+3. Invite the bot to your server
+4. Configure in OpenZess Channels page
+
+### Features
+
+- Responds to all messages in channels where the bot has access
+- Each Discord channel gets its own session for context preservation
+- Supports the full agent tool suite (with auto-approval for bot contexts)
+
+## API Endpoints
+
+### Telegram
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/channels/telegram/start` | Start the Telegram listener |
+| `POST` | `/api/channels/telegram/stop` | Stop the listener |
+| `GET` | `/api/channels/telegram/status` | Check if running |
+
+### Discord
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/channels/discord/start` | Start the Discord listener |
+| `POST` | `/api/channels/discord/stop` | Stop the listener |
+| `GET` | `/api/channels/discord/status` | Check if running |
+
+---
+
+<!-- source: openzess-docs/docs/features/automation.md -->
+
+# Cron Jobs & Watchdogs
+
+OpenZess supports two types of autonomous background automation: **Cron Jobs** for time-based tasks and **Watchdogs** for event-based tasks.
+
+## Cron Jobs
+
+Schedule commands to run automatically at regular intervals.
+
+### Creating a Cron Job
+
+**From the UI:**
+Navigate to **Tools → Cron Jobs** and create a new job with a command and interval.
+
+**From the Agent:**
+The agent can create cron jobs using the `schedule_background_task` tool:
+
+```
+"Schedule a task to check disk usage every 30 minutes"
+→ Agent calls: schedule_background_task("df -h", 30)
+```
+
+### How It Works
+
+```python
+class CronManager:
+    def add_job(self, command, interval_minutes):
+        job_id = str(uuid.uuid4())
+        # Starts a background thread with a timer
+        # Executes the command at the specified interval
+        return job_id
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/cron` | Create a new cron job |
+| `GET` | `/api/cron` | List all active jobs |
+| `DELETE` | `/api/cron/{id}` | Remove a job |
+
+## Filesystem Watchdogs
+
+Monitor directories for changes and automatically execute actions when files are created, modified, or deleted.
+
+### Creating a Watchdog
+
+**From the Agent:**
+```
+"Watch the /tmp/downloads folder and notify me when new files appear"
+→ Agent calls: monitor_directory("/tmp/downloads", "echo 'New file detected!'")
+```
+
+### How It Works
+
+The watchdog system uses filesystem polling to detect changes. When a change is detected, the specified action is executed automatically.
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/watchdog` | Create a new watchdog |
+| `GET` | `/api/watchdog` | List all active watchdogs |
+| `DELETE` | `/api/watchdog/{id}` | Remove a watchdog |
+
+## Use Cases
+
+| Automation | Example |
+|------------|---------|
+| **Health monitoring** | Check server status every 5 minutes |
+| **Auto-backup** | Copy important files every hour |
+| **Code watch** | Run tests when source files change |
+| **Log analysis** | Parse new log entries as they appear |
+
+---
+
+<!-- source: openzess-docs/docs/features/paperbanana.md -->
+
+# 📊 PaperBanana Visualization Engine
+
+**PaperBanana** is a native visualization plugin bundled with Openzess that generates publication-grade 300 DPI figures, statistical charts, and benchmark diagrams directly from agent reasoning.
+
+---
+
+## 🎨 Publication Palettes
+
+PaperBanana ships with four curated aesthetic themes:
+
+1. **`academic`** — Clean, serif-styled aesthetic suitable for IEEE / Nature / arXiv papers.
+2. **`dark_matrix`** — High-contrast cyberpunk palette with emerald and lime highlights.
+3. **`vibrant`** — Modern presentation palette with bold gradients.
+4. **`deep`** — Elegant muted palette for dark mode dashboards.
+
+---
+
+## 💻 Invoking PaperBanana
+
+You can prompt Openzess naturally to create plots:
+
+```text
+"Plot a benchmark comparison between Python, Rust, and Openzess Hybrid engine at 300 DPI using the dark_matrix palette."
+```
+
+Under the hood, Openzess invokes `@generate_paperbanana_plot` from `backend/app/plugins/paperbanana_plugin.py`, renders the figure using `matplotlib` & `seaborn`, and returns the high-resolution PNG directly.
+
+# API Reference
+
+---
+
+<!-- source: openzess-docs/docs/api/rest-api.md -->
+
+# REST API Reference
+
+OpenZess exposes a comprehensive REST API on `http://localhost:8000`. All endpoints accept and return JSON.
+
+## Chat
+
+### `POST /api/chat`
+Send a message to the agent.
+
+**Request Body:**
+```json
+{
+    "message": "Write a Python hello world script",
+    "api_key": "your-api-key",
+    "provider": "gemini",
+    "session_id": null,
+    "system_instruction": null,
+    "allowed_tools": ["run_terminal_command", "create_file"],
+    "stream": true,
+    "agent_name": null,
+    "use_swarm": false
+}
+```
+
+**SSE Response (when `stream: true`):**
+```
+data: {"type": "session", "session_id": "abc123"}
+data: {"type": "content", "content": "Sure, "}
+data: {"type": "content", "content": "here's a script..."}
+data: {"type": "tool_call", "name": "create_file", "args": {...}}
+data: {"type": "done", "reply": "Full response..."}
+```
+
+### `POST /api/chat/approve`
+Approve or deny pending tool calls.
+
+```json
+{
+    "session_id": "abc123",
+    "pending_calls": [...],
+    "approved": true,
+    "stream": true
+}
+```
+
+---
+
+## Sessions
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/sessions` | List all chat sessions |
+| `GET` | `/api/sessions/{id}/messages` | Get messages for a session |
+| `DELETE` | `/api/sessions/{id}` | Delete a session |
+| `DELETE` | `/api/messages/{id}` | Delete a specific message |
+
+---
+
+## Memory Vault
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/memory` | List all memories |
+| `DELETE` | `/api/memory/{id}` | Delete a memory |
+| `DELETE` | `/api/memory` | Clear all memories |
+
+---
+
+## MCP Servers
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/mcp/servers` | List connected servers |
+| `POST` | `/api/mcp/connect` | Connect a new server |
+| `POST` | `/api/mcp/disconnect/{id}` | Disconnect a server |
+| `DELETE` | `/api/mcp/saved/{id}` | Remove a saved server |
+
+---
+
+## Automation
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/cron` | Create a cron job |
+| `GET` | `/api/cron` | List cron jobs |
+| `DELETE` | `/api/cron/{id}` | Delete a cron job |
+| `POST` | `/api/watchdog` | Create a watchdog |
+| `GET` | `/api/watchdog` | List watchdogs |
+| `DELETE` | `/api/watchdog/{id}` | Delete a watchdog |
+
+---
+
+## Knowledge Base
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/notes` | Create a note |
+| `GET` | `/api/notes` | List all notes |
+| `PUT` | `/api/notes/{id}` | Update a note |
+| `DELETE` | `/api/notes/{id}` | Delete a note |
+| `POST` | `/api/notes/upload` | Upload an image for notes |
+
+---
+
+## Utilities
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/tools` | List available tools |
+| `POST` | `/api/tts` | Generate text-to-speech audio |
+
+---
+
+<!-- source: openzess-docs/docs/api/openai-compat.md -->
+
+# OpenAI-Compatible API
+
+OpenZess exposes an OpenAI-compatible API, which means you can use it as a drop-in replacement for OpenAI in any tool that supports custom endpoints (like Cursor, Continue, or any OpenAI SDK client).
+
+## Chat Completions
+
+### `POST /v1/chat/completions`
+
+Follows the exact OpenAI Chat Completions API format:
+
+```bash
+curl http://localhost:8000/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "openzess",
+    "messages": [
+      {"role": "user", "content": "What is OpenZess?"}
+    ]
+  }'
+```
+
+**Response:**
+```json
+{
+    "id": "chatcmpl-uuid",
+    "object": "chat.completion",
+    "model": "openzess",
+    "choices": [{
+        "index": 0,
+        "message": {
+            "role": "assistant",
+            "content": "OpenZess is an autonomous agent platform..."
+        },
+        "finish_reason": "stop"
+    }]
+}
+```
+
+### `GET /v1/models`
+
+Lists available models:
+
+```json
+{
+    "object": "list",
+    "data": [{
+        "id": "openzess",
+        "object": "model",
+        "owned_by": "openzess"
+    }]
+}
+```
+
+## Anthropic-Compatible API
+
+### `POST /v1/messages`
+
+Also supports the Anthropic Messages API format:
+
+```bash
+curl http://localhost:8000/v1/messages \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "openzess",
+    "messages": [
+      {"role": "user", "content": "Hello!"}
+    ],
+    "system": "You are a helpful assistant.",
+    "max_tokens": 1024
+  }'
+```
+
+## Smart Key Detection
+
+OpenZess automatically detects which provider to use based on your API key format:
+
+| Key Prefix | Detected Provider |
+|------------|------------------|
+| `sk-ant-*` | Anthropic |
+| `gsk_*` | Groq |
+| `sk-*` | OpenAI |
+| Other | Gemini (default) |
+
+::: tip
+This means you can point any OpenAI-compatible tool at `http://localhost:8000/v1` and it will route through OpenZess, giving your tools access to the full agent capability (terminal, file system, web search, etc.).
+:::
+
+---
+
+<!-- source: openzess-docs/docs/api/websocket.md -->
+
+# WebSocket API (Matrix Viewer)
+
+The Matrix Viewer uses a WebSocket connection for bidirectional real-time communication.
+
+## Connection
+
+```javascript
+const ws = new WebSocket("ws://localhost:8000/api/matrix/stream");
+```
+
+## Server → Client (Video Frames)
+
+The server sends **binary** WebSocket messages containing JPEG-encoded frames at ~15 FPS:
+
+```javascript
+ws.onmessage = (event) => {
+    if (event.data instanceof Blob) {
+        const url = URL.createObjectURL(event.data);
+        imageElement.src = url;
+    }
+};
+```
+
+### Frame Specifications
+
+| Property | Value |
+|----------|-------|
+| Format | JPEG |
+| Quality | 65% |
+| Resolution | 1280×800 (Xvfb native) |
+| Frame Rate | ~15 FPS |
+| Encoding | Binary WebSocket frames |
+
+## Client → Server (User Input)
+
+Send JSON text messages to control the virtual desktop:
+
+### Click
+```json
+{
+    "action": "click",
+    "x": 0.45,
+    "y": 0.32
+}
+```
+
+::: info
+Coordinates are **percentage-based** (0.0 to 1.0), not pixel-based. The server multiplies by the native monitor resolution. This ensures the UI works correctly regardless of browser window size.
+:::
+
+### Type Text
+```json
+{
+    "action": "type",
+    "text": "hello world"
+}
+```
+
+### Press Key
+```json
+{
+    "action": "key",
+    "key": "enter"
+}
+```
+
+Supported keys include: `enter`, `tab`, `backspace`, `escape`, `shift`, `ctrl`, `alt`, `up`, `down`, `left`, `right`, `space`, `f1`-`f12`.
+
+## Concurrent Tasks
+
+The WebSocket handler runs two async tasks concurrently:
+
+1. **`send_frames()`** — Continuously captures and sends screen frames
+2. **`receive_input()`** — Listens for and processes user input
+
+```python
+stream_task = asyncio.create_task(send_frames())
+input_task = asyncio.create_task(receive_input())
+
+done, pending = await asyncio.wait(
+    [stream_task, input_task],
+    return_when=asyncio.FIRST_COMPLETED
+)
+```
+
+If either task fails (e.g., client disconnects), both are cleaned up gracefully.
+
+# Meta
+
+---
+
+<!-- source: CHANGELOG.md -->
+
+# Changelog
+
+All notable changes to Openzess are documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- **Rust acceleration sidecar** (`rust-sidecar/`) — optional Axum microservice with
+  `/health`, `/image/encode` and `/graphify/report` endpoints; Python integration via
+  `backend/app/sidecar_client.py` featuring silent Pillow/pure-Python fallback,
+  gated behind the new `SIDECAR_URL` environment flag
+- **Hybrid Matrix stream encoding** — frame compression now runs off the asyncio
+  event loop through the sidecar client (fixes blocking Pillow save at 15 fps)
+- **Graphify dynamic auto-rebuild** — `POST /api/graphify/rebuild` rescans backend
+  modules, plugins and frontend pages into a fresh `graphify-out/graph.json` +
+  `GRAPH_REPORT.md`; report endpoint optionally sidecar-accelerated
+- **PaperBanana theme engine** — four publication palettes (`academic`,
+  `dark_matrix`, `vibrant`, `deep`) for diagrams; statistical plots gain clean
+  numeric tick formatting at 300 DPI across all six chart types
+- **Test suite expansion** — `test_sidecar_client.py` (encoding contracts, graceful
+  degradation, fake-sidecar dispatch) and PaperBanana theme/DPI parametrized tests
+- Benchmark harness `scripts/bench_sidecar.py` comparing Pillow vs Rust encoding
+- `start.bat` auto-builds and launches the sidecar when a Rust toolchain is present
+- GitHub Actions CI (frontend type-check & build, backend compile check)
+- Community health files: CONTRIBUTING, Code of Conduct, Security Policy,
+  issue & PR templates, CHANGELOG
+- Expanded `.env.example` covering all supported LLM providers plus sidecar flags
+- README roadmap rebuilt as versioned milestones (v1.1 shipped → v2.0 exploring)
+
+### Changed
+
+- Converted to a **web-only application** — Electron desktop shell retired to
+  `frontend/desktop-legacy/` (all features work in the browser)
+- Backend restructured into a proper Python package (`backend/app/`)
+- Dev utilities moved to `backend/tools/`
+- Frontend context providers consolidated under `src/contexts/`
+
+### Fixed
+
+- Production TypeScript build (`npm run build`) — 20+ strict-mode errors
+- Plugin loader failing inside package structure
+- SQLite fallback for local runs without Docker
+
+## [1.1.0] — 2026-01
+
+### Added
+
+- Multi-agent Debate Arena & WarRoom swarm collaboration
+- MCP (Model Context Protocol) server grid with stdio subprocess isolation
+- Tavern-compatible persona imports
+- Background cron jobs & watchdog workers
+- Telegram & Discord bot bridges
+- ChromaDB-backed memory vault
+- Dynamic Python plugin system
+
+[Unreleased]: https://github.com/rosdebbu/openzess/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/rosdebbu/openzess/releases/tag/v1.1.0
+
+---
+
+<!-- source: CONTRIBUTING.md -->
+
+# Contributing to Openzess
+
+First off, thanks for taking the time to contribute! 🎉
+
+Openzess is a provider-agnostic, multi-agent AI workspace — contributions from
+AI engineers, full-stack developers, and open-source enthusiasts are welcome.
+
+## 🛠️ Project Setup
+
+### Prerequisites
+- **Python 3.12+**
+- **Node.js 20+**
+- (Optional) Docker for PostgreSQL — SQLite fallback works out of the box
+
+### Quick Start
+```bash
+# Windows — one-click (creates venv, installs deps, launches everything)
+start.bat
+
+# Or manually:
+python -m venv venv
+venv\Scripts\pip install -r backend\requirements.txt   # Linux/WSL: venv/bin/pip
+cd backend && ..\venv\Scripts\python -m uvicorn app.server:app --reload --port 8000
+cd frontend && npm install && npm run dev
+```
+
+## 🔄 Development Workflow
+
+1. **Fork** the repository
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feat/your-feature
+   ```
+3. **Make your changes**, following the conventions below
+4. **Verify before pushing**
+   ```bash
+   cd frontend && npm run build      # type-check + build must pass
+   cd backend && python -m compileall app tools
+   ```
+5. **Commit** using conventional commits
+   ```bash
+   git commit -m "feat: add your feature"
+   ```
+6. **Push** and open a Pull Request against `main`
+
+## 📝 Conventions
+
+| Type | Prefix | Example |
+|---|---|---|
+| New feature | `feat:` | `feat: add voice input to chat` |
+| Bug fix | `fix:` | `fix: plugin loader path in package mode` |
+| Docs | `docs:` | `docs: update architecture diagram` |
+| Refactor/chore | `chore:` / `refactor:` | `chore: bump litellm` |
+
+### Frontend
+- TypeScript types for all new props and interfaces
+- Follow existing component/page patterns in `frontend/src`
+- Tailwind CSS v4 utility classes; keep theme tokens (`bg-brand`, dark mode variants)
+
+### Backend
+- New tools belong in `backend/app/agent.py` or as plugins in `backend/app/plugins/`
+- Keep modules package-relative (`from .agent import ...`)
+- Runtime data (DBs, logs, vector stores) must never be committed
+
+## ✅ Pull Request Checklist
+
+- [ ] `npm run build` passes (frontend)
+- [ ] Backend modules compile without errors
+- [ ] Tested with at least **two** LLM providers if behavior is provider-related
+- [ ] Documentation updated for user-facing changes
+- [ ] No API keys or secrets in the diff
+
+## 🐛 Found a Bug?
+
+Open an [issue](https://github.com/rosdebbu/openzess/issues/new?template=bug_report.md)
+with reproduction steps and your environment details.
+
+## 💬 Questions?
+
+Start a [Discussion](https://github.com/rosdebbu/openzess/discussions) — we're happy to help!
+
+---
+
+<!-- source: SECURITY.md -->
+
+# Security Policy
+
+## Supported Versions
+
+| Version | Supported |
+|---------|-----------|
+| 1.1.x   | ✅ |
+| < 1.1   | ❌ |
+
+## Reporting a Vulnerability
+
+**Please do not report security vulnerabilities through public GitHub issues.**
+
+Instead, report them privately via
+[GitHub Security Advisories](https://github.com/rosdebbu/openzess/security/advisories/new)
+("Report a vulnerability" button).
+
+Please include:
+- Type of issue (e.g. injection, privilege escalation, secret exposure)
+- Step-by-step reproduction instructions
+- Affected component (backend `app/`, frontend, MCP bridge, etc.)
+- Impact assessment
+
+You can expect an initial response within **72 hours**. We will credit you in
+the fix release unless you prefer to remain anonymous.
+
+## Security Notes for Users
+
+- **API keys** are stored client-side in `localStorage` and sent per-request;
+  they are never persisted server-side
+- **Tool execution** (terminal commands, file writes) requires explicit
+  human-in-the-loop approval before running
+- **MCP connections** run in subprocess isolation via stdio transport
+- **CORS** is configured for local development — restrict `allow_origins` in
+  `backend/app/server.py` before exposing the app beyond `localhost`
+- Never expose port `8000` directly to the public internet without adding
+  authentication and a reverse proxy
