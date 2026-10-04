@@ -1,131 +1,53 @@
-# Feature Specification: [FEATURE NAME]
+# Feature Specification: User Profiles & Customization
 
-**Feature Branch**: `[###-feature-name]`
-
-**Created**: [DATE]
-
-**Status**: Draft
-
-**Input**: User description: "$ARGUMENTS"
-
-## User Scenarios & Testing *(mandatory)*
-
-<!--
-  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
-
-  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
-  Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
--->
-
-### User Story 1 - [Brief Title] (Priority: P1)
-
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+**Feature Branch**: `002-featurename-user-profiles`  
+**Created**: 2026-10-04  
+**Status**: Ready for Implementation  
+**Input**: User description: "User Profiles feature allowing users to manage their identity, bio, avatar, and workspace preferences."
 
 ---
 
-### User Story 2 - [Brief Title] (Priority: P2)
+## 1. Overview & Motivation
+Openzess currently supports user authentication (`register`, `login`, `me`) and binds session/note ownership to a `user_id`. However, users cannot configure a custom display name, bio, avatar image, or synchronize their workspace preferences (such as dark/light theme, default persona, and tool permissions) across devices. 
 
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+This feature adds a first-class **User Profile** data model and UI, enabling users to personalize their Openzess workspace and maintain their settings consistently.
 
 ---
 
-### User Story 3 - [Brief Title] (Priority: P3)
+## 2. User Scenarios & Acceptance Criteria
 
-[Describe this user journey in plain language]
+### User Story 1 - View & Edit Profile Information (Priority: P1)
+As an authenticated Openzess user, I want to view and edit my profile (display name, bio, and avatar) so that my workspace reflects my identity.
 
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+* **Why this priority:** Core functionality needed for user personalization.
+* **Independent Test:** Authenticate via JWT, send `PUT /api/auth/profile`, and verify `GET /api/auth/profile` returns updated details.
+* **Acceptance Scenarios:**
+  1. **Given** an authenticated user, **When** they update their display name and bio via the profile settings, **Then** the updated values are persisted in the database and returned on subsequent `/api/auth/profile` requests.
+  2. **Given** an unauthenticated request to `/api/auth/profile`, **When** sent to the server, **Then** an HTTP 401 Unauthorized response is returned.
 
 ---
 
-[Add more user stories as needed, each with an assigned priority]
+### User Story 2 - User Workspace Preferences Synchronization (Priority: P2)
+As a user who switches between devices (laptop, desktop, tablet), I want my preferences (theme, default persona, auto-approve tools) saved to my profile so I don't have to reconfigure them in every browser.
 
-### Edge Cases
+* **Why this priority:** Eliminates friction when using Openzess in multi-device or remote server environments.
+* **Independent Test:** Update preferences via API, log in from a fresh incognito window, and verify preferences are restored.
+* **Acceptance Scenarios:**
+  1. **Given** a user changes their theme to "dark" and default persona to "coder", **When** they save preferences, **Then** the `preferences_json` field updates and persists across logins.
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right edge cases.
--->
+---
 
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+### User Story 3 - Avatar Selection & Display in UI (Priority: P3)
+As a user chatting with agent personas, I want my avatar visible next to my chat messages and in the sidebar navigation header.
 
-## Requirements *(mandatory)*
+* **Why this priority:** Visual polish and clear distinction between user and agent messages.
+* **Independent Test:** Set an avatar image URL or pick an avatar preset, then observe it rendered next to user chat bubbles.
+* **Acceptance Scenarios:**
+  1. **Given** a user sets an avatar URL, **When** they send messages in Chat, **Then** the user message avatar reflects their chosen image.
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right functional requirements.
--->
+---
 
-### Functional Requirements
-
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
-
-*Example of marking unclear requirements:*
-
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
-
-### Key Entities *(include if feature involves data)*
-
-- **[Entity 1]**: [What it represents, key attributes without implementation]
-- **[Entity 2]**: [What it represents, relationships to other entities]
-
-## Success Criteria *(mandatory)*
-
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
--->
-
-### Measurable Outcomes
-
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
-
-## Assumptions
-
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right assumptions based on reasonable defaults
-  chosen when the feature description did not specify certain details.
--->
-
-- [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
-- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
-- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+## 3. Assumptions & Scope Boundaries
+- **Authentication Dependency:** Reuses the existing JWT authentication flow in `backend/app/auth.py`.
+- **Database Support:** Works on both SQLite (`~/.openzess/chat_history.db`) and PostgreSQL via SQLAlchemy.
+- **Backward Compatibility:** Existing users without profile records will default gracefully (display name defaults to username).
