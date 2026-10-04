@@ -363,9 +363,9 @@ export default function Skills() {
 
                           {/* Skill Name & Keyword */}
                           <div className="mb-2">
-                            <h3 className="font-bold text-base text-[#3A3838] dark:text-[#E2DAD2] group-hover:text-brand transition-colors line-clamp-1">
+                            <h2 className="font-bold text-base text-[#3A3838] dark:text-[#E2DAD2] group-hover:text-brand transition-colors line-clamp-1">
                               {skill.name}
-                            </h3>
+                            </h2>
                             <div className="text-xs font-mono font-bold text-brand mt-0.5">
                               @{skill.keyword}
                             </div>
@@ -433,7 +433,7 @@ export default function Skills() {
                             <Bot size={20} />
                          </div>
                          <div>
-                            <h3 className="font-semibold text-[#3A3838] dark:text-[#E2DAD2]">{skill.name}</h3>
+                             <h2 className="font-semibold text-[#3A3838] dark:text-[#E2DAD2]">{skill.name}</h2>
                             <div className="text-xs font-mono font-bold text-brand mt-0.5">@{skill.key}</div>
                          </div>
                      </div>
