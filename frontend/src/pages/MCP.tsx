@@ -93,7 +93,11 @@ export default function MCP() {
            server_id: serverData.id,
            name: serverData.name,
            command: serverData.command,
-           args: serverData.args
+           args: serverData.args,
+           transport: serverData.transport || 'stdio',
+           url: serverData.url || '',
+           env: serverData.env,
+           headers: serverData.headers
         });
         await fetchServers();
      } catch (e) {
@@ -123,6 +127,13 @@ export default function MCP() {
            icon: '⚙️',
            command: ss.command,
            args: ss.args,
+           // Carry the full saved config so a manual off→on toggle doesn't
+           // clobber remote/env-auth servers back to stdio (the
+           // "works until restart/toggle" bug).
+           transport: ss.transport,
+           url: ss.url,
+           env: ss.env,
+           headers: ss.headers,
            isCustom: true
         });
      }

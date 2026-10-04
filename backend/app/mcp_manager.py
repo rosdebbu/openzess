@@ -32,6 +32,9 @@ class MCPManager:
             raise e
 
     async def _amake_connection(self, server_id: str, command: str, args: list, transport: str = "stdio", url: str = "", headers: dict = None):
+        # Normalize transport aliases ("streamable_http"/"streamable-http"/"SSE" etc.)
+        # so UI values can't silently fall into the stdio branch.
+        transport = (transport or "stdio").strip().lower().replace("_", "").replace("-", "")
         if server_id in self.servers:
             await self._adisconnect(server_id)
             

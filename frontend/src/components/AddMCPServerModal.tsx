@@ -3,10 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Server, Terminal } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
 
+export interface AddMCPServerPayload {
+  id: string;
+  name: string;
+  command: string;
+  args: string[];
+  transport: string;
+  url: string;
+  env?: Record<string, string>;
+  headers?: Record<string, string>;
+}
+
 interface AddMCPServerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (serverData: { id: string; name: string; command: string; args: string[] }) => Promise<void>;
+  onAdd: (serverData: AddMCPServerPayload) => Promise<void>;
 }
 
 export default function AddMCPServerModal({ isOpen, onClose, onAdd }: AddMCPServerModalProps) {
@@ -14,12 +25,35 @@ export default function AddMCPServerModal({ isOpen, onClose, onAdd }: AddMCPServ
   const [name, setName] = useState('');
   const [command, setCommand] = useState('npx');
   const [argsStr, setArgsStr] = useState('-y @modelcontextprotocol/server-postgres postgresql://localhost/mydb');
+  const [transport, setTransport] = useState('stdio');
+  const [url, setUrl] = useState('');
+  const [envStr, setEnvStr] = useState('');
+  const [headersStr, setHeadersStr] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // "KEY=value" per line → object (env); "Key: value" per line → object (headers)
+  const parseKeyValue = (str: string, sep: string): Record<string, string> | undefined => {
+    const out: Record<string, string> = {};
+    str.split('\n').forEach(line => {
+      const t = line.trim();
+      if (!t) return;
+      const idx = t.indexOf(sep);
+      if (idx <= 0) return;
+      const k = t.slice(0, idx).trim();
+      const v = t.slice(idx + sep.length).trim();
+      if (k) out[k] = v;
+    });
+    return Object.keys(out).length ? out : undefined;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !command) {
-      showToast('Name and Command are required', 'error');
+    if (!name || (transport === 'stdio' && !command)) {
+      showToast(transport === 'stdio' ? 'Name and Command are required' : 'Name is required', 'error');
+      return;
+    }
+    if (transport !== 'stdio' && !url) {
+      showToast('Server URL is required for remote transports', 'error');
       return;
     }
     
@@ -33,8 +67,12 @@ export default function AddMCPServerModal({ isOpen, onClose, onAdd }: AddMCPServ
       await onAdd({
         id,
         name,
-        command,
-        args: cleanArgs
+        command: transport === 'stdio' ? command : '',
+        args: cleanArgs,
+        transport,
+        url: transport === 'stdio' ? '' : url,
+        env: parseKeyValue(envStr, '='),
+        headers: parseKeyValue(headersStr, ':')
       });
       
       showToast(`${name} server configuration added successfully!`, 'success');
@@ -43,6 +81,10 @@ export default function AddMCPServerModal({ isOpen, onClose, onAdd }: AddMCPServ
       setName('');
       setCommand('npx');
       setArgsStr('');
+      setTransport('stdio');
+      setUrl('');
+      setEnvStr('');
+      setHeadersStr('');
     } catch (error) {
       showToast('Failed to add custom server', 'error');
     } finally {
@@ -92,6 +134,20 @@ export default function AddMCPServerModal({ isOpen, onClose, onAdd }: AddMCPServ
               </div>
 
               <div>
+                <label className="block text-sm font-medium mb-1.5 text-[#3A3838] dark:text-[#E2DAD2]">Transport</label>
+                <select
+                  value={transport}
+                  onChange={e => setTransport(e.target.value)}
+                  className="w-full bg-[#EDE8E2] dark:bg-surface border border-[#E2DAD2] dark:border-border rounded-xl p-3 focus:outline-none focus:border-brand transition-colors"
+                >
+                  <option value="stdio">stdio — local process (npx, python, docker)</option>
+                  <option value="sse">SSE — remote server endpoint</option>
+                  <option value="streamable_http">Streamable HTTP — remote server endpoint</option>
+                </select>
+              </div>
+
+              {transport === 'stdio' && (
+              <div>
                 <label className="block text-sm font-medium mb-1.5 text-[#3A3838] dark:text-[#E2DAD2]">Command</label>
                 <input
                   type="text"
@@ -101,7 +157,9 @@ export default function AddMCPServerModal({ isOpen, onClose, onAdd }: AddMCPServ
                   className="w-full bg-[#EDE8E2] dark:bg-surface border border-[#E2DAD2] dark:border-border rounded-xl p-3 focus:outline-none focus:border-brand transition-colors"
                 />
               </div>
+              )}
 
+              {transport === 'stdio' && (
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-[#3A3838] dark:text-[#E2DAD2]">Arguments (Space separated)</label>
                 <div className="relative">
@@ -115,6 +173,44 @@ export default function AddMCPServerModal({ isOpen, onClose, onAdd }: AddMCPServ
                   />
                 </div>
               </div>
+              )}
+
+              {transport !== 'stdio' && (
+              <div>
+                <label className="block text-sm font-medium mb-1.5 text-[#3A3838] dark:text-[#E2DAD2]">Server URL</label>
+                <input
+                  type="text"
+                  placeholder="https://example.com/mcp"
+                  value={url}
+                  onChange={e => setUrl(e.target.value)}
+                  className="w-full bg-[#EDE8E2] dark:bg-surface border border-[#E2DAD2] dark:border-border rounded-xl p-3 focus:outline-none focus:border-brand transition-colors font-mono text-sm"
+                />
+              </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium mb-1.5 text-[#3A3838] dark:text-[#E2DAD2]">Env Variables (optional — KEY=value per line)</label>
+                <textarea
+                  placeholder={'API_KEY=xyz123\nDEBUG=1'}
+                  value={envStr}
+                  onChange={e => setEnvStr(e.target.value)}
+                  rows={2}
+                  className="w-full bg-[#EDE8E2] dark:bg-surface border border-[#E2DAD2] dark:border-border rounded-xl p-3 focus:outline-none focus:border-brand transition-colors font-mono text-sm resize-none"
+                />
+              </div>
+
+              {transport !== 'stdio' && (
+              <div>
+                <label className="block text-sm font-medium mb-1.5 text-[#3A3838] dark:text-[#E2DAD2]">HTTP Headers (optional — Key: value per line)</label>
+                <textarea
+                  placeholder={'Authorization: Bearer xyz123\nX-Api-Key: abc'}
+                  value={headersStr}
+                  onChange={e => setHeadersStr(e.target.value)}
+                  rows={2}
+                  className="w-full bg-[#EDE8E2] dark:bg-surface border border-[#E2DAD2] dark:border-border rounded-xl p-3 focus:outline-none focus:border-brand transition-colors font-mono text-sm resize-none"
+                />
+              </div>
+              )}
 
               <div className="mt-4 flex gap-3">
                 <button
