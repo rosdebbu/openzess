@@ -1,12 +1,20 @@
 import { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, MessageCircle, Search, Zap, Monitor, Key, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { HelpCircle, ChevronDown, ChevronUp, MessageCircle, Search, Zap, Monitor, Key, Settings, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+interface FAQLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
 
 interface FAQ {
   q: string;
   a: string;
   icon: any;
   category: string;
+  links?: FAQLink[];
 }
 
 const faqs: FAQ[] = [
@@ -14,13 +22,20 @@ const faqs: FAQ[] = [
     q: "How do I configure the API Keys for swarm?",
     a: "Go to the Global Settings panel (gear icon / open settings) and supply your desired provider keys. They are saved securely in your browser's local storage and synced with the Python backend during generation. You can switch between providers (Gemini, OpenAI, Anthropic, Groq, etc.) at any time from the Welcome screen.",
     icon: Key,
-    category: "Configuration"
+    category: "Configuration",
+    links: [
+      { label: "Configuration guide", href: "https://openzess-docs.vercel.app/guide/configuration", external: true },
+      { label: "Open the workspace", href: "/" }
+    ]
   },
   {
     q: "Is the Windows native environment supported?",
     a: "OpenZess is heavily optimized for WSL (Windows Subsystem for Linux), particularly the matrix-desktop module which relies on X-server logic to virtualize screens. Run the start_wsl.sh script to boot correctly! While the frontend runs natively on Windows, all backend agent operations require the Linux sandbox for full functionality.",
     icon: Monitor,
-    category: "Platform"
+    category: "Platform",
+    links: [
+      { label: "Getting started guide", href: "https://openzess-docs.vercel.app/guide/getting-started", external: true }
+    ]
   },
   {
     q: "Why is my Matrix Viewer completely blank?",
@@ -32,19 +47,31 @@ const faqs: FAQ[] = [
     q: "How do I add custom MCP servers?",
     a: "Navigate to the MCP Grid page and click 'Add Protocol'. You can specify the server command, arguments, and environment variables. Custom servers are saved persistently and will auto-reconnect on restart. You can also install pre-built plugins from the Infinite Ecosystem marketplace.",
     icon: Zap,
-    category: "Integrations"
+    category: "Integrations",
+    links: [
+      { label: "MCP plugin system guide", href: "https://openzess-docs.vercel.app/features/mcp-plugins", external: true },
+      { label: "Open the MCP Grid", href: "/mcp" }
+    ]
   },
   {
     q: "How do custom Skills / Personas work?",
     a: "Skills are hot-swappable agent configurations that change the AI's behavior, system prompt, and tool access. Default personas like @coder, @researcher, and @writer come built-in. You can create custom personas from the Skills page with specific tool authorizations and system instructions. Switch between them by typing @keyword in the chat.",
     icon: Settings,
-    category: "Features"
+    category: "Features",
+    links: [
+      { label: "Open the Skills Hub", href: "/skills" },
+      { label: "Tavern & personas guide", href: "https://openzess-docs.vercel.app/features/tavern", external: true }
+    ]
   },
   {
     q: "Where is my conversation history stored?",
     a: "All conversations are persisted in a PostgreSQL database (Neon cloud or local). You can browse, resume, and delete past sessions from the 'Past Chats' page. The agent's long-term semantic memory is stored separately in ChromaDB and can be managed from the Memory Vault page.",
     icon: MessageCircle,
-    category: "Data"
+    category: "Data",
+    links: [
+      { label: "Memory Vault guide", href: "https://openzess-docs.vercel.app/features/memory-vault", external: true },
+      { label: "Open past sessions", href: "/sessions" }
+    ]
   }
 ];
 
@@ -160,6 +187,31 @@ export default function FAQ() {
                           <div className="px-5 pb-5 pl-[4.5rem]">
                             <div className="bg-[#EDE8E2] dark:bg-white/5 rounded-xl p-5 border border-[#E2DAD2] dark:border-[#3A3838]/60">
                               <p className="text-[#3A3838]/80 dark:text-[#E2DAD2]/80 text-sm leading-relaxed">{faq.a}</p>
+                              {faq.links && faq.links.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                  {faq.links.map(link => (
+                                    link.external ? (
+                                      <a
+                                        key={link.href}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand bg-brand/10 border border-brand/20 px-3 py-1.5 rounded-lg hover:bg-brand/20 transition-colors"
+                                      >
+                                        <ExternalLink size={12} /> {link.label}
+                                      </a>
+                                    ) : (
+                                      <Link
+                                        key={link.href}
+                                        to={link.href}
+                                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand bg-brand/10 border border-brand/20 px-3 py-1.5 rounded-lg hover:bg-brand/20 transition-colors"
+                                      >
+                                        {link.label}
+                                      </Link>
+                                    )
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </motion.div>
