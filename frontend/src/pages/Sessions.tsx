@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { History, Search, ArrowRight, MessageSquare, Clock, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useDebounce } from '../hooks/useDebounce';
 
 interface Session {
   id: string;
@@ -12,6 +13,8 @@ interface Session {
 
 export default function Sessions() {
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 250);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -52,6 +55,12 @@ export default function Sessions() {
     return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const filteredSessions = useMemo(() => {
+    if (!debouncedSearch.trim()) return sessions;
+    const q = debouncedSearch.toLowerCase();
+    return sessions.filter(s => (s.title || '').toLowerCase().includes(q));
+  }, [sessions, debouncedSearch]);
+
   return (
     <div className="flex-1 flex flex-col h-full bg-transparent p-10 overflow-hidden">
       <div className="max-w-6xl w-full mx-auto flex flex-col h-full">
@@ -67,6 +76,8 @@ export default function Sessions() {
              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B8AFA8] dark:text-[#B8AFA8]" />
              <input 
                type="text" 
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
                placeholder="Search sessions..." 
                className="bg-white dark:bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838] text-[#3A3838] dark:text-[#E2DAD2] pl-11 pr-4 py-2.5 rounded-xl w-64 focus:outline-none focus:border-brand/40 shadow-sm dark:shadow-none transition-colors text-sm font-medium"
              />
@@ -75,18 +86,38 @@ export default function Sessions() {
 
         <div className="flex-1 overflow-y-auto pb-10 custom-scrollbar pr-4">
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="w-8 h-8 rounded-full border-t-2 border-brand animate-spin"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-pulse">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div
+                  key={n}
+                  className="bg-white/60 dark:bg-[#1E1C1C]/50 border border-[#E2DAD2] dark:border-[#3A3838] rounded-2xl p-6 flex flex-col justify-between h-[150px] space-y-4"
+                >
+                  <div className="space-y-2">
+                    <div className="h-4 w-4/5 bg-[#B8AFA8]/30 dark:bg-[#3A3838] rounded" />
+                    <div className="h-3 w-1/2 bg-[#B8AFA8]/20 dark:bg-[#3A3838]/60 rounded" />
+                  </div>
+                  <div className="pt-4 border-t border-[#E2DAD2] dark:border-[#3A3838]/50 flex justify-between items-center">
+                    <div className="h-3 w-24 bg-[#B8AFA8]/20 dark:bg-[#3A3838] rounded" />
+                    <div className="h-3 w-16 bg-[#A89080]/30 dark:bg-[#A89080]/40 rounded" />
+                  </div>
+                </div>
+              ))}
             </div>
-          ) : sessions.length === 0 ? (
+          ) : filteredSessions.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-20 bg-white dark:bg-[#1E1C1C]/40 rounded-3xl border border-[#E2DAD2] dark:border-[#3A3838]/60 border-dashed mt-10 shadow-sm dark:shadow-none transition-colors">
               <MessageSquare size={48} className="text-[#B8AFA8] dark:text-[#3A3838]/80 mb-4" />
-              <h2 className="text-xl font-medium text-[#3A3838] dark:text-[#E2DAD2]/80 mb-2">No past chats found</h2>
-              <p className="text-[#B8AFA8] text-center max-w-md">Once you start chatting with openzess, your history will be saved here so you can pick up precisely where you left off.</p>
+              <h2 className="text-xl font-medium text-[#3A3838] dark:text-[#E2DAD2]/80 mb-2">
+                {debouncedSearch ? "No matching sessions found" : "No past chats found"}
+              </h2>
+              <p className="text-[#B8AFA8] text-center max-w-md">
+                {debouncedSearch 
+                  ? "Try searching with different keywords." 
+                  : "Once you start chatting with openzess, your history will be saved here so you can pick up precisely where you left off."}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {sessions.map((session, i) => (
+              {filteredSessions.map((session, i) => (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
