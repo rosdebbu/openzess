@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Request, WebSocket
 from fastapi.responses import StreamingResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 import json
 from typing import Optional, List, Dict, Any
@@ -101,6 +102,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Enable automatic Gzip payload compression for responses >= 1KB
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # ── Optional API authentication ──────────────────────────────────
 # Set OPENZESS_AUTH_TOKEN to require a bearer token on every /api request.
@@ -531,9 +535,9 @@ async def chat_approve(request: ApprovalRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/sessions")
-def list_sessions():
+def list_sessions(limit: int = 50, offset: int = 0):
     try:
-        return {"sessions": database.get_all_sessions()}
+        return {"sessions": database.get_all_sessions(limit=limit, offset=offset)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -545,11 +549,10 @@ def get_activity():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/sessions/{session_id}/messages")
-def get_messages(session_id: str):
+def get_messages(session_id: str, limit: int = 50, before_id: Optional[int] = None):
     try:
-        messages = database.get_session_messages(session_id)
-        # Presentation speed optimization implies we can also limit frontend load to 40
-        return {"messages": messages[-40:]}
+        messages = database.get_session_messages(session_id, limit=limit, before_id=before_id)
+        return {"messages": messages}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
