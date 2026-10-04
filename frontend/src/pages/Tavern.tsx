@@ -174,7 +174,7 @@ export default function Tavern() {
                   <Ghost size={20} />
                 </div>
                 <div>
-                   <h2 className="text-xl font-bold text-[#3A3838] dark:text-[#E2DAD2]">Tavern Shelf</h2>
+                   <h1 className="text-xl font-bold text-[#3A3838] dark:text-[#E2DAD2]">Tavern Shelf</h1>
                    <p className="text-xs text-[#B8AFA8]">Your loaded Personas</p>
                 </div>
              </div>
@@ -205,12 +205,12 @@ export default function Tavern() {
                    >
                       <div className="flex items-center gap-3 relative">
                          {p.avatar_base64 ? (
-                            <img src={p.avatar_base64} alt={p.name} className="w-12 h-12 rounded-xl object-cover bg-[#EDE8E2]" />
+                            <img src={p.avatar_base64} alt={p.name} width={48} height={48} loading="lazy" decoding="async" className="w-12 h-12 rounded-xl object-cover bg-[#EDE8E2]" />
                          ) : (
                             <div className="w-12 h-12 rounded-xl bg-[#EDE8E2] dark:bg-[#2A2828] flex items-center justify-center text-[#B8AFA8]"><Bot size={20}/></div>
                          )}
                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-sm text-[#3A3838] dark:text-[#E2DAD2] truncate">{p.name}</h3>
+                            <h2 className="font-bold text-sm text-[#3A3838] dark:text-[#E2DAD2] truncate">{p.name}</h2>
                             <p className="text-[10px] text-[#B8AFA8] truncate mt-0.5">{p.description}</p>
                          </div>
                          <button 
@@ -298,7 +298,7 @@ export default function Tavern() {
                                      {isUser ? (
                                         <div className="w-10 h-10 rounded-xl bg-[#2A2828] text-[#B8AFA8]/60 flex items-center justify-center text-sm font-bold shadow-sm shadow-black/20">U</div>
                                      ) : pData?.avatar_base64 ? (
-                                        <img src={pData.avatar_base64} alt={agentName} className="w-10 h-10 rounded-xl object-cover shadow-sm bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838]" />
+                                        <img src={pData.avatar_base64} alt={agentName} width={40} height={40} loading="lazy" decoding="async" className="w-10 h-10 rounded-xl object-cover shadow-sm bg-[#1E1C1C] border border-[#E2DAD2] dark:border-[#3A3838]" />
                                      ) : (
                                         <div className="w-10 h-10 rounded-xl bg-brand/20 border border-brand/30 text-brand flex items-center justify-center font-bold text-sm shadow-sm">{agentName.charAt(0)}</div>
                                      )}
