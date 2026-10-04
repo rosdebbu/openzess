@@ -199,7 +199,7 @@ export default function Channels() {
           <div className="w-12 h-12 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-4 shadow-sm">
             <Radio size={24} />
           </div>
-          <h2 className="text-xl font-semibold mb-1 text-[#3A3838] dark:text-[#E2DAD2]">Channels</h2>
+          <h1 className="text-xl font-semibold mb-1 text-[#3A3838] dark:text-[#E2DAD2]">Channels</h1>
           <p className="text-xs text-[#B8AFA8] dark:text-[#B8AFA8]">High-Velocity Logs</p>
         </div>
         
@@ -227,12 +227,12 @@ export default function Channels() {
             {currentChannel && <currentChannel.icon size={20} />}
           </div>
           <div>
-            <h3 className="font-semibold text-[#3A3838] dark:text-[#E2DAD2] flex items-center gap-2">
+            <h2 className="font-semibold text-[#3A3838] dark:text-[#E2DAD2] flex items-center gap-2">
               #{currentChannel?.name}
               {activeChannel !== 'telegram' && activeChannel !== 'discord' && <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2">Pretext V-Sync</span>}
               {activeChannel === 'telegram' && isTelegramRunning && <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2 shadow-sm animate-pulse">Online</span>}
               {activeChannel === 'discord' && isDiscordRunning && <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ml-2 shadow-sm animate-pulse">Online</span>}
-            </h3>
+            </h2>
             <p className="text-xs text-[#B8AFA8] dark:text-[#B8AFA8]">{currentChannel?.desc}</p>
           </div>
         </div>
