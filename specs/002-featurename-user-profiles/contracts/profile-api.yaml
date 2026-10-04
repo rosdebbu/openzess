@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: Openzess User Profile API
+  version: 1.0.0
+paths:
+  /api/auth/profile:
+    get:
+      summary: Get current authenticated user profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update user profile and workspace preferences
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Updated user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ProfileUpdate:
+      type: object
+      properties:
+        display_name:
+          type: string
+        avatar_url:
+          type: string
+        bio:
+          type: string
+        preferences:
+          type: object
+    ProfileResponse:
+      type: object
+      required:
+        - id
+        - email
+        - username
+        - display_name
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        display_name:
+          type: string
+        avatar_url:
+          type: string
+        bio:
+          type: string
+        preferences:
+          type: object
+        is_admin:
+          type: boolean
+        created_at:
+          type: string
