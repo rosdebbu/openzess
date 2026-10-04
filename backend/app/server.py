@@ -235,6 +235,28 @@ def api_me(credentials: HTTPAuthorizationCredentials = Security(_bearer)):
     user = get_current_user(credentials)
     return {"user": {"id": user.id, "email": user.email, "username": user.username, "is_admin": bool(user.is_admin)}}
 
+class ProfileUpdateRequest(BaseModel):
+    display_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    bio: Optional[str] = None
+    preferences: Optional[Dict[str, Any]] = None
+
+@app.get("/api/auth/profile")
+def api_get_profile(credentials: HTTPAuthorizationCredentials = Security(_bearer)):
+    user = get_current_user(credentials)
+    return {"profile": auth_module.get_user_profile(user.id)}
+
+@app.put("/api/auth/profile")
+def api_update_profile(req: ProfileUpdateRequest, credentials: HTTPAuthorizationCredentials = Security(_bearer)):
+    user = get_current_user(credentials)
+    return {"profile": auth_module.update_user_profile(
+        user_id=user.id,
+        display_name=req.display_name,
+        avatar_url=req.avatar_url,
+        bio=req.bio,
+        preferences=req.preferences,
+    )}
+
 @app.get("/api/auth/admin/ping")
 def api_admin_ping(admin_user: User = Security(get_current_admin)):
     return {"status": "ok", "admin": admin_user.username}
