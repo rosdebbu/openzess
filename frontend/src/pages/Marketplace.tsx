@@ -161,7 +161,7 @@ export default function Marketplace() {
                       
                       <div className="p-6 flex-1 flex flex-col">
                          <div className="mb-4">
-                            <h3 className="text-lg font-bold text-[#3A3838] dark:text-[#E2DAD2] mb-1">{plugin.name}</h3>
+                            <h2 className="text-lg font-bold text-[#3A3838] dark:text-[#E2DAD2] mb-1">{plugin.name}</h2>
                             <p className="text-xs font-semibold text-[#B8AFA8] uppercase tracking-wider">{plugin.developer}</p>
                          </div>
                          <p className="text-sm text-[#3A3838]/80 dark:text-[#B8AFA8] leading-relaxed mb-6 flex-1">
@@ -211,7 +211,7 @@ export default function Marketplace() {
                 <div className="w-16 h-16 bg-white dark:bg-[#1E1C1C] rounded-full shadow-lg shadow-brand/20 flex items-center justify-center text-brand mb-4">
                    <Box size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-[#3A3838] dark:text-[#E2DAD2] mb-2">Build Custom Plugin</h3>
+                <h2 className="text-xl font-bold text-[#3A3838] dark:text-[#E2DAD2] mb-2">Build Custom Plugin</h2>
                 <p className="text-sm text-[#B8AFA8] max-w-sm mb-6">
                    Are you a developer? Drop any valid Python script into the <code className="bg-white dark:bg-[#1E1C1C] px-1.5 py-0.5 rounded text-brand">backend/plugins/</code> directory and it will hot-load into Openzess instantly.
                 </p>
