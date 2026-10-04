@@ -110,7 +110,7 @@ export default function CronJobs() {
                 <div className="w-12 h-12 bg-gradient-to-br from-brand to-brand-hover text-white rounded-2xl flex items-center justify-center shadow-lg shadow-brand/20">
                   <Zap size={24} />
                 </div>
-                <h2 className="text-3xl font-semibold text-[#3A3838] dark:text-[#E2DAD2]">Omnipotent Task Center</h2>
+                <h1 className="text-3xl font-semibold text-[#3A3838] dark:text-[#E2DAD2]">Omnipotent Task Center</h1>
              </div>
              <p className="text-[#B8AFA8] dark:text-[#B8AFA8] max-w-2xl leading-relaxed">Give AI true agency. Agents can execute advanced tasks in the background, automatically controlling your PC to handle tedious work, from file organization to complex workflow automation.</p>
              <div className="flex gap-3 mt-4">
@@ -134,7 +134,7 @@ export default function CronJobs() {
         ) : (
             <>
                <div className="mb-10">
-                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-[#E2DAD2] dark:border-border pb-2"><CalendarClock size={20} className="text-brand"/> Autonomous Schedules (Cron)</h3>
+                    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-[#E2DAD2] dark:border-border pb-2"><CalendarClock size={20} className="text-brand"/> Autonomous Schedules (Cron)</h2>
                    {jobs.length === 0 ? (
                        <div className="p-8 text-center text-[#B8AFA8] border border-dashed border-[#E2DAD2] dark:border-border rounded-2xl">No background crons active. Spawn a new loop to fully automate your OS.</div>
                    ) : (
@@ -181,7 +181,7 @@ export default function CronJobs() {
                </div>
 
                <div>
-                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-[#E2DAD2] dark:border-border pb-2"><Eye size={20} className="text-brand"/> System Watchdogs</h3>
+                    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-[#E2DAD2] dark:border-border pb-2"><Eye size={20} className="text-brand"/> System Watchdogs</h2>
                    {watchdogs.length === 0 ? (
                        <div className="p-8 text-center text-[#B8AFA8] border border-dashed border-[#E2DAD2] dark:border-border rounded-2xl">No Watchdogs active. Assign the agent to persistently monitor a local directory.</div>
                    ) : (
