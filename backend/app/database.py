@@ -208,12 +208,12 @@ def add_message(session_id: str, role: str, content: str, user_id: Optional[str]
         new_msg = Message(session_id=session_id, role=role, content=content, user_id=user_id)
         db.add(new_msg)
 
-def get_all_sessions(user_id: Optional[str] = None):
+def get_all_sessions(user_id: Optional[str] = None, limit: int = 50, offset: int = 0):
     with _session() as db:
         q = db.query(Session)
         if user_id is not None:
             q = q.filter(Session.user_id == user_id)
-        results = q.order_by(Session.created_at.desc()).limit(50).all()
+        results = q.order_by(Session.created_at.desc()).offset(offset).limit(limit).all()
         return [{"id": s.id, "title": s.title, "user_id": getattr(s, "user_id", None), "created_at": s.created_at.isoformat()} for s in results]
 
 def update_session_title(session_id: str, title: str) -> bool:
@@ -233,15 +233,17 @@ def delete_session(session_id: str):
             return True
         return False
 
-def get_session_messages(session_id: str):
+def get_session_messages(session_id: str, limit: int = 100, before_id: Optional[int] = None):
     with _session() as db:
         # Check if session exists
         session = db.query(Session).filter(Session.id == session_id).first()
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
             
-        # Cap history load: fetch only the most recent 100 messages (reversed to chronological order)
-        recent = db.query(Message).filter(Message.session_id == session_id).order_by(Message.created_at.desc()).limit(100).all()
+        q = db.query(Message).filter(Message.session_id == session_id)
+        if before_id is not None:
+            q = q.filter(Message.id < before_id)
+        recent = q.order_by(Message.created_at.desc(), Message.id.desc()).limit(limit).all()
         results = list(reversed(recent))
         return [{"id": m.id, "role": m.role, "content": m.content, "created_at": m.created_at.isoformat()} for m in results]
 
