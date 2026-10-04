@@ -274,7 +274,7 @@ export default function MatrixViewer() {
                   <div className="w-16 h-16 rounded-full border border-brand/30 border-dashed animate-[spin_10s_linear_infinite] flex items-center justify-center mb-4">
                     <Monitor className="text-brand" size={24} />
                   </div>
-                  <h3 className="text-base font-bold text-white mb-2">Matrix Stream Standby</h3>
+                  <h2 className="text-base font-bold text-white mb-2">Matrix Stream Standby</h2>
                   <p className="text-neutral-400 text-xs max-w-sm mb-4 leading-relaxed font-mono">
                     Toggle the Stream switch in the top right to start the high-speed 60FPS video bridge.
                   </p>
