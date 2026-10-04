@@ -139,7 +139,7 @@ export default function MCP() {
                 <div className="w-12 h-12 bg-brand/10 text-brand rounded-2xl flex items-center justify-center shadow-sm">
                   <Zap size={24} />
                 </div>
-                <h2 className="text-3xl font-semibold text-[#3A3838] dark:text-[#E2DAD2]">MCP Grid</h2>
+                <h1 className="text-3xl font-semibold text-[#3A3838] dark:text-[#E2DAD2]">MCP Grid</h1>
              </div>
              <p className="text-[#B8AFA8] dark:text-[#B8AFA8]">Model Context Protocol integrations. Connect external tools safely.</p>
            </div>
@@ -207,7 +207,7 @@ export default function MCP() {
                    </div>
                 </div>
                 
-                <h3 className="font-semibold text-lg text-[#3A3838] dark:text-[#E2DAD2] mb-2">{server.name}</h3>
+                <h2 className="font-semibold text-lg text-[#3A3838] dark:text-[#E2DAD2] mb-2">{server.name}</h2>
                 <p className="text-sm text-[#B8AFA8] dark:text-[#B8AFA8] flex-1 leading-relaxed mb-4">{server.desc}</p>
                 
                 {/* Specific Tools Loaded via MCP */}
