@@ -168,6 +168,43 @@ class TestAuth:
             os.environ.pop("OPENZESS_ADMIN_PASSWORD", None)
             os.environ.pop("OPENZESS_ADMIN_USERNAME", None)
 
+    def test_profile_requires_token(self, client):
+        r = client.get("/api/auth/profile")
+        assert r.status_code == 401
+
+    def test_get_and_update_profile(self, client, auth_headers):
+        # 1. Fetch initial profile
+        r = client.get("/api/auth/profile", headers=auth_headers)
+        assert r.status_code == 200
+        p = r.json()["profile"]
+        assert "username" in p
+        assert p["display_name"] == p["username"]
+
+        # 2. Update profile
+        update_payload = {
+            "display_name": "Test Engineer",
+            "bio": "Building autonomous AI agents.",
+            "avatar_url": "https://example.com/avatar.png",
+            "preferences": {"theme": "dark", "persona": "coder", "auto_approve": True}
+        }
+        u = client.put("/api/auth/profile", json=update_payload, headers=auth_headers)
+        assert u.status_code == 200
+        up = u.json()["profile"]
+        assert up["display_name"] == "Test Engineer"
+        assert up["bio"] == "Building autonomous AI agents."
+        assert up["avatar_url"] == "https://example.com/avatar.png"
+        assert up["preferences"]["theme"] == "dark"
+        assert up["preferences"]["persona"] == "coder"
+        assert up["preferences"]["auto_approve"] is True
+
+        # 3. Verify changes persist
+        r2 = client.get("/api/auth/profile", headers=auth_headers)
+        assert r2.status_code == 200
+        p2 = r2.json()["profile"]
+        assert p2["display_name"] == "Test Engineer"
+        assert p2["bio"] == "Building autonomous AI agents."
+        assert p2["preferences"]["persona"] == "coder"
+
 
 # ══════════════════════════════════════════════════════════════════
 # RATE LIMITING
