@@ -1,70 +1,73 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Sidebar from './components/Sidebar';
-import Chat from './pages/Chat';
-import Tools from './pages/Tools';
-import Sessions from './pages/Sessions';
-import MemoryVault from './pages/Memory';
-import Skills from './pages/Skills';
-import Channels from './pages/Channels';
-import CronJobs from './pages/CronJobs';
-import MCP from './pages/MCP';
-import Changelog from './pages/Changelog';
-import Companion from './pages/Companion';
-import Tavern from './pages/Tavern';
-import Marketplace from './pages/Marketplace';
-import MatrixViewer from './pages/MatrixViewer';
-import WarRoom from './pages/WarRoom';
-import KnowledgeBase from './pages/KnowledgeBase';
-import DebateArena from './pages/DebateArena';
-import Doc from './pages/Doc';
-import FAQ from './pages/FAQ';
-import Graphify from './pages/Graphify';
-import BrainEvolution from './pages/BrainEvolution';
-import NotFound from './pages/NotFound';
+import PageSkeleton from './components/PageSkeleton';
 import SeoManager from './components/SeoManager';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
-
 import { PERSONAS } from './utils/personas';
-import { useLocation } from 'react-router-dom';
+
+// Lazy-loaded routes for code splitting and instant initial page load
+const Chat = lazy(() => import('./pages/Chat'));
+const Tools = lazy(() => import('./pages/Tools'));
+const Sessions = lazy(() => import('./pages/Sessions'));
+const MemoryVault = lazy(() => import('./pages/Memory'));
+const Skills = lazy(() => import('./pages/Skills'));
+const Channels = lazy(() => import('./pages/Channels'));
+const CronJobs = lazy(() => import('./pages/CronJobs'));
+const MCP = lazy(() => import('./pages/MCP'));
+const Changelog = lazy(() => import('./pages/Changelog'));
+const Companion = lazy(() => import('./pages/Companion'));
+const Tavern = lazy(() => import('./pages/Tavern'));
+const Marketplace = lazy(() => import('./pages/Marketplace'));
+const MatrixViewer = lazy(() => import('./pages/MatrixViewer'));
+const WarRoom = lazy(() => import('./pages/WarRoom'));
+const KnowledgeBase = lazy(() => import('./pages/KnowledgeBase'));
+const DebateArena = lazy(() => import('./pages/DebateArena'));
+const Doc = lazy(() => import('./pages/Doc'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const Graphify = lazy(() => import('./pages/Graphify'));
+const BrainEvolution = lazy(() => import('./pages/BrainEvolution'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function AnimatedRoutes({ persona: _persona }: { persona: string }) {
   const location = useLocation();
   return (
     <div className="flex-1 flex overflow-hidden relative">
       <AnimatePresence initial={false}>
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition><Chat /></PageTransition>} />
-          <Route path="/doc" element={<PageTransition><Doc /></PageTransition>} />
-          <Route path="/docs" element={<Navigate to="/doc" replace />} />
-          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-          <Route path="/sessions" element={<PageTransition><Sessions /></PageTransition>} />
-          <Route path="/tools" element={<PageTransition><Tools /></PageTransition>} />
-          <Route path="/brain" element={<PageTransition><BrainEvolution /></PageTransition>} />
-          <Route path="/evolution" element={<PageTransition><BrainEvolution /></PageTransition>} />
-          
-          <Route path="/channels" element={<PageTransition><Channels /></PageTransition>} />
-          <Route path="/cron-jobs" element={<PageTransition><CronJobs /></PageTransition>} />
-          <Route path="/matrix" element={<PageTransition><MatrixViewer /></PageTransition>} />
-          <Route path="/debate" element={<PageTransition><DebateArena /></PageTransition>} />
-          
-          <Route path="/skills" element={<PageTransition><Skills /></PageTransition>} />
-          <Route path="/mcp" element={<PageTransition><MCP /></PageTransition>} />
-          <Route path="/marketplace" element={<PageTransition><Marketplace /></PageTransition>} />
-          <Route path="/tavern" element={<PageTransition><Tavern /></PageTransition>} />
-          <Route path="/memory" element={<PageTransition><MemoryVault /></PageTransition>} />
-          <Route path="/canvas" element={<PageTransition><KnowledgeBase /></PageTransition>} />
-          <Route path="/companion" element={<PageTransition><Companion /></PageTransition>} />
-          <Route path="/changelog" element={<PageTransition><Changelog /></PageTransition>} />
-          <Route path="/swarm" element={<PageTransition><WarRoom /></PageTransition>} />
-          <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
-          <Route path="/graphify" element={<PageTransition><Graphify /></PageTransition>} />
-        </Routes>
+        <Suspense fallback={<PageSkeleton />}>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageTransition><Chat /></PageTransition>} />
+            <Route path="/doc" element={<PageTransition><Doc /></PageTransition>} />
+            <Route path="/docs" element={<Navigate to="/doc" replace />} />
+            <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+            <Route path="/sessions" element={<PageTransition><Sessions /></PageTransition>} />
+            <Route path="/tools" element={<PageTransition><Tools /></PageTransition>} />
+            <Route path="/brain" element={<PageTransition><BrainEvolution /></PageTransition>} />
+            <Route path="/evolution" element={<PageTransition><BrainEvolution /></PageTransition>} />
+            
+            <Route path="/channels" element={<PageTransition><Channels /></PageTransition>} />
+            <Route path="/cron-jobs" element={<PageTransition><CronJobs /></PageTransition>} />
+            <Route path="/matrix" element={<PageTransition><MatrixViewer /></PageTransition>} />
+            <Route path="/debate" element={<PageTransition><DebateArena /></PageTransition>} />
+            
+            <Route path="/skills" element={<PageTransition><Skills /></PageTransition>} />
+            <Route path="/mcp" element={<PageTransition><MCP /></PageTransition>} />
+            <Route path="/marketplace" element={<PageTransition><Marketplace /></PageTransition>} />
+            <Route path="/tavern" element={<PageTransition><Tavern /></PageTransition>} />
+            <Route path="/memory" element={<PageTransition><MemoryVault /></PageTransition>} />
+            <Route path="/canvas" element={<PageTransition><KnowledgeBase /></PageTransition>} />
+            <Route path="/companion" element={<PageTransition><Companion /></PageTransition>} />
+            <Route path="/changelog" element={<PageTransition><Changelog /></PageTransition>} />
+            <Route path="/swarm" element={<PageTransition><WarRoom /></PageTransition>} />
+            <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
+            <Route path="/graphify" element={<PageTransition><Graphify /></PageTransition>} />
+          </Routes>
+        </Suspense>
       </AnimatePresence>
     </div>
   );
