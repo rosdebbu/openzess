@@ -52,6 +52,10 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     is_admin = Column(Integer, default=0)          # 1 = admin
     is_active = Column(Integer, default=1)         # 1 = active
+    display_name = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)
+    bio = Column(String, nullable=True)
+    preferences_json = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     last_login_at = Column(DateTime, nullable=True)
 
@@ -243,3 +247,53 @@ def ensure_admin_bootstrap() -> None:
         logger.warning("Bootstrap admin skipped: %s", e.detail)
     except Exception as e:
         logger.warning("Bootstrap admin failed: %s", e)
+
+
+def get_user_profile(user_id: str) -> dict:
+    """Fetch user profile details and parsed preferences."""
+    with _session() as db:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        import json
+        prefs = {}
+        if user.preferences_json:
+            try:
+                prefs = json.loads(user.preferences_json)
+            except Exception:
+                prefs = {}
+        return {
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+            "display_name": user.display_name or user.username,
+            "avatar_url": user.avatar_url or "",
+            "bio": user.bio or "",
+            "preferences": prefs,
+            "is_admin": bool(user.is_admin),
+            "created_at": user.created_at.isoformat() if user.created_at else "",
+        }
+
+
+def update_user_profile(
+    user_id: str,
+    display_name: Optional[str] = None,
+    avatar_url: Optional[str] = None,
+    bio: Optional[str] = None,
+    preferences: Optional[dict] = None,
+) -> dict:
+    """Update profile fields and/or preferences for the given user."""
+    with _session() as db:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        if display_name is not None:
+            user.display_name = display_name.strip()
+        if avatar_url is not None:
+            user.avatar_url = avatar_url.strip()
+        if bio is not None:
+            user.bio = bio.strip()
+        if preferences is not None:
+            import json
+            user.preferences_json = json.dumps(preferences)
+    return get_user_profile(user_id)
