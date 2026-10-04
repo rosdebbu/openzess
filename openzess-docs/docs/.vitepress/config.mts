@@ -3,12 +3,21 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "OpenZess",
   description: "The Autonomous, Self-Growing AI Workspace & Cyberpunk Terminal Matrix — Built for Builders.",
+  sitemap: {
+    hostname: 'https://openzess-docs.vercel.app'
+  },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#16a34a' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'OpenZess Documentation — Lizard Matrix Core' }],
     ['meta', { property: 'og:description', content: 'Autonomous AI coding assistant, hybrid Python/Rust engine, self-growing habit learner, and Hermes-grade cyberpunk terminal TUI.' }],
+    ['meta', { property: 'og:image', content: 'https://openzess-docs.vercel.app/og-image.png' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: 'https://openzess-docs.vercel.app/og-image.png' }],
+    ['meta', { name: 'robots', content: 'index, follow' }]
   ],
   themeConfig: {
     logo: '/logo.svg',
