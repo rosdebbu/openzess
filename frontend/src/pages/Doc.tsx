@@ -6,7 +6,7 @@ const docSections = [
     title: "Getting Started",
     description: "Learn how to install, configure, and boot up the system environments correctly via the shell scripts.",
     icon: Rocket,
-    link: "https://openzess-docs.vercel.app/getting-started",
+    link: "https://openzess-docs.vercel.app/guide/getting-started",
     gradient: "from-emerald-500/20 to-cyan-500/20",
     iconColor: "text-emerald-500",
     tags: ["Installation", "Setup", "WSL"]
@@ -15,7 +15,7 @@ const docSections = [
     title: "Matrix Viewer",
     description: "Understand the sandboxed Linux GUI desktop and how the AI autonomously controls the Xvfb virtual display.",
     icon: Monitor,
-    link: "https://openzess-docs.vercel.app/matrix-viewer",
+    link: "https://openzess-docs.vercel.app/features/matrix-viewer",
     gradient: "from-[#A89080]/20 to-violet-500/20",
     iconColor: "text-brand",
     tags: ["Xvfb", "VNC", "Sandbox"]
@@ -33,7 +33,7 @@ const docSections = [
     title: "Agent Architecture",
     description: "Deep dive into the multi-agent swarm architecture, persona system, and tool authorization framework.",
     icon: Sparkles,
-    link: "https://openzess-docs.vercel.app/architecture",
+    link: "https://openzess-docs.vercel.app/guide/architecture",
     gradient: "from-pink-500/20 to-rose-500/20",
     iconColor: "text-pink-500",
     tags: ["Swarm", "Personas", "Tools"]
@@ -42,7 +42,7 @@ const docSections = [
     title: "Channels & Cron",
     description: "Configure Telegram, Discord, and email integrations. Set up autonomous background task scheduling.",
     icon: Zap,
-    link: "https://openzess-docs.vercel.app/features/tools",
+    link: "https://openzess-docs.vercel.app/features/channels",
     gradient: "from-violet-500/20 to-[#3A3838]/20",
     iconColor: "text-violet-500",
     tags: ["Telegram", "Discord", "Scheduler"]
@@ -112,7 +112,7 @@ export default function Doc() {
                       <Icon size={22} />
                     </div>
                     
-                    <h3 className="font-bold text-lg text-[#3A3838] dark:text-[#E2DAD2] mb-2 group-hover:text-brand transition-colors">{doc.title}</h3>
+                    <h2 className="font-bold text-lg text-[#3A3838] dark:text-[#E2DAD2] mb-2 group-hover:text-brand transition-colors">{doc.title}</h2>
                     <p className="text-[#B8AFA8] dark:text-[#B8AFA8] text-sm leading-relaxed flex-1 mb-4">{doc.description}</p>
                     
                     <div className="flex flex-wrap gap-1.5 mb-4">
