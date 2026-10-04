@@ -1,0 +1,33 @@
+# robots.txt for Openzess
+# Production URL: https://openzess.vercel.app
+# NOTE: If the app is hosted under a different domain, update the Sitemap
+# directive below and the SITE_URL constant in frontend/src/seo.ts to match.
+
+User-agent: *
+Disallow: /api/
+Disallow: /admin/
+Disallow: /sessions
+Disallow: /tools
+Disallow: /brain
+Disallow: /evolution
+Disallow: /channels
+Disallow: /cron-jobs
+Disallow: /matrix
+Disallow: /debate
+Disallow: /skills
+Disallow: /mcp
+Disallow: /marketplace
+Disallow: /tavern
+Disallow: /memory
+Disallow: /canvas
+Disallow: /companion
+Disallow: /swarm
+Disallow: /graphify
+Disallow: /desktop-widget
+Allow: /
+
+# AI / LLM crawlers (GEO): explicitly welcomed, same rules apply via User-agent: *
+# GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot, Google-Extended,
+# CCBot, Applebot-Extended and Bytespider all honor the wildcard group above.
+
+Sitemap: https://openzess.vercel.app/sitemap.xml
