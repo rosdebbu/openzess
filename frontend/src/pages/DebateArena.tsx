@@ -272,7 +272,7 @@ export default function DebateArena() {
                     >
                         <div className="p-6 max-w-4xl mx-auto flex gap-8">
                             <div className="flex-1">
-                                <h3 className="text-sm font-bold mb-3 uppercase tracking-wider text-[#A89080]">Participants</h3>
+                                <h2 className="text-sm font-bold mb-3 uppercase tracking-wider text-[#A89080]">Participants</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {agents.map(agent => (
                                         <button 
@@ -299,7 +299,7 @@ export default function DebateArena() {
                                 </div>
                             </div>
                             <div className="w-[250px] shrink-0 border-l border-[#E2DAD2] dark:border-[#3A3838] pl-8">
-                                <h3 className="text-sm font-bold mb-3 uppercase tracking-wider text-[#A89080]">Debate Rules</h3>
+                                <h2 className="text-sm font-bold mb-3 uppercase tracking-wider text-[#A89080]">Debate Rules</h2>
                                 <div className="flex flex-col gap-4">
                                     <div>
                                         <label className="text-xs font-medium text-[#B8AFA8] block mb-1">Max Rounds</label>
