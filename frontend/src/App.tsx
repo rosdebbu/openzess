@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Key, Bot, Settings as SettingsIcon, TerminalSquare, Globe, BookOpen, FilePlus, FileText, FileCode2, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -24,6 +24,8 @@ import Doc from './pages/Doc';
 import FAQ from './pages/FAQ';
 import Graphify from './pages/Graphify';
 import BrainEvolution from './pages/BrainEvolution';
+import NotFound from './pages/NotFound';
+import SeoManager from './components/SeoManager';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import PageTransition from './components/PageTransition';
@@ -38,6 +40,9 @@ function AnimatedRoutes({ persona: _persona }: { persona: string }) {
       <AnimatePresence initial={false}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Chat /></PageTransition>} />
+          <Route path="/doc" element={<PageTransition><Doc /></PageTransition>} />
+          <Route path="/docs" element={<Navigate to="/doc" replace />} />
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
           <Route path="/sessions" element={<PageTransition><Sessions /></PageTransition>} />
           <Route path="/tools" element={<PageTransition><Tools /></PageTransition>} />
           <Route path="/brain" element={<PageTransition><BrainEvolution /></PageTransition>} />
@@ -57,7 +62,6 @@ function AnimatedRoutes({ persona: _persona }: { persona: string }) {
           <Route path="/companion" element={<PageTransition><Companion /></PageTransition>} />
           <Route path="/changelog" element={<PageTransition><Changelog /></PageTransition>} />
           <Route path="/swarm" element={<PageTransition><WarRoom /></PageTransition>} />
-          <Route path="/doc" element={<PageTransition><Doc /></PageTransition>} />
           <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
           <Route path="/graphify" element={<PageTransition><Graphify /></PageTransition>} />
         </Routes>
@@ -187,6 +191,7 @@ function App() {
 
             {/* Main Split */}
             <div className="flex flex-1 overflow-hidden relative text-[#3A3838] dark:text-[#E2DAD2] bg-[#F0EBE5] dark:bg-[#1A1818]">
+              <SeoManager />
               <Sidebar />
               <AnimatedRoutes persona={persona} />
             </div>
