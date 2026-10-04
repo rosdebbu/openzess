@@ -195,12 +195,20 @@ class MCPManager:
         openai_tools = []
         for sid, tools in self.server_tools.items():
             for t in tools:
+                schema = getattr(t, "input_schema", getattr(t, "inputSchema", None))
+                if schema is None and isinstance(t, dict):
+                    schema = t.get("input_schema") or t.get("inputSchema")
+                if not schema:
+                    schema = {"type": "object", "properties": {}}
+                
+                name = getattr(t, "name", None) or (t.get("name") if isinstance(t, dict) else str(t))
+                desc = getattr(t, "description", "") or (t.get("description", "") if isinstance(t, dict) else "")
                 openai_tools.append({
                     "type": "function",
                     "function": {
-                        "name": t.name,
-                        "description": f"[MCP: {sid}] {t.description}",
-                        "parameters": t.inputSchema if t.inputSchema else {"type": "object", "properties": {}}
+                        "name": name,
+                        "description": f"[MCP: {sid}] {desc}",
+                        "parameters": schema
                     }
                 })
         return openai_tools
