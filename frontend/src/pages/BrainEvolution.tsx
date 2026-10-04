@@ -332,10 +332,10 @@ export default function BrainEvolution() {
                     >
                       <div>
                         <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                          <h2 className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
                             <Sparkles size={13} className="text-brand shrink-0" />
                             <span>{m.concept}</span>
-                          </h3>
+                          </h2>
                           <button
                             onClick={() => handleDeleteMemory(m.id)}
                             className="text-neutral-400 hover:text-red-400 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
@@ -373,7 +373,7 @@ export default function BrainEvolution() {
                   <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 font-mono">Core AI Runtime</span>
                   <Activity size={18} className="text-emerald-400 animate-pulse" />
                 </div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">FastAPI + LiteLLM</h3>
+                <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">FastAPI + LiteLLM</h2>
                 <p className="text-xs text-neutral-500 font-mono mb-6">Python 3.12 · Async Event Loop</p>
                 <div className="space-y-3 font-mono text-xs">
                   <div className="flex justify-between text-neutral-600 dark:text-neutral-400 border-b border-white/5 pb-2">
@@ -399,7 +399,7 @@ export default function BrainEvolution() {
                   <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 font-mono">Native Sidecar</span>
                   <Cpu size={18} className="text-brand" />
                 </div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">Rust Axum Engine</h3>
+                <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">Rust Axum Engine</h2>
                 <p className="text-xs text-neutral-500 font-mono mb-6">SIMD Math · 60FPS Video Encoder</p>
                 <div className="space-y-3 font-mono text-xs">
                   <div className="flex justify-between text-neutral-600 dark:text-neutral-400 border-b border-white/5 pb-2">
@@ -425,7 +425,7 @@ export default function BrainEvolution() {
                   <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 font-mono">Vector Storage</span>
                   <Database size={18} className="text-purple-400" />
                 </div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">ChromaDB Vault</h3>
+                <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">ChromaDB Vault</h2>
                 <p className="text-xs text-neutral-500 font-mono mb-6">Persistent Knowledge Embeddings</p>
                 <div className="space-y-3 font-mono text-xs">
                   <div className="flex justify-between text-neutral-600 dark:text-neutral-400 border-b border-white/5 pb-2">
