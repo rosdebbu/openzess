@@ -25,6 +25,32 @@ export default defineConfig({
       'remark-gfm'
     ]
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('three') || id.includes('@react-three') || id.includes('@pixiv/three-vrm')) {
+              return 'vendor-3d-vrm';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-motion';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('react-markdown') || id.includes('remark-gfm')) {
+              return 'vendor-markdown';
+            }
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react-core';
+            }
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  },
   server: {
     port: 5173,
     host: '0.0.0.0'
