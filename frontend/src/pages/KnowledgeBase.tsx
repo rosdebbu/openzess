@@ -150,9 +150,9 @@ export default function KnowledgeBase() {
                 `}
               >
                 <div className="flex justify-between items-start mb-2 relative z-10">
-                  <h3 className={`font-bold transition-colors line-clamp-1 pr-6 ${activeNote?.id === note.id ? 'text-brand' : 'text-[#3A3838] dark:text-[#E2DAD2] group-hover:text-[#3A3838] dark:group-hover:text-white'}`}>
+                  <h2 className={`font-bold transition-colors line-clamp-1 pr-6 ${activeNote?.id === note.id ? 'text-brand' : 'text-[#3A3838] dark:text-[#E2DAD2] group-hover:text-[#3A3838] dark:group-hover:text-white'}`}>
                     {note.title}
-                  </h3>
+                  </h2>
                   <button 
                     onClick={(e) => handleDelete(note.id, e)}
                     className="absolute right-0 top-0 text-[#B8AFA8] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-[#EDE8E2] dark:bg-[#2A2828] p-1.5 rounded-md"
@@ -270,7 +270,7 @@ export default function KnowledgeBase() {
                   </motion.div>
                 ) : (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="prose dark:prose-invert prose-lg max-w-none prose-headings:font-bold prose-a:text-brand prose-pre:bg-[#1E1C1C] prose-pre:border prose-pre:border-[#3A3838] prose-pre:shadow-xl prose-pre:rounded-2xl pb-32">
-                    <h1 style={{ fontFamily: "'Outfit', sans-serif" }} className="text-5xl mb-8 pb-8 border-b border-[#E2DAD2] dark:border-[#3A3838]">{activeNote?.title}</h1>
+                    <h2 style={{ fontFamily: "'Outfit', sans-serif" }} className="text-5xl mb-8 pb-8 border-b border-[#E2DAD2] dark:border-[#3A3838]">{activeNote?.title}</h2>
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {activeNote?.content || '*Empty canvas.*'}
                     </ReactMarkdown>
