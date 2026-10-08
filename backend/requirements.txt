@@ -1,6 +1,6 @@
 # ── Core web framework ──────────────────────────────────────────
 # NOTE: Pinned for reproducible builds/CI. Bump deliberately, run tests after.
-fastapi==0.141.1
+fastapi==0.142.2
 uvicorn[standard]==0.52.3
 pydantic==2.13.4
 
