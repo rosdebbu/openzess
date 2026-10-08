@@ -23,7 +23,7 @@ duckduckgo_search==8.1.1
 mcp==2.1.1
 
 # ── Chat bridges ────────────────────────────────────────────────
-pyTelegramBotAPI==4.36.1  # telegram_worker.py (imports telebot)
+pyTelegramBotAPI==4.37.0  # telegram_worker.py (imports telebot)
 discord.py==2.7.1         # discord_worker.py
 
 # ── Voice / TTS ─────────────────────────────────────────────────
