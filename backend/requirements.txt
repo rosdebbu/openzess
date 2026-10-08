@@ -42,7 +42,7 @@ matplotlib==3.11.1
 seaborn==0.13.2
 
 # ── Environment config ──────────────────────────────────────────
-python-dotenv==1.2.3
+python-dotenv==1.2.4
 
 # ── Server extras ───────────────────────────────────────────────
 python-multipart==0.0.32  # file uploads (FastAPI UploadFile)
