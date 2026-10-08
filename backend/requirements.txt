@@ -9,7 +9,7 @@ litellm==1.98.0
 
 # ── Database ────────────────────────────────────────────────────
 sqlalchemy==2.0.52
-psycopg2-binary==2.9.12   # PostgreSQL (docker-compose.yml)
+psycopg2-binary==2.9.13   # PostgreSQL (docker-compose.yml)
 
 # ── Memory / vector store ───────────────────────────────────────
 chromadb==1.5.9
